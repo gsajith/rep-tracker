@@ -14,9 +14,10 @@ export default function UserBadge() {
         display: 'flex',
         alignItems: 'center',
         gap: 10,
-        background: '#ECEFF388',
+        background: '#ECEFF3aa',
         paddingRight: 24,
         padding: 8,
+        zIndex: 9,
       }}
     >
       {user ? (
