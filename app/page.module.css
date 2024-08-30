@@ -1,3 +1,18 @@
 .main {
-  background: blue;
+}
+
+.startWorkout {
+  background: white;
+  color: #35155D;
+  width: 150px;
+  height: 200px;
+  border-radius: 24px;
+  padding: 16px;
+  font-size: 32px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.startWorkout:hover {
+  color: black;
 }
