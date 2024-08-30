@@ -38,8 +38,8 @@ export default function RootLayout({ children }) {
           </SignedOut>
           <SignedIn>
             <UserButton />
+            {children}
           </SignedIn>
-          {children}
         </body>
       </html>
     </ClerkProvider>

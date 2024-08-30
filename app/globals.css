@@ -1,1 +1,11 @@
 @import 'normalize.css';
+
+html, body {
+  background: #35155D;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
