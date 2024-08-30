@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient } from '@supabase/supabase-js';
 
 export const createClerkSupabaseClient = (session) => {
   return createClient(
@@ -13,18 +13,19 @@ export const createClerkSupabaseClient = (session) => {
             // Pass the name of the JWT template you created in the Clerk Dashboard
             // For this tutorial, you named it 'supabase'
             template: 'supabase',
-          })
+          });
 
           // Insert the Clerk Supabase token into the headers
-          const headers = new Headers(options?.headers)
-          headers.set('Authorization', `Bearer ${clerkToken}`)
+          const headers = new Headers(options?.headers);
+          headers.set('Authorization', `Bearer ${clerkToken}`);
 
           // Call the default fetch
           return fetch(url, {
             ...options,
             headers,
-          })
+          });
         },
-      }
-    });
-}
+      },
+    }
+  );
+};

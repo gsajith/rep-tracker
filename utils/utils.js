@@ -2,11 +2,11 @@ export const calculateWorkoutTimer = (start, end) => {
   let seconds = (end - start) / 1000;
   let minutes = Math.floor(seconds / 60);
   seconds = Math.floor(seconds % 60);
-  return pad(minutes) + ":" + pad(seconds);
-}
+  return pad(minutes) + ':' + pad(seconds);
+};
 
 function pad(n) {
-  return (n < 10) ? ("0" + n) : n;
+  return n < 10 ? '0' + n : n;
 }
 
 export function parseISOString(s) {
@@ -18,7 +18,7 @@ export function readableDate(d) {
   const month = d.toLocaleString('default', { month: 'short' });
   const day = d.toLocaleString('default', { day: 'numeric' });
   const year = d.toLocaleString('default', { year: 'numeric' });
-  return month + " " + day + ", " + year;
+  return month + ' ' + day + ', ' + year;
 }
 
 export function readableTime(d) {

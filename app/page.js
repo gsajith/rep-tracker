@@ -31,11 +31,10 @@ export default function Home() {
         for (let i = 0; i < data.length; i++) {
           if (data[i].exercises) {
             for (let j = 0; j < data[i].exercises.length; j++) {
-              const { data: exercise, error: exerciseError } =
-                await client
-                  .from('exercises')
-                  .select()
-                  .eq('id', data[i].exercises[j]);
+              const { data: exercise, error: exerciseError } = await client
+                .from('exercises')
+                .select()
+                .eq('id', data[i].exercises[j]);
               if (!exerciseError) {
                 data[i].exercises[j] = exercise[0];
               }
@@ -118,9 +117,7 @@ export default function Home() {
         workouts.length > 0 &&
         workouts
           .sort((a, b) => b.end_time.valueOf() - a.end_time.valueOf())
-          .map((workout) => (
-            <LoggedWorkout key={workout.id} data={workout} />
-          ))}
+          .map((workout) => <LoggedWorkout key={workout.id} data={workout} />)}
 
       {!loading && workouts.length === 0 && <p> No workouts found</p>}
     </main>
