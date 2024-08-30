@@ -6,7 +6,7 @@ export default function UserBadge() {
 
   return <div
     style={{
-      position: "absolute",
+      position: "fixed",
       top: 16,
       borderRadius: 12,
       left: 12,
