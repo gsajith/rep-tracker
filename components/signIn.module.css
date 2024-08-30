@@ -1,0 +1,18 @@
+.signIn {
+  border: none;
+  background: #A462D8;
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  padding: 24px;
+  border-radius: 999px;
+}
+
+.signIn:focus {
+  outline: 2px solid black;
+}
+
+.signIn:hover {
+  cursor: pointer;
+  background: #9b63c8;
+}

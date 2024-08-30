@@ -3,6 +3,7 @@ import "./globals.css";
 import { ClerkProvider, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { shadesOfPurple } from "@clerk/themes";
 import UserBadge from "@/components/userBadge";
+import SignIn from "@/components/signIn";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,7 +37,11 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <body className={inter.className}>
           <SignedOut>
-            <SignInButton />
+            <div style={{ fontSize: 24, color: "#747176", maxWidth: 320, textAlign: "center" }}>
+              Welcome to <b>Rep Tracker</b>!
+              <br /><br />Sign in to get started tracking your workouts.<br /><br />
+            </div>
+            <SignIn />
           </SignedOut>
           <SignedIn>
             <UserBadge />
