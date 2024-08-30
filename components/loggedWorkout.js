@@ -37,7 +37,7 @@ export default function LoggedWorkout({ data }) {
             }
 
             return (
-              <div className={styles.exercise}>
+              <div className={styles.exercise} key={exercise.id}>
                 <div className={styles.exerciseName}>{exercise.name}</div>
                 {exercise.notes && exercise.notes.length > 0 && (
                   <div className={styles.commentIcon} title={exercise.notes}>
