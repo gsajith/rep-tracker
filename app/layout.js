@@ -1,11 +1,8 @@
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { shadesOfPurple } from "@clerk/themes";
 import UserBadge from "@/components/userBadge";
 import SignIn from "@/components/signIn";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "RepTracker",
@@ -35,7 +32,7 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider appearance={{ baseTheme: shadesOfPurple }}>
       <html lang="en">
-        <body className={inter.className}>
+        <body>
           <SignedOut>
             <div style={{ fontSize: 24, color: "#747176", maxWidth: 320, textAlign: "center" }}>
               Welcome to <b>Rep Tracker</b>!
