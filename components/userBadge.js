@@ -7,7 +7,7 @@ export default function UserBadge() {
   return <div
     style={{
       position: "fixed",
-      top: 16,
+      top: 8,
       borderRadius: 12,
       left: 12,
       display: "flex",
@@ -15,8 +15,7 @@ export default function UserBadge() {
       gap: 10,
       background: "#ECEFF388",
       paddingRight: 24,
-      paddingLeft: 8,
-      paddingBottom: 8
+      padding: 8
     }}>
     {user ? <UserButton /> : <div style={{ width: 56, height: 56, background: "#ababab", borderRadius: 999 }} />}
     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
