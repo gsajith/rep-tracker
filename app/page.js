@@ -5,12 +5,9 @@ import { createClerkSupabaseClient } from "@/utils/supabase/clerk-client";
 import { useEffect, useState } from "react";
 import { createWorkout } from "@/utils/supabase/database";
 import LoggedWorkout from "@/components/loggedWorkout";
-import { useStickyState } from "@/hooks/useStickyState";
+import Workout from "@/components/workout";
 
 export default function Home() {
-  const [inWorkout, setInWorkout] = useStickyState(false, "inWorkokut");
-  const [workoutStartTime, setWorkoutStartTime] = useStickyState(null, "workoutStartTime");
-
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,6 +39,7 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
+      <Workout />
       <form onSubmit={handleCreateWorkout}>
         <button type="submit">Add</button>
       </form>
