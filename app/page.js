@@ -1,44 +1,55 @@
 "use client";
-import { useStickyState } from "@/hooks/useStickyState";
+import { useSession, useUser } from "@clerk/nextjs";
 import styles from "./page.module.css";
+import { createClerkSupabaseClient } from "@/utils/supabase/clerk-client";
 import { useEffect, useState } from "react";
-import { calculateWorkoutTimer } from "@/utils";
 
 export default function Home() {
-  const [inWorkout, setInWorkout] = useStickyState(false, "inWorkout");
-  const [workoutStartTime, setWorkoutStartTime] = useStickyState(null, "workoutStart");
-  const [workoutTimer, setWorkoutTimer] = useState("");
+  const [workouts, setWorkouts] = useState([])
+  const [loading, setLoading] = useState(true);
+
+  // The `useUser()` hook will be used to ensure that Clerk has loaded data about the logged in user
+  const { user } = useUser()
+  // The `useSession()` hook will be used to get the Clerk `session` object
+  const { session } = useSession()
+
+  const client = createClerkSupabaseClient(session);
 
   useEffect(() => {
-    if (workoutStartTime) {
-      setWorkoutTimer(calculateWorkoutTimer(workoutStartTime, Date.now()))
-      const timerId = setInterval(() => {
-        setWorkoutTimer(calculateWorkoutTimer(workoutStartTime, Date.now()))
-      }, 1000);
+    if (!user) return;
 
-      return () => clearInterval(timerId);
+    async function loadWorkouts() {
+      setLoading(true)
+      const { data, error } = await client.from('workouts').select()
+      if (!error) setWorkouts(data)
+      setLoading(false)
     }
-  }, [workoutStartTime]);
+
+    loadWorkouts()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  async function createWorkout(e) {
+    e.preventDefault()
+    // Insert task into the "tasks" database
+    await client.from('workouts').insert({
+      start_time: new Date().toISOString(),
+      end_time: new Date().toISOString(),
+      notes: "Text noteeee"
+    })
+  }
 
   return (
     <main className={styles.main}>
-      {!inWorkout && (
-        <div className={styles.startWorkout} onClick={() => {
-          setInWorkout(true);
-          setWorkoutStartTime(Date.now());
-        }}>
-          Start a workout
-        </div>
-      )}
-      {inWorkout && (
-        <div>
-          In a workout: {workoutTimer}<br />
-          <button onClick={() => {
-            setInWorkout(false);
-            setWorkoutStartTime(null);
-          }}>end</button>
-        </div>
-      )}
+      {loading && <p>Loading...</p>}
+
+      {!loading && workouts.length > 0 && workouts.map((workout) => <p key={workout.id}>{workout.notes} {workout.id}</p>)}
+
+      {!loading && workouts.length === 0 && <p> No workouts found</p>}
+
+      <form onSubmit={createWorkout}>
+        <button type="submit">Add</button>
+      </form>
     </main>
   );
 }
