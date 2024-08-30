@@ -27,6 +27,8 @@ export default function Workout() {
     setInWorkout(!inWorkout);
     if (!inWorkout) {
       setWorkoutStartTime(Date.now());
+    } else {
+      setWorkoutStartTime(null);
     }
   }}>
     {inWorkout ?

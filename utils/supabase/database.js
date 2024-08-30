@@ -6,3 +6,12 @@ export async function createWorkout(client, startTime, endTime, exercises, notes
     notes: notes
   });
 }
+
+export async function createExercise(client, name, reps, weights, notes) {
+  await client.from("exercises").insert({
+    name: name,
+    reps: reps,
+    weights: weights,
+    notes: notes
+  });
+}
