@@ -1,6 +1,8 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## RepTracker
 
-## Getting Started
+### A light-weight workout tracker app (NextJS PWA).
+
+---
 
 First, run the development server:
 
