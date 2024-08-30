@@ -44,7 +44,7 @@ export default function Home() {
 
       {loading && <p>Loading...</p>}
 
-      {!loading && workouts.length > 0 && workouts.map((workout) => <Workout data={workout} />)}
+      {!loading && workouts.length > 0 && workouts.map((workout) => <Workout key={workout.id} data={workout} />)}
 
       {!loading && workouts.length === 0 && <p> No workouts found</p>}
 
