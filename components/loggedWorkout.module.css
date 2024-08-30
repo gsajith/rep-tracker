@@ -38,7 +38,7 @@
   position: relative;
 }
 
-.exercisesContainer::--webkit-scrollbar {
+.exercisesContainer::state(webkit-scrollbar) {
   display: none; /* Safari and Chrome */
 }
 

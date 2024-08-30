@@ -47,7 +47,7 @@ export default function LoggedWorkout({ data }) {
                 {numSets > 0 && (
                   <div className={styles.setsContainer}>
                     {[...Array(numSets)].map((_e, i) => (
-                      <div className={styles.setContainer}>
+                      <div className={styles.setContainer} key={i}>
                         <span style={{ fontSize: 18 }}>{exercise.reps[i]}</span>
                         <span
                           style={{
