@@ -14,10 +14,10 @@ export default function UserBadge() {
       alignItems: "center",
       gap: 10
     }}>
-    <UserButton />
+    {user ? <UserButton /> : <div style={{ width: 56, height: 56, background: "#ababab", borderRadius: 999 }} />}
     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <span style={{ fontSize: 14, color: "#747176" }}>Welcome 👋</span>
-      <span style={{ fontSize: 20, fontWeight: "bold" }}>{user.fullName}</span>
+      {user && <span style={{ fontSize: 14, color: "#747176" }}>Welcome 👋</span>}
+      <span style={{ fontSize: 20, fontWeight: "bold" }}>{user ? user.fullName : "Logging in..."}</span>
     </div>
   </div>
 }
