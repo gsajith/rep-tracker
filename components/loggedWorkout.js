@@ -87,7 +87,7 @@ export default function LoggedWorkout({ data }) {
       <br />
       <div className={styles.metadata}>
         <span style={{ width: 220 }}>
-          Note: {data.notes} This was a pretty easy workout overall, thanks!
+          {data.notes ? 'Note: ' + data.notes : ''}
         </span>
         <span
           style={{
