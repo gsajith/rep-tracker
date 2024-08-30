@@ -6,7 +6,7 @@ html, body {
   color: #1D1226;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  padding-top: 48px;
   align-items: center;
   height: 100vh;
   font-family: "futura-pt", sans-serif;
