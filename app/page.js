@@ -4,9 +4,13 @@ import styles from "./page.module.css";
 import { createClerkSupabaseClient } from "@/utils/supabase/clerk-client";
 import { useEffect, useState } from "react";
 import { createWorkout } from "@/utils/supabase/database";
-import Workout from "@/components/workout";
+import LoggedWorkout from "@/components/loggedWorkout";
+import { useStickyState } from "@/hooks/useStickyState";
 
 export default function Home() {
+  const [inWorkout, setInWorkout] = useStickyState(false, "inWorkokut");
+  const [workoutStartTime, setWorkoutStartTime] = useStickyState(null, "workoutStartTime");
+
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,7 +48,7 @@ export default function Home() {
 
       {loading && <p>Loading...</p>}
 
-      {!loading && workouts.length > 0 && workouts.map((workout) => <Workout key={workout.id} data={workout} />)}
+      {!loading && workouts.length > 0 && workouts.map((workout) => <LoggedWorkout key={workout.id} data={workout} />)}
 
       {!loading && workouts.length === 0 && <p> No workouts found</p>}
 
