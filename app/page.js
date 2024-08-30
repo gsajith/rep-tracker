@@ -58,10 +58,16 @@ export default function Home() {
 
   async function handleCreateWorkout(e) {
     e.preventDefault();
+    var d = new Date();
+    d.setDate(d.getDate() - 1234);
+    var d2 = new Date();
+    d2.setDate(d2.getDate() - 1234);
+    d.setHours(d.getHours() - 2);
+    d.setMinutes(d.getMinutes() - 16);
     createWorkout(
       client,
-      new Date().toISOString(),
-      new Date().toISOString(),
+      d.toISOString(),
+      d2.toISOString(),
       [
         '26ebd1d5-4f37-4fa9-974a-d41f1904708e',
         '63cc84a1-35ff-4f91-af32-9645a5ee603f',

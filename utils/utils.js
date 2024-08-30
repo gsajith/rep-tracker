@@ -24,3 +24,14 @@ export function readableDate(d) {
 export function readableTime(d) {
   return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
+
+export const calculateMinutes = (start, end) => {
+  let seconds = (end - start) / 1000;
+  let minutes = Math.ceil(seconds / 60);
+  return minutes;
+};
+
+export const calculateDaysAgo = (timestamp) => {
+  var today = new Date();
+  return Math.floor((today - timestamp) / 1000 / 60 / 60 / 24) + ' days ago';
+};

@@ -45,22 +45,25 @@
 .exercises {
   display: flex;
   gap: 12px;
+  align-items: baseline;
 }
 
 .exercise {
   background: #DBF881;
   border-radius: 8px;
   padding: 8px;
-  max-width: 120px;
-  width: 120px;
+  max-width: 100px;
+  width: 100px;
   position: relative;
 }
 
 .exerciseName {
   font-size: 16px;
   font-weight: bold;
-  width: 100px;
-
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .commentIcon {
@@ -68,4 +71,32 @@
   top: 4px;
   right: 5px;
   cursor: pointer;
+}
+
+.setContainer {
+  background: white;
+  border-radius: 8px;
+  padding: 2px 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.setsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.metadata {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: #908E96;
+  gap: 16px;
 }
