@@ -11,7 +11,7 @@ export default function Home() {
 
   useEffect(() => {
     if (workoutStartTime) {
-      setWorkoutTimer("00:00")
+      setWorkoutTimer(calculateWorkoutTimer(workoutStartTime, Date.now()))
       const timerId = setInterval(() => {
         setWorkoutTimer(calculateWorkoutTimer(workoutStartTime, Date.now()))
       }, 1000);
