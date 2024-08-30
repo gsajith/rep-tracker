@@ -12,7 +12,11 @@ export default function UserBadge() {
       left: 12,
       display: "flex",
       alignItems: "center",
-      gap: 10
+      gap: 10,
+      background: "#ECEFF388",
+      paddingRight: 24,
+      paddingLeft: 8,
+      paddingBottom: 8
     }}>
     {user ? <UserButton /> : <div style={{ width: 56, height: 56, background: "#ababab", borderRadius: 999 }} />}
     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
