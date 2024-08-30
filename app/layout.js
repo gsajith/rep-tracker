@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider, SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { shadesOfPurple } from "@clerk/themes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,14 +31,16 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={{ baseTheme: shadesOfPurple }}>
       <html lang="en">
         <body className={inter.className}>
           <SignedOut>
             <SignInButton />
           </SignedOut>
           <SignedIn>
-            <UserButton />
+            <div style={{ position: "absolute", top: 16, background: "rgba(0,0,0,.3)", padding: 8, borderRadius: 12, right: 12 }}>
+              <UserButton showName />
+            </div>
             {children}
           </SignedIn>
         </body>
