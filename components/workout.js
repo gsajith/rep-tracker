@@ -2,17 +2,20 @@
 import { useStickyState } from '@/hooks/useStickyState';
 import styles from './workout.module.css';
 import { useEffect, useState } from 'react';
-import { calculateWorkoutTimer } from '@/utils/utils';
+import { calculateWorkoutTimer, capitalize } from '@/utils/utils';
+import ComboBox from './combobox';
 
-export default function Workout() {
+export default function Workout({ exerciseNames }) {
   const [inWorkout, setInWorkout] = useStickyState(false, 'inWorkout');
   const [workoutStartTime, setWorkoutStartTime] = useStickyState(
     null,
     'workoutStartTime'
   );
   const [workoutTimer, setWorkoutTimer] = useState(null);
+  const [exercises, setExercises] = useState([]);
 
   useEffect(() => {
+    console.log(workoutStartTime);
     if (workoutStartTime) {
       setWorkoutTimer(calculateWorkoutTimer(workoutStartTime, Date.now()));
       const timerInterval = setInterval(() => {
@@ -28,8 +31,8 @@ export default function Workout() {
     <div
       className={`${styles.container} ${!inWorkout && styles.startup}`}
       onClick={() => {
-        setInWorkout(!inWorkout);
         if (!inWorkout) {
+          setInWorkout(!inWorkout);
           setWorkoutStartTime(Date.now());
         } else {
           setWorkoutStartTime(null);
@@ -37,7 +40,14 @@ export default function Workout() {
       }}
     >
       {inWorkout ? (
-        <>Started {workoutTimer}</>
+        <div>
+          {workoutTimer} [
+          {Array.from(exerciseNames)
+            .map((exercise) => capitalize(exercise.name))
+            .join(', ')}
+          ]
+          <ComboBox options={exerciseNames} />
+        </div>
       ) : (
         <div
           style={{

@@ -1,0 +1,12 @@
+.comboBoxInput {
+  border: none;
+  display: block;
+  padding: 16px;
+  border-radius: 8px;
+  outline: none;
+  width: calc(100% - 32px);
+}
+
+.comboBoxInput[data-open] {
+  border-radius: 8px 8px 0px 0px;
+}

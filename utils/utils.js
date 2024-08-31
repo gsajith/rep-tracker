@@ -35,3 +35,7 @@ export const calculateDaysAgo = (timestamp) => {
   var today = new Date();
   return Math.floor((today - timestamp) / 1000 / 60 / 60 / 24) + ' days ago';
 };
+
+export function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}

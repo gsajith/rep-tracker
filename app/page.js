@@ -13,6 +13,9 @@ const DEBUG = process.env.NODE_ENV === 'development';
 export default function Home() {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [exerciseNames, setExerciseNames] = useState(
+    new Set(['bicep curl', 'squats', 'deadlift'])
+  );
 
   // The `useUser()` hook will be used to ensure that Clerk has loaded data about the logged in user
   const { user } = useUser();
@@ -37,6 +40,7 @@ export default function Home() {
                 .eq('id', data[i].exercises[j]);
               if (!exerciseError) {
                 data[i].exercises[j] = exercise[0];
+                addExerciseName(exercise[0].name);
               }
             }
           }
@@ -55,6 +59,12 @@ export default function Home() {
     loadWorkouts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  function addExerciseName(name) {
+    setExerciseNames(
+      (oldExerciseNames) => new Set([...oldExerciseNames, name.toLowerCase()])
+    );
+  }
 
   async function handleCreateWorkout(e) {
     e.preventDefault();
@@ -92,7 +102,12 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <Workout />
+      <Workout
+        exerciseNames={Array.from(exerciseNames).map((exerciseName, index) => ({
+          id: index,
+          name: exerciseName,
+        }))}
+      />
 
       {DEBUG && (
         <>
