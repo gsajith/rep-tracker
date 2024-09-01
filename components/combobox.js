@@ -36,7 +36,8 @@ export default function ComboBox({ options }) {
       <ComboboxOptions anchor="bottom">
         {query.length > 0 && (
           <ComboboxOption value={{ id: null, name: query }}>
-            Add exercise: <span style={{ fontWeight: 'bold' }}>"{query}"</span>
+            Add exercise:{' '}
+            <span style={{ fontWeight: 'bold' }}>&quot;{query}&quot;</span>
           </ComboboxOption>
         )}
         {filteredOptions.map((option) => (

@@ -31,7 +31,7 @@ div[data-open] > div {
 }
 
 div[data-focus] {
-  background: blue;
+  background: #e3b8f8;
 }
 
 div[data-selected] {
