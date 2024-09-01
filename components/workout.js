@@ -35,7 +35,6 @@ export default function Workout({ exerciseNames }) {
           setInWorkout(!inWorkout);
           setWorkoutStartTime(Date.now());
         } else {
-          setWorkoutStartTime(null);
         }
       }}
     >
