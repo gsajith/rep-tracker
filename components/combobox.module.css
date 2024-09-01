@@ -2,12 +2,12 @@
   border: none;
   display: block;
   padding: 16px;
-  border-radius: 25px 0px 0px 25px;
+  border-radius: 14px 0px 0px 14px;
   outline: none;
   width: calc(100% - 32px);
   transition: border-radius 100ms ease-in-out;
 }
 
 .comboBoxInput[data-open] {
-  border-radius: 25px 0px 0px 0px;
+  border-radius: 14px 0px 0px 0px;
 }

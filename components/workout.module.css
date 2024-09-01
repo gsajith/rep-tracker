@@ -30,9 +30,9 @@
 .addButton {
   background: #DBF881;
   border: none;
-  border-radius: 0px 25px 25px 0px;
+  border-radius: 0px 14px 14px 0px;
   font-weight: bold;
-  width: 59px;
+  width: 68px;
   outline: none;
   transition: background 150ms ease-in-out;
 }
@@ -57,16 +57,76 @@
   padding: 16px;
 }
 
-.exerciseContainer {
+.exercisesContainer {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-bottom: 12px;
 }
 
+.exerciseContainer {
+  max-height: 56px;
+  overflow: hidden;
+  transition: max-height 300ms ease-in-out;
+}
+
 .exercise {
   background: #DBF881;
   color: #1D1226;
+  border-radius: 14px 14px 0px 0px;
+  padding: 16px;
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.pastExercise {
+  opacity: 0.7;
+  border-radius: 0px 0px 14px 14px;
+  background: #DBF881;
+  color: #1D1226;
+  padding: 16px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+}
+.exerciseName {
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px;
+  margin: -8px;
   border-radius: 8px;
-  padding: 8px 16px;
+  border: none;
+  background: none;
+}
+.exerciseName:hover, .exerciseName:focus {
+  background: rgba(0,0,0,.2);
+  outline: none;
+}
+.exerciseName > svg {
+  transition: rotate 150ms ease-in-out;
+}
+
+.setContainer {
+  background: white;
+  border-radius: 8px;
+  padding: 2px 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.setsContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
 }
