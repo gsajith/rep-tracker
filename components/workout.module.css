@@ -33,7 +33,6 @@
   border-radius: 0px 25px 25px 0px;
   font-weight: bold;
   width: 59px;
-  cursor: pointer;
   outline: none;
   transition: background 150ms ease-in-out;
 }
@@ -42,49 +41,18 @@
   background: #DBF881AA;
 }
 
-.addButton:hover, .addButton:focus {
+.addButton:not(:disabled):hover, .addButton:not(:disabled):focus {
   background: #b7d755;
 }
 
-.exercisePreview {
-  opacity: 0.5;
-  margin-top: 12px;
-  background: #DBF881;
-  border-radius: 8px;
-  padding: 8px 16px;
-  color: #1D1226;
+.addButton:not(:disabled):hover {
+  cursor: pointer;
 }
 
-.exercisePreviewTitle {
-  font-size: 12px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.setContainer {
+.firstTime {
   background: white;
+  color: #1D1226;
   border-radius: 8px;
-  padding: 2px 8px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  font-weight: bold;
-  font-size: 12px;
-}
-
-.setsContainer {
-  display: flex;
-  flex-direction: row;
-  gap: 4px;
   margin-top: 12px;
-  flex-wrap: wrap;
-}
-
-.previewNotes {
-  display: flex;
-  margin-top: 12px;
-  align-items: flex-start;
+  padding: 16px;
 }

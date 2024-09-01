@@ -39,7 +39,7 @@ export default function ComboBox({ options, onSelect }) {
       <ComboboxOptions anchor="bottom">
         {query.length > 0 && (
           <ComboboxOption value={{ id: null, name: query }}>
-            Add exercise:{' '}
+            New exercise:{' '}
             <span style={{ fontWeight: 'bold' }}>&quot;{query}&quot;</span>
           </ComboboxOption>
         )}
