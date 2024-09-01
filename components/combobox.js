@@ -8,7 +8,7 @@ import { useState } from 'react';
 import styles from './combobox.module.css';
 import { capitalize } from '@/utils/utils';
 
-export default function ComboBox({ options }) {
+export default function ComboBox({ options, onSelect }) {
   const [selectedItem, setSelectedItem] = useState();
   const [query, setQuery] = useState('');
 
@@ -22,7 +22,10 @@ export default function ComboBox({ options }) {
   return (
     <Combobox
       value={selectedItem}
-      onChange={setSelectedItem}
+      onChange={(item) => {
+        setSelectedItem(item);
+        onSelect(item);
+      }}
       onClose={() => setQuery('')}
     >
       <ComboboxInput
