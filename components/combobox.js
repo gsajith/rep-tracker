@@ -4,14 +4,16 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from '@headlessui/react';
-import { useState } from 'react';
 import styles from './combobox.module.css';
 import { capitalize } from '@/utils/utils';
 
-export default function ComboBox({ options, onSelect }) {
-  const [selectedItem, setSelectedItem] = useState();
-  const [query, setQuery] = useState('');
-
+export default function ComboBox({
+  options,
+  selectedItem,
+  setSelectedItem,
+  query,
+  setQuery,
+}) {
   const filteredOptions =
     query === ''
       ? options
@@ -22,10 +24,7 @@ export default function ComboBox({ options, onSelect }) {
   return (
     <Combobox
       value={selectedItem}
-      onChange={(item) => {
-        setSelectedItem(item);
-        onSelect(item);
-      }}
+      onChange={setSelectedItem}
       onClose={() => setQuery('')}
     >
       <ComboboxInput
