@@ -2,13 +2,8 @@
 import { useStickyState } from '@/hooks/useStickyState';
 import styles from './workout.module.css';
 import { useEffect, useRef, useState } from 'react';
-import {
-  calculateDaysAgo,
-  calculateWorkoutTimer,
-  readableDate,
-} from '@/utils/utils';
+import { calculateWorkoutTimer } from '@/utils/utils';
 import ComboBox from './combobox';
-import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import ExerciseToPreview from './exerciseToPreview';
 
 export default function Workout({ exerciseNames, latestExercises }) {
@@ -23,7 +18,6 @@ export default function Workout({ exerciseNames, latestExercises }) {
   const [exercises, setExercises] = useState([]);
 
   useEffect(() => {
-    console.log(workoutStartTime);
     if (workoutStartTime) {
       setWorkoutTimer(calculateWorkoutTimer(workoutStartTime, Date.now()));
       const timerInterval = setInterval(() => {
@@ -33,6 +27,31 @@ export default function Workout({ exerciseNames, latestExercises }) {
       return () => clearInterval(timerInterval);
     }
   }, [workoutStartTime]);
+
+  const addExercise = (name, preview) => {
+    setExercises((oldExercises) => {
+      const exists = oldExercises.findIndex(
+        (e) => e.name.toLowerCase() === name.toLowerCase()
+      );
+      if (exists > -1) {
+        oldExercises.push(oldExercises.splice(exists, 1)[0]);
+      } else {
+        oldExercises.push(
+          preview
+            ? preview.exercise
+            : {
+                name: name,
+                reps: [],
+                weights: [],
+                notes: '',
+              }
+        );
+      }
+      return oldExercises;
+    });
+    setExerciseToPreview(null);
+    exerciseName.current = null;
+  };
 
   return (
     <div
@@ -48,6 +67,9 @@ export default function Workout({ exerciseNames, latestExercises }) {
       {inWorkout ? (
         <div>
           <div style={{ display: 'flex' }}>
+            {exercises.map((exercise) => (
+              <div key={exercise.name}>{exercise.name}</div>
+            ))}
             <ComboBox
               options={exerciseNames}
               onSelect={(item) => {
@@ -63,7 +85,14 @@ export default function Workout({ exerciseNames, latestExercises }) {
             <button
               disabled={exerciseToPreview === null}
               className={styles.addButton}
-              onClick={() => console.log('we will add', exerciseName.current)}
+              onClick={() => {
+                addExercise(
+                  exerciseToPreview
+                    ? exerciseToPreview.exercise.name
+                    : exerciseName.current,
+                  exerciseToPreview
+                );
+              }}
             >
               Add
             </button>

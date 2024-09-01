@@ -23,10 +23,14 @@ export default function Home() {
   // The `useSession()` hook will be used to get the Clerk `session` object
   const { session } = useSession();
 
-  const client = createClerkSupabaseClient(session);
+  let client = null;
 
   useEffect(() => {
-    if (!user) return;
+    client = createClerkSupabaseClient(session);
+  }, [session]);
+
+  useEffect(() => {
+    if (!user || !client) return;
 
     async function loadWorkouts() {
       setLoading(true);
@@ -62,8 +66,7 @@ export default function Home() {
     }
 
     loadWorkouts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, client]);
 
   function addExerciseName(name, workoutEndISO, exercise) {
     if (
