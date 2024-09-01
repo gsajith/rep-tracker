@@ -33,7 +33,3 @@ div[data-open] > div {
 div[data-focus] {
   background: #e3b8f8;
 }
-
-div[data-selected] {
-  background: green;
-}

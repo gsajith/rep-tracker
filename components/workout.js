@@ -1,7 +1,7 @@
 'use client';
 import { useStickyState } from '@/hooks/useStickyState';
 import styles from './workout.module.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   calculateDaysAgo,
   calculateWorkoutTimer,
@@ -19,6 +19,7 @@ export default function Workout({ exerciseNames, latestExercises }) {
   );
   const [workoutTimer, setWorkoutTimer] = useState(null);
   const [exerciseToPreview, setExerciseToPreview] = useState(null);
+  const exerciseName = useRef(null);
   const [exercises, setExercises] = useState([]);
 
   useEffect(() => {
@@ -52,14 +53,17 @@ export default function Workout({ exerciseNames, latestExercises }) {
               onSelect={(item) => {
                 if (item !== null && item.name.length > 0) {
                   setExerciseToPreview(latestExercises[item.name]);
+                  exerciseName.current = item.name;
                 } else {
                   setExerciseToPreview(null);
+                  exerciseName.current = null;
                 }
               }}
             />
             <button
               disabled={exerciseToPreview === null}
               className={styles.addButton}
+              onClick={() => console.log('we will add', exerciseName.current)}
             >
               Add
             </button>
@@ -69,7 +73,7 @@ export default function Workout({ exerciseNames, latestExercises }) {
           )}
           {exerciseToPreview === undefined && (
             <div className={styles.firstTime}>
-              This is your first time doing this exercise!
+              This is your first time doing <b>{exerciseName.current}</b>!
             </div>
           )}
         </div>
