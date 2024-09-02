@@ -25,19 +25,3 @@
   width: 200px;
   z-index: 999;
 }
-
-.modalHeader {
-  width: 100%;
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.modalHeader > svg {
-  opacity: 0.6;
-  cursor: pointer;
-}
-
-.modalHeader > svg:hover {
-  opacity: 1;
-}
