@@ -35,8 +35,8 @@ html, body {
 /** Combobox styling **/
 div[data-open] {
   background: var(--white);
-  width: calc(100% - 126px);
-  max-width: calc(263px) !important;
+  width: calc(100% - 119px);
+  max-width: calc(260px) !important;
   border-radius: 0px 0px 8px 8px;
 }
 
