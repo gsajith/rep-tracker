@@ -15,6 +15,7 @@ import VariableInput from './variableInput';
 import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
 import Modal from './modal';
 import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
+import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 
 // TODO: Add note to whole workout
 export default function Workout({
@@ -267,7 +268,7 @@ export default function Workout({
                     className={styles.exerciseContainer}
                     style={
                       exercise.expanded
-                        ? { maxHeight: 150 * numOldSets + 300 }
+                        ? { maxHeight: 50 * numOldSets + 50 * numSets + 300 }
                         : {}
                     }
                   >
@@ -374,15 +375,28 @@ export default function Workout({
                               </div>
                             ))}
                           </div>
-                          <input
-                            type="text"
-                            className={styles.notesInput}
-                            placeholder="Add notes..."
-                            value={exercise.notes}
-                            onChange={(e) =>
-                              updateExerciseNotes(index, e.target.value)
-                            }
-                          />
+                          <div
+                            className={styles.notesInputContainer}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              opacity:
+                                exercise.notes.length > 0 ? 1 : 'revert-layer',
+                            }}
+                          >
+                            <LetsIconsComment
+                              className={styles.notesInputIcon}
+                            />
+                            <input
+                              type="text"
+                              className={styles.notesInput}
+                              placeholder={`Add notes about ${exercise.name}`}
+                              value={exercise.notes}
+                              onChange={(e) =>
+                                updateExerciseNotes(index, e.target.value)
+                              }
+                            />
+                          </div>
                         </>
                       )}
                     </div>
