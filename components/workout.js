@@ -164,10 +164,16 @@ export default function Workout({
   const addSet = (exerciseIndex, num) => {
     setExercises((oldExercises) => {
       const newExercises = [...oldExercises];
-      if (newExercises[exerciseIndex].reps.length < num)
-        newExercises[exerciseIndex].reps.push(0);
-      if (newExercises[exerciseIndex].weights.length < num)
-        newExercises[exerciseIndex].weights.push(0);
+      const repsLength = newExercises[exerciseIndex].reps.length;
+      if (repsLength < num)
+        newExercises[exerciseIndex].reps.push(
+          newExercises[exerciseIndex].reps[repsLength - 1]
+        );
+      const weightsLength = newExercises[exerciseIndex].weights.length;
+      if (weightsLength < num)
+        newExercises[exerciseIndex].weights.push(
+          newExercises[exerciseIndex].weights[weightsLength - 1]
+        );
       return newExercises;
     });
   };
