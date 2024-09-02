@@ -15,6 +15,7 @@ import { useStickyState } from '@/hooks/useStickyState';
 
 const DEBUG = process.env.NODE_ENV === 'development' && false;
 
+// TODO: Long press workout to copy it over?
 export default function Home() {
   const [workouts, setWorkouts] = useState([]);
   const [storedWorkouts, setStoredWorkouts] = useStickyState(
@@ -114,6 +115,7 @@ export default function Home() {
 
         // TODO: Only do this if no errors
         setInWorkout(false);
+        location.reload();
       }
     }
     if (!window.navigator.online || hasError) {
