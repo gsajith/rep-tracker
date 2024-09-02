@@ -76,14 +76,15 @@ export default function Workout({
 
   const addExercise = (name, preview) => {
     setExercises((oldExercises) => {
-      const exists = oldExercises.findIndex(
+      const newExercises = [...oldExercises];
+      const exists = newExercises.findIndex(
         (e) => e.name.toLowerCase() === name.toLowerCase()
       );
       if (exists > -1) {
-        oldExercises.push(oldExercises.splice(exists, 1)[0]);
-        setExpanded(oldExercises.length - 1, true);
+        newExercises.push(newExercises.splice(exists, 1)[0]);
+        setExpanded(newExercises.length - 1, true);
       } else {
-        oldExercises.push(
+        newExercises.push(
           preview
             ? {
                 name: preview.exercise.name,
@@ -114,7 +115,7 @@ export default function Workout({
               }
         );
       }
-      return oldExercises;
+      return newExercises;
     });
     setExerciseToPreview(null);
     exerciseName.current = null;
