@@ -1,9 +1,23 @@
 @import 'normalize.css';
 @import url('https://use.typekit.net/usl1ngp.css');
 
+/** TODO: Find and replace in-line style colors with these too **/
+:root {
+  --background: #ECEFF3;
+  --white: #FFFFFF;
+  --text: #1D1226;
+  --textSecondary: #908E96;
+  --accent: #A462D8;
+  --accentHover: #8553ae;
+  --accentHoverLight: #e2caf5;
+  --secondary: #DBF881;
+  --secondaryHover: #b7d755;
+  --textInverted: #FFFFFF;
+}
+
 html, body {
-  background: #ECEFF3;
-  color: #1D1226;
+  background: var(--background);
+  color: var(--text);
   display: flex;
   flex-direction: column;
   padding-top: 48px;
@@ -18,9 +32,8 @@ html, body {
 }
 
 /** Combobox styling **/
-
 div[data-open] {
-  background: white;
+  background: var(--white);
   width: 263px;
   border-radius: 0px 0px 8px 8px;
 }

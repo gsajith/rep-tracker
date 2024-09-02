@@ -1,6 +1,6 @@
 .container {
-  background: #A462D8;
-  color: white;
+  background: var(--accent);
+  color: var(--textInverted);
   transition: width 300ms ease-in-out, background 300ms ease-in-out;
   max-width: calc(100vw - 64px);
   padding: 24px;
@@ -16,19 +16,19 @@
 
 .startup:hover, .startup:focus {
   cursor: pointer;
-  background: #8553ae;
+  background: var(--accentHover);
 }
 
 .plusContainer {
-  color: #A462D8;
-  background: white;
+  color: var(--accent);
+  background: var(--white);
   border-radius: 999px;
   font-size: 64px;
   padding: 3px 24px;
 }
 
 .addButton {
-  background: #DBF881;
+  background: var(--secondary);
   border: none;
   border-radius: 0px 14px 14px 0px;
   font-weight: bold;
@@ -38,11 +38,12 @@
 }
 
 .addButton:disabled {
-  background: #DBF881AA;
+  background: var(--secondary);
+  opacity: 0.75;
 }
 
 .addButton:not(:disabled):hover, .addButton:not(:disabled):focus {
-  background: #b7d755;
+  background: var(--secondaryHover);
 }
 
 .addButton:not(:disabled):hover {
@@ -50,8 +51,8 @@
 }
 
 .firstTime {
-  background: white;
-  color: #1D1226;
+  background: var(--white);
+  color: var(--text);
   border-radius: 8px;
   margin-top: 12px;
   padding: 16px;
@@ -71,8 +72,8 @@
 }
 
 .exercise {
-  background: #DBF881;
-  color: #1D1226;
+  background: var(--secondary);
+  color: var(--text);
   border-radius: 14px 14px 0px 0px;
   padding: 16px;
   display: flex;
@@ -83,8 +84,8 @@
 .pastExercise {
   opacity: 0.7;
   border-radius: 0px 0px 14px 14px;
-  background: #DBF881;
-  color: #1D1226;
+  background: var(--secondary);
+  color: var(--text);
   padding: 16px;
   font-size: 12px;
   display: flex;
@@ -111,7 +112,7 @@
 }
 
 .setContainer {
-  background: white;
+  background: var(--white);
   border-radius: 8px;
   padding: 2px 8px;
   display: flex;
@@ -138,7 +139,7 @@
 }
 
 .notesInput:focus {
-  outline: 2px solid #1D1226;
+  outline: 2px solid var(--text);
 }
 
 .setInputs {
@@ -157,8 +158,8 @@
 
 
 .addSetButton {
-  background: #A462D8;
-  color: white;
+  background: var(--accent);
+  color: var(--textInverted);
   border-radius: 8px;
   border: none;
   font-weight: bold;
@@ -168,7 +169,7 @@
 }
 
 .addSetButton:hover, .addSetButton:focus {
-  background: #8553ae;
+  background: var(--accentHover);
 }
 
 .setInputContainer {
@@ -184,11 +185,11 @@
   border: none;
   border-radius: 8px;
   font-weight: bold;
-  color: #1D1226;
+  color: var(--text);
 }
 
 .setInputNumber:focus {
-  outline: 2px solid #1D1226;
+  outline: 2px solid var(--text);
 }
 
 .deleteSetButton {
@@ -225,33 +226,33 @@
 
 .endWorkoutButton {
   border: none;
-  background: white;
-  color: #A462D8;
+  background: var(--white);
+  color: var(--accent);
   padding: 16px;
   font-weight: bold;
   font-size: 24px;
   border-radius: 14px;
   transition: background 150ms ease-in-out, border 150ms ease-in-out;
-  border: 2px solid #A462D8;
+  border: 2px solid var(--accent);
   cursor: pointer;
 }
 
 .endWorkoutButton:hover, .endWorkoutButton:focus {
   outline: none;
-  background: #e2caf5;
-  border: 2px solid #1D1226;
+  background: var(--accentHoverLight);
+  border: 2px solid var(--text);
 }
 
 .endWorkoutConfirmButton {
   border: none;
-  background: #A462D8;
-  color: white;
+  background: var(--accent);
+  color: var(--textInverted);
   padding: 16px;
   font-weight: bold;
   font-size: 18px;
   border-radius: 14px;
   transition: background 150ms ease-in-out, border 150ms ease-in-out;
-  border: 2px solid #A462D8;
+  border: 2px solid var(--accent);
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -264,6 +265,6 @@
 .endWorkoutConfirmButton:hover,
 .endWorkoutConfirmButton:focus {
   outline: none;
-  background: #8553ae;
-  border: 2px solid #1D1226;
+  background: var(--accentHover);
+  border: 2px solid var(--text);
 }

@@ -1,8 +1,8 @@
 .signIn {
   border: none;
-  background: #A462D8;
+  background: var(--accent);
   transition: background 300ms ease-in-out;
-  color: white;
+  color: var(--textInverted);
   font-size: 32px;
   font-weight: bold;
   padding: 24px;
@@ -10,10 +10,10 @@
 }
 
 .signIn:focus {
-  outline: 2px solid #1D1226;
+  outline: 2px solid var(--text);
 }
 
 .signIn:hover {
   cursor: pointer;
-  background: #8553ae;
+  background: var(--accentHover);
 }
