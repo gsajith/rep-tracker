@@ -90,8 +90,14 @@ export default function Workout({
                 oldWeights: preview.exercise.weights,
                 oldNotes: preview.exercise.notes,
                 time: preview.time,
-                reps: [0],
-                weights: [0],
+                reps: [
+                  preview.exercise.reps[preview.exercise.reps.length - 1] || 0,
+                ],
+                weights: [
+                  preview.exercise.weights[
+                    preview.exercise.weights.length - 1
+                  ] || 0,
+                ],
                 notes: '',
                 expanded: true,
               }

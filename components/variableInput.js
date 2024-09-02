@@ -12,10 +12,10 @@ export default function VariableInput({
   );
 
   useEffect(() => {
-    if (value.length < 1) {
+    if (value.toString().length < 1) {
       setWidth((placeholder ? placeholder.length : 0) + 'ch');
     } else {
-      setWidth(value.length + 'ch');
+      setWidth(value.toString().length + 'ch');
     }
   }, [placeholder, value]);
 
