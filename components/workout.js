@@ -10,6 +10,7 @@ import {
 import ComboBox from './combobox';
 import ExerciseToPreview from './exerciseToPreview';
 import { LetsIconsExpandDown } from './SVGIcons/LetsIconsExpand';
+import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
 
 export default function Workout({ exerciseNames, latestExercises }) {
   const [inWorkout, setInWorkout] = useStickyState(false, 'inWorkout');
@@ -42,6 +43,7 @@ export default function Workout({ exerciseNames, latestExercises }) {
       );
       if (exists > -1) {
         oldExercises.push(oldExercises.splice(exists, 1)[0]);
+        setExpanded(oldExercises.length - 1, true);
       } else {
         oldExercises.push(
           preview
@@ -51,8 +53,8 @@ export default function Workout({ exerciseNames, latestExercises }) {
                 oldWeights: preview.exercise.weights,
                 oldNotes: preview.exercise.notes,
                 time: preview.time,
-                reps: [],
-                weights: [],
+                reps: [0],
+                weights: [0],
                 notes: '',
                 expanded: true,
               }
@@ -61,8 +63,8 @@ export default function Workout({ exerciseNames, latestExercises }) {
                 oldReps: null,
                 oldWeights: null,
                 oldNotes: null,
-                reps: [],
-                weights: [],
+                reps: [0],
+                weights: [0],
                 notes: '',
                 expanded: true,
               }
@@ -100,11 +102,49 @@ export default function Workout({ exerciseNames, latestExercises }) {
 
   const setExpanded = (index, expanded) => {
     setExercises((oldExercises) => {
-      oldExercises[index].expanded = expanded;
-      return oldExercises;
+      const newExercises = [...oldExercises];
+      newExercises[index].expanded = expanded;
+      return newExercises;
     });
   };
 
+  const updateExerciseReps = (exerciseIndex, setIndex, value) => {
+    setExercises((oldExercises) => {
+      const newExercises = [...oldExercises];
+      newExercises[exerciseIndex].reps[setIndex] = value;
+      return newExercises;
+    });
+  };
+
+  const updateExerciseWeights = (exerciseIndex, setIndex, value) => {
+    setExercises((oldExercises) => {
+      const newExercises = [...oldExercises];
+      newExercises[exerciseIndex].weights[setIndex] = value;
+      return newExercises;
+    });
+  };
+
+  const addSet = (exerciseIndex, num) => {
+    setExercises((oldExercises) => {
+      const newExercises = [...oldExercises];
+      if (newExercises[exerciseIndex].reps.length < num)
+        newExercises[exerciseIndex].reps.push(0);
+      if (newExercises[exerciseIndex].weights.length < num)
+        newExercises[exerciseIndex].weights.push(0);
+      return newExercises;
+    });
+  };
+
+  const deleteSet = (exerciseIndex, setIndex, num) => {
+    setExercises((oldExercises) => {
+      const newExercises = [...oldExercises];
+      if (newExercises[exerciseIndex].reps.length >= num)
+        newExercises[exerciseIndex].reps.splice(setIndex, 1);
+      if (newExercises[exerciseIndex].weights.length >= num)
+        newExercises[exerciseIndex].weights.splice(setIndex, 1);
+      return newExercises;
+    });
+  };
   return (
     <div
       className={`${styles.container} ${!inWorkout && styles.startup}`}
@@ -129,6 +169,12 @@ export default function Workout({ exerciseNames, latestExercises }) {
                       exercise.oldWeights?.length
                     )) ||
                   0;
+
+                const numSets = Math.min(
+                  exercise.reps.length,
+                  exercise.weights.length
+                );
+
                 return (
                   <div
                     key={exercise.name}
@@ -160,8 +206,76 @@ export default function Workout({ exerciseNames, latestExercises }) {
                       </button>
                       {exercise.expanded && (
                         <>
-                          <span>set1</span>
-                          <span>set2</span>
+                          <div className={styles.setInputs}>
+                            {[...Array(numSets)].map((_e, i) => (
+                              <div className={styles.setInputWrapper}>
+                                <div className={styles.setInputContainer}>
+                                  <input
+                                    type="number"
+                                    className={styles.setInputNumber}
+                                    value={exercise.reps[i]}
+                                    onChange={(e) => {
+                                      updateExerciseReps(
+                                        index,
+                                        i,
+                                        e.target.value
+                                      );
+                                    }}
+                                  />
+                                  <span
+                                    style={{
+                                      color: '#908E96',
+                                      marginTop: 2,
+                                      fontSize: 16,
+                                    }}
+                                  >
+                                    ×
+                                  </span>
+                                  <input
+                                    type="number"
+                                    className={styles.setInputNumber}
+                                    value={exercise.weights[i]}
+                                    onChange={(e) => {
+                                      updateExerciseWeights(
+                                        index,
+                                        i,
+                                        e.target.value
+                                      );
+                                    }}
+                                  />
+                                  <span
+                                    style={{
+                                      color: '#908E96',
+                                      marginLeft: -3,
+                                      marginTop: 5,
+                                    }}
+                                  >
+                                    lbs
+                                  </span>
+                                </div>
+                                {i + 1 === numSets ? (
+                                  <button
+                                    className={styles.addSetButton}
+                                    onClick={() => addSet(index, numSets + 1)}
+                                  >
+                                    Add a set
+                                  </button>
+                                ) : (
+                                  <button
+                                    className={styles.deleteSetButton}
+                                    onClick={() => deleteSet(index, i, numSets)}
+                                  >
+                                    <LetsIconsTrash />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                          <input
+                            type="text"
+                            className={styles.notesInput}
+                            placeholder="Add notes..."
+                          />
                         </>
                       )}
                     </div>

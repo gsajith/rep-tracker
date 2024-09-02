@@ -14,7 +14,7 @@
   height: 80px;
 }
 
-.startup:hover {
+.startup:hover, .startup:focus {
   cursor: pointer;
   background: #8553ae;
 }
@@ -102,7 +102,7 @@
   border: none;
   background: none;
 }
-.exerciseName:hover, .exerciseName:focus {
+.exerciseName:hover {
   background: rgba(0,0,0,.2);
   outline: none;
 }
@@ -130,3 +130,76 @@
   flex-wrap: wrap;
   margin-top: 8px;
 }
+
+.notesInput {
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.notesInput:focus {
+  outline: 2px solid #1D1226;
+}
+
+.setInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.setInputWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.addSetButton {
+  background: #A462D8;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 150ms ease-in-out;
+}
+
+.addSetButton:hover, .addSetButton:focus {
+  background: #8553ae;
+}
+
+.setInputContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+  font-weight: bold;
+}
+
+.setInputNumber {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #1D1226;
+  width: 25px;
+}
+
+.setInputNumber:focus {
+  outline: 2px solid #1D1226;
+}
+
+.deleteSetButton {
+  opacity: 0.4;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.deleteSetButton:hover, .deleteSetButton:focus {
+  opacity: 1;
+}
+
