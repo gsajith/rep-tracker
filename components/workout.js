@@ -208,7 +208,10 @@ export default function Workout({ exerciseNames, latestExercises }) {
                         <>
                           <div className={styles.setInputs}>
                             {[...Array(numSets)].map((_e, i) => (
-                              <div className={styles.setInputWrapper}>
+                              <div
+                                key={index + '-' + 'set' + i}
+                                className={styles.setInputWrapper}
+                              >
                                 <div className={styles.setInputContainer}>
                                   <input
                                     type="number"
