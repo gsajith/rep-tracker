@@ -15,6 +15,7 @@
 }
 
 .startup:hover, .startup:focus {
+  color: var(--textInverted);
   cursor: pointer;
   background: var(--accentHover);
 }
@@ -43,6 +44,7 @@
 }
 
 .addButton:not(:disabled):hover, .addButton:not(:disabled):focus {
+  color: var(--text);
   background: var(--secondaryHover);
 }
 
@@ -188,6 +190,7 @@
 }
 
 .addSetButton:hover, .addSetButton:focus {
+  color: var(--textInverted);
   background: var(--accentHover);
 }
 
@@ -221,6 +224,7 @@
 
 .deleteSetButton:hover, .deleteSetButton:focus {
   opacity: 1;
+  color: var(--accent);
 }
 
 .endWorkoutContainer {
@@ -257,6 +261,7 @@
 }
 
 .endWorkoutButton:hover, .endWorkoutButton:focus {
+  color: var(--accent);
   outline: none;
   background: var(--accentHoverLight);
   border: 2px solid var(--text);
@@ -282,6 +287,7 @@
 
 .endWorkoutConfirmButton:hover,
 .endWorkoutConfirmButton:focus {
+  color: var(--textInverted);
   outline: none;
   background: var(--accentHover);
   border: 2px solid var(--text);
