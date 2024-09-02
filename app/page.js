@@ -8,7 +8,7 @@ import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
 import { parseISOString } from '@/utils/utils';
 
-const DEBUG = process.env.NODE_ENV === 'development';
+const DEBUG = process.env.NODE_ENV === 'development' && false;
 
 export default function Home() {
   const [workouts, setWorkouts] = useState([]);
@@ -79,9 +79,9 @@ export default function Home() {
         exercise: exercise,
       };
     }
-    setExerciseNames(
-      (oldExerciseNames) => new Set([...oldExerciseNames, name])
-    );
+    setExerciseNames((oldExerciseNames) => {
+      return new Set([...oldExerciseNames, name]);
+    });
   }
 
   async function handleCreateWorkout(e) {

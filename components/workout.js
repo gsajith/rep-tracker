@@ -13,17 +13,30 @@ import { LetsIconsExpandDown } from './SVGIcons/LetsIconsExpand';
 import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
 
 export default function Workout({ exerciseNames, latestExercises }) {
+  // Tracks whether workout has been started or not
   const [inWorkout, setInWorkout] = useStickyState(false, 'inWorkout');
+
+  // Tracks in storage the timestamp when current workout was started
   const [workoutStartTime, setWorkoutStartTime] = useStickyState(
     null,
     'workoutStartTime'
   );
-  const [workoutTimer, setWorkoutTimer] = useState(null);
-  const [exerciseToPreview, setExerciseToPreview] = useState(null);
-  const exerciseName = useRef(null);
-  const [exercises, setExercises] = useState([]);
+
+  // Tracks in storage exercises have been added to this workout
+  const [exercises, setExercises] = useStickyState([], 'exercises');
+
+  // State for the exercise selector combobox
   const [selectedItem, setSelectedItem] = useState();
+  // State for the exercise selector combobox
   const [query, setQuery] = useState('');
+
+  // Tracks which exercise is being previewed from combobox selection
+  const [exerciseToPreview, setExerciseToPreview] = useState(null);
+  // Tracks name of exercise selected via combobox
+  const exerciseName = useRef(null);
+
+  // Tracks in memory the minutes and seconds since workout was started
+  const [workoutTimer, setWorkoutTimer] = useState(null);
 
   useEffect(() => {
     if (workoutStartTime) {
