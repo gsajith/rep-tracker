@@ -11,8 +11,16 @@ import ComboBox from './combobox';
 import ExerciseToPreview from './exerciseToPreview';
 import { LetsIconsExpandDown } from './SVGIcons/LetsIconsExpand';
 import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
+import VariableInput from './variableInput';
+import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
+import Modal from './modal';
+import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
 
-export default function Workout({ exerciseNames, latestExercises }) {
+export default function Workout({
+  exerciseNames,
+  latestExercises,
+  saveWorkout,
+}) {
   // Tracks whether workout has been started or not
   const [inWorkout, setInWorkout] = useStickyState(false, 'inWorkout');
 
@@ -38,6 +46,9 @@ export default function Workout({ exerciseNames, latestExercises }) {
   // Tracks in memory the minutes and seconds since workout was started
   const [workoutTimer, setWorkoutTimer] = useState(null);
 
+  // Modal state
+  const [modalShown, setModalShown] = useState(false);
+
   useEffect(() => {
     if (workoutStartTime) {
       setWorkoutTimer(calculateWorkoutTimer(workoutStartTime, Date.now()));
@@ -48,6 +59,18 @@ export default function Workout({ exerciseNames, latestExercises }) {
       return () => clearInterval(timerInterval);
     }
   }, [workoutStartTime]);
+
+  useEffect(() => {
+    if (!inWorkout) {
+      setWorkoutStartTime(null);
+      setExercises([]);
+      setQuery('');
+      setSelectedItem(undefined);
+      setExerciseToPreview(null);
+      exerciseName.current = null;
+      setModalShown(false);
+    }
+  }, [inWorkout]);
 
   const addExercise = (name, preview) => {
     setExercises((oldExercises) => {
@@ -158,6 +181,15 @@ export default function Workout({ exerciseNames, latestExercises }) {
       return newExercises;
     });
   };
+
+  const updateExerciseNotes = (exerciseIndex, note) => {
+    setExercises((oldExercises) => {
+      const newExercises = [...oldExercises];
+      newExercises[exerciseIndex].notes = note;
+      return newExercises;
+    });
+  };
+
   return (
     <div
       className={`${styles.container} ${!inWorkout && styles.startup}`}
@@ -169,6 +201,30 @@ export default function Workout({ exerciseNames, latestExercises }) {
         }
       }}
     >
+      {modalShown && (
+        <Modal setShown={setModalShown}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              gap: 24,
+            }}
+          >
+            <div style={{ textAlign: 'left' }}>
+              Are you sure you want to end this workout?
+            </div>
+            <button
+              className={styles.endWorkoutConfirmButton}
+              onClick={() => {
+                saveWorkout(setInWorkout, workoutStartTime, exercises);
+              }}
+            >
+              <LetsIconsDoneRound /> Save & end!
+            </button>
+          </div>
+        </Modal>
+      )}
       {inWorkout ? (
         <div>
           {exercises.length > 0 && (
@@ -212,7 +268,14 @@ export default function Workout({ exerciseNames, latestExercises }) {
                           setExpanded(index, !exercise.expanded);
                         }}
                       >
-                        {exercise.name}{' '}
+                        <span>
+                          {exercise.name}
+                          {!exercise.expanded && (
+                            <span style={{ fontWeight: '400' }}>
+                              •{numSets} {numSets === 1 ? 'set' : 'sets'}
+                            </span>
+                          )}
+                        </span>
                         <LetsIconsExpandDown
                           style={exercise.expanded ? { rotate: '-180deg' } : {}}
                         />
@@ -226,7 +289,7 @@ export default function Workout({ exerciseNames, latestExercises }) {
                                 className={styles.setInputWrapper}
                               >
                                 <div className={styles.setInputContainer}>
-                                  <input
+                                  <VariableInput
                                     type="number"
                                     className={styles.setInputNumber}
                                     value={exercise.reps[i]}
@@ -247,7 +310,7 @@ export default function Workout({ exerciseNames, latestExercises }) {
                                   >
                                     ×
                                   </span>
-                                  <input
+                                  <VariableInput
                                     type="number"
                                     className={styles.setInputNumber}
                                     value={exercise.weights[i]}
@@ -291,6 +354,10 @@ export default function Workout({ exerciseNames, latestExercises }) {
                             type="text"
                             className={styles.notesInput}
                             placeholder="Add notes..."
+                            value={exercise.notes}
+                            onChange={(e) =>
+                              updateExerciseNotes(index, e.target.value)
+                            }
                           />
                         </>
                       )}
@@ -343,7 +410,6 @@ export default function Workout({ exerciseNames, latestExercises }) {
               })}
             </div>
           )}
-
           <div style={{ display: 'flex' }}>
             <ComboBox
               options={exerciseNames}
@@ -377,6 +443,18 @@ export default function Workout({ exerciseNames, latestExercises }) {
                 This is your first time doing <b>{exerciseName.current}</b>!
               </div>
             )}
+          <div className={styles.endWorkoutContainer}>
+            <div className={styles.timer}>
+              <LetsIconsTimeAtack />
+              <span>{workoutTimer}</span>
+            </div>
+            <button
+              onClick={() => setModalShown(true)}
+              className={styles.endWorkoutButton}
+            >
+              End workout
+            </button>
+          </div>
         </div>
       ) : (
         <div

@@ -7,11 +7,16 @@ import { createExercise, createWorkout } from '@/utils/supabase/database';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
 import { parseISOString } from '@/utils/utils';
+import { useStickyState } from '@/hooks/useStickyState';
 
 const DEBUG = process.env.NODE_ENV === 'development' && false;
 
 export default function Home() {
   const [workouts, setWorkouts] = useState([]);
+  const [storedWorkouts, setStoredWorkouts] = useStickyState(
+    [],
+    'storedWorkouts'
+  );
   const [loading, setLoading] = useState(true);
   const [exerciseNames, setExerciseNames] = useState(
     new Set(['bicep curl', 'squats', 'deadlift'])
@@ -103,7 +108,7 @@ export default function Home() {
 
   async function handleCreateExercise(e) {
     e.preventDefault();
-    createExercise(client, 'Pushups', [10, 10], [0, 0]);
+    // createExercise(client, 'Pushups', [10, 10], [0, 0]);
     // createExercise(client, 'Squats', [8, 8], [30, 30], 'Easy peasy');
     // createExercise(client, 'Dumbbell row', [8], [15]);
     // createExercise(
@@ -115,6 +120,53 @@ export default function Home() {
     // );
   }
 
+  const saveWorkout = async (setInWorkout, workoutStartTime, exercises) => {
+    if (window.navigator.onLine) {
+      console.log('Saving...');
+      let hasError = false;
+      const errors = [];
+      const exerciseIds = [];
+      for (let i = 0; i < exercises.length; i++) {
+        const { data: exercise, error: exerciseError } = await createExercise(
+          client,
+          exercises[i].name,
+          exercises[i].reps.map((rep) => parseInt(rep) || 0),
+          exercises[i].weights.map((weight) => parseInt(weight) || 0),
+          exercises[i].notes
+        );
+        if (!exerciseError) {
+          exerciseIds.push(exercise[0].id);
+        } else {
+          hasError = true;
+          errors.push(exerciseError);
+          console.error(exerciseError);
+        }
+      }
+      if (!hasError) {
+        const { data: _w, error: workoutError } = await createWorkout(
+          client,
+          new Date(workoutStartTime).toISOString(),
+          new Date().toISOString(),
+          exerciseIds,
+          ''
+        );
+        if (!workoutError) {
+          // TODO: Handle error fallback
+        } else {
+          hasError = true;
+          errors.push(workoutError);
+          console.error(workoutError);
+        }
+
+        // TODO: Only do this if no errors
+        setInWorkout(false);
+      }
+    }
+    if (!window.navigator.online || hasError) {
+      // TODO: Handle error fallback
+    }
+  };
+
   return (
     <main className={styles.main}>
       <Workout
@@ -123,6 +175,7 @@ export default function Home() {
           name: exerciseName,
         }))}
         latestExercises={latestExercises.current}
+        saveWorkout={saveWorkout}
       />
 
       {DEBUG && (

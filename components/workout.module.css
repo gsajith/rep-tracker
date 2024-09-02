@@ -180,12 +180,11 @@
 }
 
 .setInputNumber {
-  padding: 8px 16px;
+  padding: 8px 12px;
   border: none;
   border-radius: 8px;
   font-weight: bold;
   color: #1D1226;
-  width: 25px;
 }
 
 .setInputNumber:focus {
@@ -204,3 +203,67 @@
   opacity: 1;
 }
 
+.endWorkoutContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.timer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.timer > span {
+  font-size: 24px;
+  margin-top: 1.5px;
+}
+
+.endWorkoutButton {
+  border: none;
+  background: white;
+  color: #A462D8;
+  padding: 16px;
+  font-weight: bold;
+  font-size: 24px;
+  border-radius: 14px;
+  transition: background 150ms ease-in-out, border 150ms ease-in-out;
+  border: 2px solid #A462D8;
+  cursor: pointer;
+}
+
+.endWorkoutButton:hover, .endWorkoutButton:focus {
+  outline: none;
+  background: #e2caf5;
+  border: 2px solid #1D1226;
+}
+
+.endWorkoutConfirmButton {
+  border: none;
+  background: #A462D8;
+  color: white;
+  padding: 16px;
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 14px;
+  transition: background 150ms ease-in-out, border 150ms ease-in-out;
+  border: 2px solid #A462D8;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding-left: 2px;
+}
+
+
+.endWorkoutConfirmButton:hover,
+.endWorkoutConfirmButton:focus {
+  outline: none;
+  background: #8553ae;
+  border: 2px solid #1D1226;
+}
