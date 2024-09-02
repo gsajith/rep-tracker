@@ -196,7 +196,39 @@ export default function Home() {
         Your previous workouts
       </div>
 
-      {loading && <p>Loading...</p>}
+      {loading && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div
+            className="shimmerBG"
+            style={{
+              maxWidth: 368,
+              width: '100%',
+              height: 150,
+              borderRadius: 16,
+            }}
+          ></div>
+
+          <div
+            className="shimmerBG"
+            style={{
+              maxWidth: 368,
+              width: '100%',
+              height: 150,
+              borderRadius: 16,
+            }}
+          ></div>
+
+          <div
+            className="shimmerBG"
+            style={{
+              maxWidth: 368,
+              width: '100%',
+              height: 150,
+              borderRadius: 16,
+            }}
+          ></div>
+        </div>
+      )}
 
       {/** TODO: Do loading shimmers **/}
       {!loading &&
