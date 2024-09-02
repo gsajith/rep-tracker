@@ -16,6 +16,7 @@ import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
 import Modal from './modal';
 import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
 
+// TODO: Add note to whole workout
 export default function Workout({
   exerciseNames,
   latestExercises,
@@ -174,10 +175,14 @@ export default function Workout({
   const deleteSet = (exerciseIndex, setIndex, num) => {
     setExercises((oldExercises) => {
       const newExercises = [...oldExercises];
-      if (newExercises[exerciseIndex].reps.length >= num)
-        newExercises[exerciseIndex].reps.splice(setIndex, 1);
-      if (newExercises[exerciseIndex].weights.length >= num)
-        newExercises[exerciseIndex].weights.splice(setIndex, 1);
+      if (num === 1) {
+        newExercises.splice(exerciseIndex, 1);
+      } else {
+        if (newExercises[exerciseIndex].reps.length >= num)
+          newExercises[exerciseIndex].reps.splice(setIndex, 1);
+        if (newExercises[exerciseIndex].weights.length >= num)
+          newExercises[exerciseIndex].weights.splice(setIndex, 1);
+      }
       return newExercises;
     });
   };
@@ -332,21 +337,28 @@ export default function Workout({
                                     lbs
                                   </span>
                                 </div>
-                                {i + 1 === numSets ? (
-                                  <button
-                                    className={styles.addSetButton}
-                                    onClick={() => addSet(index, numSets + 1)}
-                                  >
-                                    Add a set
-                                  </button>
-                                ) : (
+
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                  }}
+                                >
                                   <button
                                     className={styles.deleteSetButton}
                                     onClick={() => deleteSet(index, i, numSets)}
                                   >
                                     <LetsIconsTrash />
                                   </button>
-                                )}
+                                  {i + 1 === numSets && (
+                                    <button
+                                      className={styles.addSetButton}
+                                      onClick={() => addSet(index, numSets + 1)}
+                                    >
+                                      Add a set
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                             ))}
                           </div>
