@@ -102,3 +102,14 @@
   color: var(--textSecondary);
   gap: 16px;
 }
+
+.setAdornment {
+  color: var(--textSecondary);
+}
+
+.minutesLabel {
+  color: var(--accent);
+  font-weight: bold;
+  margin-top: 4px;
+  text-align: right;
+}

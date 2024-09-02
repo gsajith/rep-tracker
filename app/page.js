@@ -28,26 +28,29 @@ export default function Home() {
   // The `useSession()` hook will be used to get the Clerk `session` object
   const { session } = useSession();
 
-  let client = null;
+  let client = useRef(null);
 
   useEffect(() => {
-    client = createClerkSupabaseClient(session);
+    if (session) {
+      client.current = createClerkSupabaseClient(session);
+    }
   }, [session]);
 
   useEffect(() => {
-    if (!user || !client) return;
+    if (!user || !client.current) return;
 
     async function loadWorkouts() {
       setLoading(true);
-      const { data, error } = await client.from('workouts').select();
+      const { data, error } = await client.current.from('workouts').select();
       if (!error) {
         for (let i = 0; i < data.length; i++) {
           if (data[i].exercises) {
             for (let j = 0; j < data[i].exercises.length; j++) {
-              const { data: exercise, error: exerciseError } = await client
-                .from('exercises')
-                .select()
-                .eq('id', data[i].exercises[j]);
+              const { data: exercise, error: exerciseError } =
+                await client.current
+                  .from('exercises')
+                  .select()
+                  .eq('id', data[i].exercises[j]);
               if (!exerciseError) {
                 data[i].exercises[j] = exercise[0];
                 addExerciseName(
@@ -98,7 +101,7 @@ export default function Home() {
     d.setHours(d.getHours() - 2);
     d.setMinutes(d.getMinutes() - 16);
     createWorkout(
-      client,
+      client.current,
       d.toISOString(),
       d2.toISOString(),
       ['7d2a19f0-c25f-43dd-9a23-27d0bb82cc88'],
@@ -128,7 +131,7 @@ export default function Home() {
       const exerciseIds = [];
       for (let i = 0; i < exercises.length; i++) {
         const { data: exercise, error: exerciseError } = await createExercise(
-          client,
+          client.current,
           exercises[i].name,
           exercises[i].reps.map((rep) => parseInt(rep) || 0),
           exercises[i].weights.map((weight) => parseInt(weight) || 0),
@@ -144,7 +147,7 @@ export default function Home() {
       }
       if (!hasError) {
         const { data: _w, error: workoutError } = await createWorkout(
-          client,
+          client.current,
           new Date(workoutStartTime).toISOString(),
           new Date().toISOString(),
           exerciseIds,
@@ -189,20 +192,13 @@ export default function Home() {
         </>
       )}
 
-      <div
-        style={{
-          marginTop: 32,
-          marginBottom: 12,
-          fontSize: 18,
-          fontWeight: 'bold',
-          color: '#908E96',
-        }}
-      >
+      <div className={styles.previousWorkoutsHeader}>
         Your previous workouts
       </div>
 
       {loading && <p>Loading...</p>}
 
+      {/** TODO: Do loading shimmers **/}
       {!loading &&
         workouts.length > 0 &&
         workouts

@@ -50,8 +50,8 @@ export default function LoggedWorkout({ data }) {
                       <div className={styles.setContainer} key={i}>
                         <span style={{ fontSize: 18 }}>{exercise.reps[i]}</span>
                         <span
+                          className={styles.setAdornment}
                           style={{
-                            color: '#908E96',
                             marginTop: 2,
                             fontSize: 16,
                           }}
@@ -62,8 +62,8 @@ export default function LoggedWorkout({ data }) {
                           {exercise.weights[i]}
                         </span>
                         <span
+                          className={styles.setAdornment}
                           style={{
-                            color: '#908E96',
                             marginLeft: -3,
                             marginTop: 5,
                           }}
@@ -97,14 +97,7 @@ export default function LoggedWorkout({ data }) {
             justifyContent: 'flex-end',
           }}
         >
-          <span
-            style={{
-              color: '#A462D8',
-              fontWeight: 'bold',
-              marginTop: 4,
-              textAlign: 'right',
-            }}
-          >
+          <span className={styles.minutesLabel}>
             {calculateMinutes(data.start_time, data.end_time)} mins
           </span>
           <LetsIconsTimeAtack />

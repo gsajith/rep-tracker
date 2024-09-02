@@ -3,6 +3,7 @@ import { ClerkProvider, SignedIn, SignedOut } from '@clerk/nextjs';
 import { shadesOfPurple } from '@clerk/themes';
 import UserBadge from '@/components/userBadge';
 import SignIn from '@/components/signIn';
+import styles from './layout.module.css';
 
 export const metadata = {
   title: 'RepTracker',
@@ -34,14 +35,7 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <body>
           <SignedOut>
-            <div
-              style={{
-                fontSize: 24,
-                color: '#908E96',
-                maxWidth: 320,
-                textAlign: 'center',
-              }}
-            >
+            <div className={styles.signedOutText}>
               Welcome to <b>Rep Tracker</b>!
               <br />
               <br />

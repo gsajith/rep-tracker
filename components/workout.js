@@ -302,8 +302,8 @@ export default function Workout({
                                     }}
                                   />
                                   <span
+                                    className={styles.setAdornment}
                                     style={{
-                                      color: '#908E96',
                                       marginTop: 2,
                                       fontSize: 16,
                                     }}
@@ -323,8 +323,8 @@ export default function Workout({
                                     }}
                                   />
                                   <span
+                                    className={styles.setAdornment}
                                     style={{
-                                      color: '#908E96',
                                       marginLeft: -3,
                                       marginTop: 5,
                                     }}
@@ -375,8 +375,8 @@ export default function Workout({
                                 {exercise.oldReps[i]}
                               </span>
                               <span
+                                className={styles.setAdornment}
                                 style={{
-                                  color: '#908E96',
                                   marginTop: 2,
                                   fontSize: 16,
                                 }}
@@ -387,8 +387,8 @@ export default function Workout({
                                 {exercise.oldWeights[i]}
                               </span>
                               <span
+                                className={styles.setAdornment}
                                 style={{
-                                  color: '#908E96',
                                   marginLeft: -3,
                                   marginTop: 5,
                                 }}

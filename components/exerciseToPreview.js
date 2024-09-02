@@ -25,8 +25,8 @@ export default function ExerciseToPreview({ exerciseToPreview }) {
                   {exerciseToPreview.exercise.reps[i]}
                 </span>
                 <span
+                  className={styles.setAdornment}
                   style={{
-                    color: '#908E96',
                     marginTop: 2,
                     fontSize: 16,
                   }}
@@ -37,8 +37,8 @@ export default function ExerciseToPreview({ exerciseToPreview }) {
                   {exerciseToPreview.exercise.weights[i]}
                 </span>
                 <span
+                  className={styles.setAdornment}
                   style={{
-                    color: '#908E96',
                     marginLeft: -3,
                     marginTop: 5,
                   }}

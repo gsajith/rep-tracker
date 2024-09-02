@@ -1,0 +1,25 @@
+.userBadgeWrapper {
+  position: fixed;
+  top: 8px;
+  left: 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--backgroundShim);
+  padding-right: 24px;
+  padding: 8px;
+  z-index: 9;
+}
+
+.placeholderUserImage {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: var(--white);
+}
+
+.welcomeText {
+  font-size: 14px;
+  color: var(--textSecondary);
+}

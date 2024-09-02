@@ -1,0 +1,7 @@
+.previousWorkoutsHeader {
+  margin-top: 32px;
+  margin-bottom: 32px;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--textSecondary);
+}

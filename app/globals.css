@@ -4,6 +4,7 @@
 /** TODO: Find and replace in-line style colors with these too **/
 :root {
   --background: #ECEFF3;
+  --backgroundShim: #ECEFF3AA;
   --white: #FFFFFF;
   --text: #1D1226;
   --textSecondary: #908E96;
@@ -44,7 +45,7 @@ div[data-open] > div {
 }
 
 div[data-focus] {
-  background: #e3b8f8;
+  background: var(--accentHoverLight);
 }
 
 /** Hide number input arrows **/
