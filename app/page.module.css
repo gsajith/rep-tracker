@@ -6,7 +6,7 @@
   color: var(--textSecondary);
 }
 
-.cloneWorkoutConfirmButton {
+.workoutButton {
   border: none;
   background: var(--accent);
   color: var(--textInverted);
@@ -21,12 +21,23 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
+
+  padding-left: 8px;
 }
 
-.cloneWorkoutConfirmButton:hover,
-.cloneWorkoutConfirmButton:focus {
+.workoutButton:hover,
+.workoutButton:focus {
   color: var(--textInverted);
   outline: none;
   background: var(--accentHover);
   border: 2px solid var(--text);
+}
+
+.delete {
+  background: var(--warning);
+  border: 2px solid var(--textSecondary);
+}
+
+.delete:hover, .delete:focus {
+  background: var(--warning)
 }

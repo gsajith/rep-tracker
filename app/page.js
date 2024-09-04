@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 import {
   createExercise,
   createWorkout,
+  deleteExercise,
+  deleteWorkout,
   loadWorkoutWithExercises,
 } from '@/utils/supabase/database';
 import LoggedWorkout from '@/components/loggedWorkout';
@@ -13,6 +15,8 @@ import Workout from '@/components/workout';
 import { parseISOString } from '@/utils/utils';
 import { useStickyState } from '@/hooks/useStickyState';
 import Modal from '@/components/modal';
+import { LetsIconsTrash } from '@/components/SVGIcons/LetsIconsTrash';
+import { LetsIconsCopy } from '@/components/SVGIcons/LetsIconsCopy';
 
 const DEBUG = process.env.NODE_ENV === 'development' && false;
 
@@ -93,10 +97,11 @@ export default function Home() {
     });
   }
 
-  const saveWorkout = async (setInWorkout, workoutStartTime, exercises) => {
+  const saveWorkoutHandler = async () => {
+    // TODO: Add loading for this and dont reload page
+    let hasError = false;
     if (window.navigator.onLine) {
       console.log('Saving...');
-      let hasError = false;
       const errors = [];
       const exerciseIds = [];
       for (let i = 0; i < exercises.length; i++) {
@@ -136,7 +141,47 @@ export default function Home() {
         location.reload();
       }
     }
-    if (!window.navigator.online || hasError) {
+    if (!window.navigator.onLine || hasError) {
+      // TODO: Handle error fallback
+    }
+  };
+
+  const deleteWorkoutHandler = async (workout) => {
+    // TODO: add loading for this and dont reload page
+    let hasError = false;
+    if (window.navigator.onLine) {
+      console.log('Deleting...', workout);
+      const errors = [];
+      const exercises = workout.exercises;
+      for (let i = 0; i < exercises.length; i++) {
+        const { data: _e, error: exerciseError } = await deleteExercise(
+          client.current,
+          exercises[i].id
+        );
+        if (exerciseError) {
+          hasError = true;
+          errors.push(exerciseError);
+          console.error(exerciseError);
+        }
+      }
+      if (!hasError) {
+        const { data: _w, error: workoutError } = await deleteWorkout(
+          client.current,
+          workout.id
+        );
+        if (!workoutError) {
+          // TODO: Handle error fallback
+        } else {
+          hasError = true;
+          errors.push(workoutError);
+          console.error(workoutError);
+        }
+
+        // TODO: Only do this if no errors
+        location.reload();
+      }
+    }
+    if (!window.navigator.onLine || hasError) {
       // TODO: Handle error fallback
     }
   };
@@ -153,11 +198,9 @@ export default function Home() {
               gap: 24,
             }}
           >
-            <div style={{ textAlign: 'left' }}>
-              Make a copy of this workout and start it?
-            </div>
+            <div style={{ textAlign: 'left' }}>What would you like to do?</div>
             <button
-              className={styles.cloneWorkoutConfirmButton}
+              className={styles.workoutButton}
               onClick={() => {
                 setInWorkout(false);
                 setInWorkout(true);
@@ -172,7 +215,17 @@ export default function Home() {
                 setModalShown(false);
               }}
             >
-              Start!
+              <LetsIconsCopy />
+              Copy workout
+            </button>
+            <button
+              className={`${styles.workoutButton} ${styles.delete}`}
+              onClick={() => {
+                deleteWorkoutHandler(longPressedWorkout);
+              }}
+            >
+              <LetsIconsTrash />
+              Delete workout
             </button>
           </div>
         </Modal>
@@ -189,7 +242,7 @@ export default function Home() {
           name: exerciseName,
         }))}
         latestExercises={latestExercises.current}
-        saveWorkout={saveWorkout}
+        saveWorkout={saveWorkoutHandler}
       />
 
       {DEBUG && (

@@ -18,6 +18,14 @@ export async function createWorkout(
     .select();
 }
 
+export async function deleteWorkout(client, workoutId) {
+  if (workoutId) {
+    return await client.from('workouts').delete().eq('id', workoutId);
+  } else {
+    return { data: null, error: 'No workout ID' };
+  }
+}
+
 export async function createExercise(client, name, reps, weights, notes) {
   return await client
     .from('exercises')
@@ -28,6 +36,14 @@ export async function createExercise(client, name, reps, weights, notes) {
       notes: notes,
     })
     .select();
+}
+
+export async function deleteExercise(client, exerciseId) {
+  if (exerciseId) {
+    return await client.from('exercises').delete().eq('id', exerciseId);
+  } else {
+    return { data: null, error: 'No exercise ID' };
+  }
 }
 
 export async function loadWorkoutWithExercises(client, addExerciseName) {

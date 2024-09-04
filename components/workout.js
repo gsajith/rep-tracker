@@ -1,5 +1,4 @@
 'use client';
-import { useStickyState } from '@/hooks/useStickyState';
 import styles from './workout.module.css';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -10,7 +9,7 @@ import {
 import ComboBox from './combobox';
 import ExerciseToPreview from './exerciseToPreview';
 import { LetsIconsExpandDown } from './SVGIcons/LetsIconsExpand';
-import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
+import { LetsIconsClose } from './SVGIcons/LetsIconsClose';
 import VariableInput from './variableInput';
 import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
 import Modal from './modal';
@@ -230,7 +229,7 @@ export default function Workout({
             <button
               className={styles.endWorkoutConfirmButton}
               onClick={() => {
-                saveWorkout(setInWorkout, workoutStartTime, exercises);
+                saveWorkout();
               }}
             >
               <LetsIconsDoneRound /> Save & end!
@@ -356,7 +355,7 @@ export default function Workout({
                                     className={styles.deleteSetButton}
                                     onClick={() => deleteSet(index, i, numSets)}
                                   >
-                                    <LetsIconsTrash />
+                                    <LetsIconsClose />
                                   </button>
                                   {i + 1 === numSets && (
                                     <button
