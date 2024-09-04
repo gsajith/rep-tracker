@@ -7,10 +7,15 @@ import {
 import styles from './loggedWorkout.module.css';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
+import { useLongPress } from 'use-long-press';
 
-export default function LoggedWorkout({ data }) {
+export default function LoggedWorkout({ data, onLongPress }) {
+  const bind = useLongPress(() => {
+    onLongPress();
+  });
+
   return (
-    <div className={styles.container}>
+    <div className={styles.container} {...bind()}>
       <div className={styles.header}>
         <span className={styles.title}>{readableDate(data.end_time)}</span>
         <div className={styles.times}>

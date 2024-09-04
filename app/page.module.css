@@ -5,3 +5,28 @@
   font-weight: bold;
   color: var(--textSecondary);
 }
+
+.cloneWorkoutConfirmButton {
+  border: none;
+  background: var(--accent);
+  color: var(--textInverted);
+  padding: 16px;
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 14px;
+  transition: background 150ms ease-in-out, border 150ms ease-in-out;
+  border: 2px solid var(--accent);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.cloneWorkoutConfirmButton:hover,
+.cloneWorkoutConfirmButton:focus {
+  color: var(--textInverted);
+  outline: none;
+  background: var(--accentHover);
+  border: 2px solid var(--text);
+}

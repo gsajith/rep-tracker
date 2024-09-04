@@ -12,12 +12,30 @@ import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
 import { parseISOString } from '@/utils/utils';
 import { useStickyState } from '@/hooks/useStickyState';
+import Modal from '@/components/modal';
 
 const DEBUG = process.env.NODE_ENV === 'development' && false;
 
 // TODO: Long press workout to copy it over?
 export default function Home() {
   const [workouts, setWorkouts] = useState([]);
+
+  // Tracks whether workout has been started or not
+  const [inWorkout, setInWorkout] = useStickyState(false, 'inWorkout');
+
+  // Tracks in storage the timestamp when current workout was started
+  const [workoutStartTime, setWorkoutStartTime] = useStickyState(
+    null,
+    'workoutStartTime'
+  );
+
+  // Tracks in storage exercises have been added to this workout
+  const [exercises, setExercises] = useStickyState([], 'exercises');
+
+  const [modalShown, setModalShown] = useState(false);
+
+  const [longPressedWorkout, setLongPressedWorkout] = useState(null);
+
   const [storedWorkouts, setStoredWorkouts] = useStickyState(
     [],
     'storedWorkouts'
@@ -125,7 +143,47 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
+      {modalShown && (
+        <Modal setShown={setModalShown}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              gap: 24,
+            }}
+          >
+            <div style={{ textAlign: 'left' }}>
+              Make a copy of this workout and start it?
+            </div>
+            <button
+              className={styles.cloneWorkoutConfirmButton}
+              onClick={() => {
+                setInWorkout(false);
+                setInWorkout(true);
+                setWorkoutStartTime(Date.now());
+                setExercises(
+                  longPressedWorkout.exercises.map((exercise) => ({
+                    ...exercise,
+                    notes: '',
+                    expanded: true,
+                  }))
+                );
+                setModalShown(false);
+              }}
+            >
+              Start!
+            </button>
+          </div>
+        </Modal>
+      )}
       <Workout
+        inWorkout={inWorkout}
+        setInWorkout={setInWorkout}
+        exercises={exercises}
+        setExercises={setExercises}
+        workoutStartTime={workoutStartTime}
+        setWorkoutStartTime={setWorkoutStartTime}
         exerciseNames={Array.from(exerciseNames).map((exerciseName, index) => ({
           id: index,
           name: exerciseName,
@@ -187,7 +245,16 @@ export default function Home() {
         workouts.length > 0 &&
         workouts
           .sort((a, b) => b.end_time.valueOf() - a.end_time.valueOf())
-          .map((workout) => <LoggedWorkout key={workout.id} data={workout} />)}
+          .map((workout) => (
+            <LoggedWorkout
+              key={workout.id}
+              data={workout}
+              onLongPress={() => {
+                setLongPressedWorkout(workout);
+                setModalShown(true);
+              }}
+            />
+          ))}
 
       {!loading && workouts.length === 0 && <p> No workouts found</p>}
     </main>

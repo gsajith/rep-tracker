@@ -22,19 +22,13 @@ export default function Workout({
   exerciseNames,
   latestExercises,
   saveWorkout,
+  inWorkout,
+  setInWorkout,
+  exercises,
+  setExercises,
+  workoutStartTime,
+  setWorkoutStartTime,
 }) {
-  // Tracks whether workout has been started or not
-  const [inWorkout, setInWorkout] = useStickyState(false, 'inWorkout');
-
-  // Tracks in storage the timestamp when current workout was started
-  const [workoutStartTime, setWorkoutStartTime] = useStickyState(
-    null,
-    'workoutStartTime'
-  );
-
-  // Tracks in storage exercises have been added to this workout
-  const [exercises, setExercises] = useStickyState([], 'exercises');
-
   // State for the exercise selector combobox
   const [selectedItem, setSelectedItem] = useState();
   // State for the exercise selector combobox
@@ -287,7 +281,7 @@ export default function Workout({
                           setExpanded(index, !exercise.expanded);
                         }}
                       >
-                        <span>
+                        <span style={{ textAlign: 'left' }}>
                           {exercise.name}
                           {!exercise.expanded && (
                             <span style={{ fontWeight: '400' }}>
