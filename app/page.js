@@ -104,7 +104,7 @@ export default function Home() {
           client.current,
           exercises[i].name,
           exercises[i].reps.map((rep) => parseInt(rep) || 0),
-          exercises[i].weights.map((weight) => parseInt(weight) || 0),
+          exercises[i].weights.map((weight) => parseFloat(weight) || 0),
           exercises[i].notes
         );
         if (!exerciseError) {

@@ -25,6 +25,14 @@ export default function VariableInput({
       style={{ ...style, width: width }}
       placeholder={placeholder}
       value={value}
+      onFocus={function (e) {
+        e.currentTarget.type = 'text';
+        e.currentTarget.setSelectionRange(
+          e.currentTarget.value.length,
+          e.currentTarget.value.length
+        );
+        e.currentTarget.type = 'number';
+      }}
     >
       {children}
     </input>
