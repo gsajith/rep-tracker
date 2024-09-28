@@ -17,6 +17,12 @@
   --warning: #ac2746;
 }
 
+* {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+
 html, body {
   background: var(--background);
   color: var(--text);
