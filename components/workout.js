@@ -580,7 +580,13 @@ export default function Workout({
               <LetsIconsTimeAtack />
               <span>{workoutTimer}</span>
             </div>
-            <div>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+              }}
+            >
               <button
                 onClick={() => setModalShown(true)}
                 className={styles.endWorkoutButton}

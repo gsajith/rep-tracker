@@ -63,6 +63,8 @@ export default function Home() {
     }
   }, [session]);
 
+  console.log('loading...', loading);
+
   useEffect(() => {
     if (!user || !client.current) return;
 
@@ -261,7 +263,14 @@ export default function Home() {
       </div>
 
       {loading && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            width: '100%',
+          }}
+        >
           <div
             className="shimmerBG"
             style={{
@@ -271,7 +280,6 @@ export default function Home() {
               borderRadius: 16,
             }}
           ></div>
-
           <div
             className="shimmerBG"
             style={{
@@ -281,7 +289,6 @@ export default function Home() {
               borderRadius: 16,
             }}
           ></div>
-
           <div
             className="shimmerBG"
             style={{
