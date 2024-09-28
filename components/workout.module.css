@@ -73,6 +73,9 @@
 }
 
 .exercise {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   background: var(--secondary);
   color: var(--text);
   border-radius: 14px 14px 0px 0px;
