@@ -80,7 +80,8 @@
   display: flex;
   gap: 8px;
   flex-direction: column;
-  margin: 12px 0px;
+  margin-top: 12px;
+  margin-bottom: 0px;
 }
 
 .pastExercise {

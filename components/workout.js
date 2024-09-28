@@ -284,8 +284,8 @@ export default function Workout({
 
                       return (
                         <Draggable
-                          key={exercise.id}
-                          draggableId={exercise.id}
+                          key={'exercise' + exercise.name + index}
+                          draggableId={'exercise' + exercise.name + index}
                           index={index}
                         >
                           {(provided, snapshot) => (
