@@ -30,6 +30,9 @@ html, body {
 
 button {
   color: var(--text);
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
 }
 
 button:hover, button:focus {
