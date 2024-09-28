@@ -12,7 +12,7 @@ import {
 } from '@/utils/supabase/database';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
-import { parseISOString } from '@/utils/utils';
+import { parseISOString, readableDate } from '@/utils/utils';
 import { useStickyState } from '@/hooks/useStickyState';
 import Modal from '@/components/modal';
 import { LetsIconsTrash } from '@/components/SVGIcons/LetsIconsTrash';
@@ -62,8 +62,6 @@ export default function Home() {
       client.current = createClerkSupabaseClient(session);
     }
   }, [session]);
-
-  console.log('loading...', loading);
 
   useEffect(() => {
     if (!user || !client.current) return;
@@ -201,6 +199,12 @@ export default function Home() {
             }}
           >
             <div style={{ textAlign: 'left' }}>What would you like to do?</div>
+            <div>
+              Workout on{' '}
+              <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>
+                {readableDate(longPressedWorkout.end_time)}
+              </span>
+            </div>
             <button
               className={styles.workoutButton}
               onClick={() => {
@@ -215,6 +219,7 @@ export default function Home() {
                   }))
                 );
                 setModalShown(false);
+                console.log(longPressedWorkout);
               }}
             >
               <LetsIconsCopy />
