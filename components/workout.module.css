@@ -3,7 +3,7 @@
   color: var(--textInverted);
   transition: width 300ms ease-in-out, background 300ms ease-in-out;
   max-width: calc(100vw - 64px);
-  padding: 24px;
+  padding: 18px;
   border-radius: 32px;
   width: 320px;
 }
@@ -63,7 +63,6 @@
 .exercisesContainer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
   margin-bottom: 12px;
 }
 
@@ -81,6 +80,7 @@
   display: flex;
   gap: 8px;
   flex-direction: column;
+  margin: 12px 0px;
 }
 
 .pastExercise {

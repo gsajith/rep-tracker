@@ -15,6 +15,13 @@ import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
 import Modal from './modal';
 import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+
+const getExerciseStyle = (isDragging, exerciseStyle, draggableStyle) => ({
+  userSelect: 'none',
+  ...exerciseStyle,
+  ...draggableStyle,
+});
 
 // TODO: Add note to whole workout
 export default function Workout({
@@ -202,6 +209,18 @@ export default function Workout({
     });
   };
 
+  const onDragEnd = (result) => {
+    // Dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const newExercises = Array.from(exercises);
+    const [removed] = newExercises.splice(result.source.index, 1);
+    newExercises.splice(result.destination.index, 0, removed);
+    setExercises(newExercises);
+  };
+
   return (
     <div
       className={`${styles.container} ${!inWorkout && styles.startup}`}
@@ -240,207 +259,260 @@ export default function Workout({
       {inWorkout ? (
         <div>
           {exercises.length > 0 && (
-            <div className={styles.exercisesContainer}>
-              {exercises.map((exercise, index) => {
-                const numOldSets =
-                  (exercise.time &&
-                    exercise.expanded &&
-                    Math.min(
-                      exercise.oldReps?.length,
-                      exercise.oldWeights?.length
-                    )) ||
-                  0;
-
-                const numSets = Math.min(
-                  exercise.reps.length,
-                  exercise.weights.length
-                );
-
-                return (
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided, snapshot) => (
                   <div
-                    key={exercise.name}
-                    className={styles.exerciseContainer}
-                    style={
-                      exercise.expanded
-                        ? { maxHeight: 50 * numOldSets + 50 * numSets + 300 }
-                        : {}
-                    }
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className={styles.exercisesContainer}
                   >
-                    <div
-                      className={styles.exercise}
-                      style={
-                        !(exercise.time && exercise.expanded)
-                          ? { borderRadius: 14 }
-                          : {}
-                      }
-                    >
-                      <button
-                        className={styles.exerciseName}
-                        onClick={() => {
-                          setExpanded(index, !exercise.expanded);
-                        }}
-                      >
-                        <span style={{ textAlign: 'left' }}>
-                          {exercise.name}
-                          {!exercise.expanded && (
-                            <span style={{ fontWeight: '400' }}>
-                              •{numSets} {numSets === 1 ? 'set' : 'sets'}
-                            </span>
-                          )}
-                        </span>
-                        <LetsIconsExpandDown
-                          style={exercise.expanded ? { rotate: '-180deg' } : {}}
-                        />
-                      </button>
-                      {exercise.expanded && (
-                        <>
-                          <div className={styles.setInputs}>
-                            {[...Array(numSets)].map((_e, i) => (
-                              <div
-                                key={index + '-' + 'set' + i}
-                                className={styles.setInputWrapper}
-                              >
-                                <div className={styles.setInputContainer}>
-                                  <VariableInput
-                                    type="number"
-                                    className={styles.setInputNumber}
-                                    value={exercise.reps[i]}
-                                    onChange={(e) => {
-                                      updateExerciseReps(
-                                        index,
-                                        i,
-                                        e.target.value
-                                      );
-                                    }}
-                                  />
-                                  <span
-                                    className={styles.setAdornment}
-                                    style={{
-                                      marginTop: 2,
-                                      fontSize: 16,
-                                    }}
-                                  >
-                                    ×
-                                  </span>
-                                  <VariableInput
-                                    type="number"
-                                    className={styles.setInputNumber}
-                                    value={exercise.weights[i]}
-                                    onChange={(e) => {
-                                      updateExerciseWeights(
-                                        index,
-                                        i,
-                                        e.target.value
-                                      );
-                                    }}
-                                  />
-                                  <span
-                                    className={styles.setAdornment}
-                                    style={{
-                                      marginLeft: -3,
-                                      marginTop: 5,
-                                    }}
-                                  >
-                                    lbs
-                                  </span>
-                                </div>
+                    {exercises.map((exercise, index) => {
+                      const numOldSets =
+                        (exercise.time &&
+                          exercise.expanded &&
+                          Math.min(
+                            exercise.oldReps?.length,
+                            exercise.oldWeights?.length
+                          )) ||
+                        0;
 
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
+                      const numSets = Math.min(
+                        exercise.reps.length,
+                        exercise.weights.length
+                      );
+
+                      return (
+                        <Draggable
+                          key={exercise.id}
+                          draggableId={exercise.id}
+                          index={index}
+                        >
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              key={exercise.name}
+                              className={styles.exerciseContainer}
+                              style={getExerciseStyle(
+                                snapshot.isDragging,
+                                exercise.expanded
+                                  ? {
+                                      maxHeight:
+                                        50 * numOldSets + 50 * numSets + 300,
+                                    }
+                                  : {},
+                                provided.draggableProps.style
+                              )}
+                            >
+                              <div
+                                className={styles.exercise}
+                                style={
+                                  !(exercise.time && exercise.expanded)
+                                    ? {
+                                        borderRadius: 14,
+                                        filter: snapshot.isDragging
+                                          ? 'brightness(85%)'
+                                          : 'revert-layer',
+                                      }
+                                    : {}
+                                }
+                              >
+                                <button
+                                  className={styles.exerciseName}
+                                  onClick={() => {
+                                    setExpanded(index, !exercise.expanded);
                                   }}
                                 >
-                                  <button
-                                    className={styles.deleteSetButton}
-                                    onClick={() => deleteSet(index, i, numSets)}
-                                  >
-                                    <LetsIconsClose />
-                                  </button>
-                                  {i + 1 === numSets && (
-                                    <button
-                                      className={styles.addSetButton}
-                                      onClick={() => addSet(index, numSets + 1)}
+                                  <span style={{ textAlign: 'left' }}>
+                                    {exercise.name}
+                                    {!exercise.expanded && (
+                                      <span style={{ fontWeight: '400' }}>
+                                        •{numSets}{' '}
+                                        {numSets === 1 ? 'set' : 'sets'}
+                                      </span>
+                                    )}
+                                  </span>
+                                  <LetsIconsExpandDown
+                                    style={
+                                      exercise.expanded
+                                        ? { rotate: '-180deg' }
+                                        : {}
+                                    }
+                                  />
+                                </button>
+                                {exercise.expanded && (
+                                  <>
+                                    <div className={styles.setInputs}>
+                                      {[...Array(numSets)].map((_e, i) => (
+                                        <div
+                                          key={index + '-' + 'set' + i}
+                                          className={styles.setInputWrapper}
+                                        >
+                                          <div
+                                            className={styles.setInputContainer}
+                                          >
+                                            <VariableInput
+                                              type="number"
+                                              className={styles.setInputNumber}
+                                              value={exercise.reps[i]}
+                                              onChange={(e) => {
+                                                updateExerciseReps(
+                                                  index,
+                                                  i,
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                            <span
+                                              className={styles.setAdornment}
+                                              style={{
+                                                marginTop: 2,
+                                                fontSize: 16,
+                                              }}
+                                            >
+                                              ×
+                                            </span>
+                                            <VariableInput
+                                              type="number"
+                                              className={styles.setInputNumber}
+                                              value={exercise.weights[i]}
+                                              onChange={(e) => {
+                                                updateExerciseWeights(
+                                                  index,
+                                                  i,
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                            <span
+                                              className={styles.setAdornment}
+                                              style={{
+                                                marginLeft: -3,
+                                                marginTop: 5,
+                                              }}
+                                            >
+                                              lbs
+                                            </span>
+                                          </div>
+
+                                          <div
+                                            style={{
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                            }}
+                                          >
+                                            <button
+                                              className={styles.deleteSetButton}
+                                              onClick={() =>
+                                                deleteSet(index, i, numSets)
+                                              }
+                                            >
+                                              <LetsIconsClose />
+                                            </button>
+                                            {i + 1 === numSets && (
+                                              <button
+                                                className={styles.addSetButton}
+                                                onClick={() =>
+                                                  addSet(index, numSets + 1)
+                                                }
+                                              >
+                                                Add a set
+                                              </button>
+                                            )}
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <div
+                                      className={styles.notesInputContainer}
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        opacity:
+                                          exercise.notes.length > 0
+                                            ? 1
+                                            : 'revert-layer',
+                                      }}
                                     >
-                                      Add a set
-                                    </button>
-                                  )}
-                                </div>
+                                      <LetsIconsComment
+                                        className={styles.notesInputIcon}
+                                      />
+                                      <input
+                                        type="text"
+                                        className={styles.notesInput}
+                                        placeholder={`Add notes about ${exercise.name}`}
+                                        value={exercise.notes}
+                                        onChange={(e) =>
+                                          updateExerciseNotes(
+                                            index,
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                  </>
+                                )}
                               </div>
-                            ))}
-                          </div>
-                          <div
-                            className={styles.notesInputContainer}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              opacity:
-                                exercise.notes.length > 0 ? 1 : 'revert-layer',
-                            }}
-                          >
-                            <LetsIconsComment
-                              className={styles.notesInputIcon}
-                            />
-                            <input
-                              type="text"
-                              className={styles.notesInput}
-                              placeholder={`Add notes about ${exercise.name}`}
-                              value={exercise.notes}
-                              onChange={(e) =>
-                                updateExerciseNotes(index, e.target.value)
-                              }
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                    {exercise.time && exercise.expanded && (
-                      <div className={styles.pastExercise}>
-                        <span>
-                          Previously: {readableDate(new Date(exercise.time))} (
-                          {calculateDaysAgo(new Date(exercise.time))})
-                        </span>
-                        <div className={styles.setsContainer}>
-                          {[...Array(numOldSets)].map((_e, i) => (
-                            <div className={styles.setContainer} key={i}>
-                              <span style={{ fontSize: 18 }}>
-                                {exercise.oldReps[i]}
-                              </span>
-                              <span
-                                className={styles.setAdornment}
-                                style={{
-                                  marginTop: 2,
-                                  fontSize: 16,
-                                }}
-                              >
-                                ×
-                              </span>
-                              <span style={{ fontSize: 18 }}>
-                                {exercise.oldWeights[i]}
-                              </span>
-                              <span
-                                className={styles.setAdornment}
-                                style={{
-                                  marginLeft: -3,
-                                  marginTop: 5,
-                                }}
-                              >
-                                lbs
-                              </span>
+                              {exercise.time && exercise.expanded && (
+                                <div className={styles.pastExercise}>
+                                  <span>
+                                    Previously:{' '}
+                                    {readableDate(new Date(exercise.time))} (
+                                    {calculateDaysAgo(new Date(exercise.time))})
+                                  </span>
+                                  <div className={styles.setsContainer}>
+                                    {[...Array(numOldSets)].map((_e, i) => (
+                                      <div
+                                        className={styles.setContainer}
+                                        key={i}
+                                      >
+                                        <span style={{ fontSize: 18 }}>
+                                          {exercise.oldReps[i]}
+                                        </span>
+                                        <span
+                                          className={styles.setAdornment}
+                                          style={{
+                                            marginTop: 2,
+                                            fontSize: 16,
+                                          }}
+                                        >
+                                          ×
+                                        </span>
+                                        <span style={{ fontSize: 18 }}>
+                                          {exercise.oldWeights[i]}
+                                        </span>
+                                        <span
+                                          className={styles.setAdornment}
+                                          style={{
+                                            marginLeft: -3,
+                                            marginTop: 5,
+                                          }}
+                                        >
+                                          lbs
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                  {exercise.oldNotes &&
+                                    exercise.oldNotes.length > 0 && (
+                                      <div style={{ marginTop: 8 }}>
+                                        Note: {exercise.oldNotes}
+                                      </div>
+                                    )}
+                                </div>
+                              )}
                             </div>
-                          ))}
-                        </div>
-                        {exercise.oldNotes && exercise.oldNotes.length > 0 && (
-                          <div style={{ marginTop: 8 }}>
-                            Note: {exercise.oldNotes}
-                          </div>
-                        )}
-                      </div>
-                    )}
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                    {provided.placeholder}
                   </div>
-                );
-              })}
-            </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           )}
           <div style={{ display: 'flex' }}>
             <ComboBox
