@@ -44,8 +44,8 @@ button:hover, button:focus {
 /** Combobox styling **/
 div[data-open] {
   background: var(--white);
-  width: calc(100% - 119px);
-  max-width: calc(259px) !important;
+  width: calc(100% - 116px);
+  max-width: calc(278px) !important;
   border-radius: 0px 0px 8px 8px;
 }
 
