@@ -2,10 +2,10 @@
   background: var(--accent);
   color: var(--textInverted);
   transition: width 300ms ease-in-out, background 300ms ease-in-out;
-  max-width: calc(100vw - 64px);
+  max-width: calc(100vw - 52px);
   padding: 18px;
   border-radius: 32px;
-  width: 320px;
+  width: 332px;
 }
 
 .startup {
