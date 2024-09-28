@@ -16,6 +16,7 @@ import Modal from './modal';
 import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
 
 const getExerciseStyle = (isDragging, exerciseStyle, draggableStyle) => ({
   userSelect: 'none',
@@ -50,6 +51,7 @@ export default function Workout({
 
   // Modal state
   const [modalShown, setModalShown] = useState(false);
+  const [trashModalShown, setTrashModalShown] = useState(false);
 
   useEffect(() => {
     if (workoutStartTime) {
@@ -71,6 +73,7 @@ export default function Workout({
       setExerciseToPreview(null);
       exerciseName.current = null;
       setModalShown(false);
+      setTrashModalShown(false);
     }
   }, [inWorkout]);
 
@@ -252,6 +255,31 @@ export default function Workout({
               }}
             >
               <LetsIconsDoneRound /> Save & end!
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {trashModalShown && (
+        <Modal setShown={setTrashModalShown}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              gap: 24,
+            }}
+          >
+            <div style={{ textAlign: 'left' }}>
+              Are you sure you want to trash this workout?
+            </div>
+            <button
+              className={styles.deleteWorkout}
+              onClick={() => {
+                setInWorkout(false);
+              }}
+            >
+              <LetsIconsTrash /> Trash it!
             </button>
           </div>
         </Modal>
@@ -552,12 +580,20 @@ export default function Workout({
               <LetsIconsTimeAtack />
               <span>{workoutTimer}</span>
             </div>
-            <button
-              onClick={() => setModalShown(true)}
-              className={styles.endWorkoutButton}
-            >
-              End workout
-            </button>
+            <div>
+              <button
+                onClick={() => setModalShown(true)}
+                className={styles.endWorkoutButton}
+              >
+                End workout
+              </button>
+              <button
+                onClick={() => setTrashModalShown(true)}
+                className={styles.trashWorkoutButton}
+              >
+                <LetsIconsTrash />
+              </button>
+            </div>
           </div>
         </div>
       ) : (
