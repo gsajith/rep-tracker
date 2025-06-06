@@ -19,8 +19,8 @@ export default function LoggedWorkout({ data, onLongPress }) {
       <div className={styles.header}>
         <span className={styles.title}>{readableDate(data.end_time)}</span>
         <div className={styles.times}>
-          <span>{calculateDaysAgo(data.end_time)}</span>
-          <span>{readableTime(data.end_time)}</span>
+          <span>{calculateDaysAgo(data.start_time)}</span>
+          <span>{readableTime(data.start_time)}</span>
         </div>
       </div>
       <div className={styles.exercisesContainer}>
