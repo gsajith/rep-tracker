@@ -2,7 +2,6 @@
 
 ### A light-weight workout tracker app (NextJS PWA).
 
-
 ---
 
 First, run the development server:
