@@ -425,13 +425,19 @@ export default function Workout({
                                                 console.log(
                                                   event.touches[0].clientX
                                                 );
+                                                const rect =
+                                                  event.target.getBoundingClientRect();
                                                 setTouchDrag(
-                                                  event.touches[0].clientX
+                                                  event.touches[0].clientX -
+                                                    rect.left
                                                 );
                                               }}
                                               onTouchEnd={() => {
                                                 setTouchDrag(0);
                                               }}
+                                              onMouseMove={(event) =>
+                                                console.log(event)
+                                              }
                                               type="number"
                                               className={styles.setInputNumber}
                                               value={Math.max(
