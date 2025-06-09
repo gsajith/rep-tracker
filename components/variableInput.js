@@ -22,7 +22,7 @@ export default function VariableInput({
   return (
     <input
       {...props}
-      style={{ ...style, width: width }}
+      style={{ ...style, width: width, touchAction: 'none' }}
       placeholder={placeholder}
       value={value}
       onFocus={function (e) {

@@ -17,9 +17,6 @@ import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
-import dynamic from 'next/dynamic';
-
-const DragRange = dynamic(() => import('react-drag-range'));
 
 const getExerciseStyle = (isDragging, exerciseStyle, draggableStyle) => ({
   userSelect: 'none',
@@ -264,6 +261,8 @@ export default function Workout({
     setExercises(newExercises);
   };
 
+  const [touchDrag, setTouchDrag] = useState(0);
+
   return (
     <div
       className={`${styles.container} ${!inWorkout && styles.startup}`}
@@ -421,54 +420,33 @@ export default function Workout({
                                           <div
                                             className={styles.setInputContainer}
                                           >
-                                            <DragRange
-                                              onDragEnd={() => {
+                                            <VariableInput
+                                              onTouchMove={(event) => {
+                                                console.log(
+                                                  event.touches[0].clientX
+                                                );
+                                                setTouchDrag(
+                                                  event.touches[0].clientX
+                                                );
+                                              }}
+                                              onTouchEnd={() => {
+                                                setTouchDrag(0);
+                                              }}
+                                              type="number"
+                                              className={styles.setInputNumber}
+                                              value={Math.max(
+                                                0,
+                                                parseInt(exercise.reps[i]) +
+                                                  parseInt(exercise.repsDrag[i])
+                                              )}
+                                              onChange={(e) => {
                                                 updateExerciseReps(
                                                   index,
                                                   i,
-                                                  Math.max(
-                                                    0,
-                                                    parseInt(exercise.reps[i]) +
-                                                      parseInt(
-                                                        exercise.repsDrag[i]
-                                                      )
-                                                  )
-                                                );
-                                                updateExerciseRepsDrag(
-                                                  index,
-                                                  i,
-                                                  0
+                                                  e.target.value
                                                 );
                                               }}
-                                              onChange={(v) =>
-                                                updateExerciseRepsDrag(
-                                                  index,
-                                                  i,
-                                                  v
-                                                )
-                                              }
-                                            >
-                                              <VariableInput
-                                                type="number"
-                                                className={
-                                                  styles.setInputNumber
-                                                }
-                                                value={Math.max(
-                                                  0,
-                                                  parseInt(exercise.reps[i]) +
-                                                    parseInt(
-                                                      exercise.repsDrag[i]
-                                                    )
-                                                )}
-                                                onChange={(e) => {
-                                                  updateExerciseReps(
-                                                    index,
-                                                    i,
-                                                    e.target.value
-                                                  );
-                                                }}
-                                              />
-                                            </DragRange>
+                                            />
                                             <span
                                               className={styles.setAdornment}
                                               style={{
@@ -478,58 +456,25 @@ export default function Workout({
                                             >
                                               ×
                                             </span>
-                                            <DragRange
-                                              onDragEnd={() => {
+
+                                            <VariableInput
+                                              type="number"
+                                              className={styles.setInputNumber}
+                                              value={Math.max(
+                                                0,
+                                                parseInt(exercise.weights[i]) +
+                                                  parseInt(
+                                                    exercise.weightsDrag[i]
+                                                  )
+                                              )}
+                                              onChange={(e) => {
                                                 updateExerciseWeights(
                                                   index,
                                                   i,
-                                                  Math.max(
-                                                    0,
-                                                    parseInt(
-                                                      exercise.weights[i]
-                                                    ) +
-                                                      parseInt(
-                                                        exercise.weightsDrag[i]
-                                                      )
-                                                  )
-                                                );
-                                                updateExerciseWeightsDrag(
-                                                  index,
-                                                  i,
-                                                  0
+                                                  e.target.value
                                                 );
                                               }}
-                                              onChange={(v) =>
-                                                updateExerciseWeightsDrag(
-                                                  index,
-                                                  i,
-                                                  v
-                                                )
-                                              }
-                                            >
-                                              <VariableInput
-                                                type="number"
-                                                className={
-                                                  styles.setInputNumber
-                                                }
-                                                value={Math.max(
-                                                  0,
-                                                  parseInt(
-                                                    exercise.weights[i]
-                                                  ) +
-                                                    parseInt(
-                                                      exercise.weightsDrag[i]
-                                                    )
-                                                )}
-                                                onChange={(e) => {
-                                                  updateExerciseWeights(
-                                                    index,
-                                                    i,
-                                                    e.target.value
-                                                  );
-                                                }}
-                                              />
-                                            </DragRange>
+                                            />
                                             <span
                                               className={styles.setAdornment}
                                               style={{
