@@ -177,10 +177,22 @@ export default function Workout({
     });
   };
 
+  const normalizeWeightsDrag = (value) => {
+    if (value <= 15) {
+      return Math.ceil(value / 3);
+    } else {
+      return Math.ceil((value - 15) / 3) * 5;
+    }
+  };
+
+  const normalizeRepsDrag = (value) => {
+    return Math.ceil(value / 3);
+  };
+
   const updateExerciseRepsDrag = (exerciseIndex, setIndex, value) => {
     setExercises((oldExercises) => {
       const newExercises = [...oldExercises];
-      newExercises[exerciseIndex].repsDrag[setIndex] = value;
+      newExercises[exerciseIndex].repsDrag[setIndex] = normalizeRepsDrag(value);
       return newExercises;
     });
   };
@@ -188,7 +200,8 @@ export default function Workout({
   const updateExerciseWeightsDrag = (exerciseIndex, setIndex, value) => {
     setExercises((oldExercises) => {
       const newExercises = [...oldExercises];
-      newExercises[exerciseIndex].weightsDrag[setIndex] = value;
+      newExercises[exerciseIndex].weightsDrag[setIndex] =
+        normalizeWeightsDrag(value);
       return newExercises;
     });
   };
@@ -411,10 +424,13 @@ export default function Workout({
                                                 updateExerciseReps(
                                                   index,
                                                   i,
-                                                  parseInt(exercise.reps[i]) +
-                                                    parseInt(
-                                                      exercise.repsDrag[i]
-                                                    )
+                                                  Math.max(
+                                                    0,
+                                                    parseInt(exercise.reps[i]) +
+                                                      parseInt(
+                                                        exercise.repsDrag[i]
+                                                      )
+                                                  )
                                                 );
                                                 updateExerciseRepsDrag(
                                                   index,
@@ -435,10 +451,13 @@ export default function Workout({
                                                 className={
                                                   styles.setInputNumber
                                                 }
-                                                value={
+                                                value={Math.max(
+                                                  0,
                                                   parseInt(exercise.reps[i]) +
-                                                  parseInt(exercise.repsDrag[i])
-                                                }
+                                                    parseInt(
+                                                      exercise.repsDrag[i]
+                                                    )
+                                                )}
                                                 onChange={(e) => {
                                                   updateExerciseReps(
                                                     index,
@@ -462,12 +481,15 @@ export default function Workout({
                                                 updateExerciseWeights(
                                                   index,
                                                   i,
-                                                  parseInt(
-                                                    exercise.weights[i]
-                                                  ) +
+                                                  Math.max(
+                                                    0,
                                                     parseInt(
-                                                      exercise.weightsDrag[i]
-                                                    )
+                                                      exercise.weights[i]
+                                                    ) +
+                                                      parseInt(
+                                                        exercise.weightsDrag[i]
+                                                      )
+                                                  )
                                                 );
                                                 updateExerciseWeightsDrag(
                                                   index,
@@ -488,14 +510,15 @@ export default function Workout({
                                                 className={
                                                   styles.setInputNumber
                                                 }
-                                                value={
+                                                value={Math.max(
+                                                  0,
                                                   parseInt(
                                                     exercise.weights[i]
                                                   ) +
-                                                  parseInt(
-                                                    exercise.weightsDrag[i]
-                                                  )
-                                                }
+                                                    parseInt(
+                                                      exercise.weightsDrag[i]
+                                                    )
+                                                )}
                                                 onChange={(e) => {
                                                   updateExerciseWeights(
                                                     index,
