@@ -431,6 +431,14 @@ export default function Workout({
                                                 );
                                               }}
                                               onTouchEnd={() => {
+                                                updateExerciseReps(
+                                                  index,
+                                                  i,
+                                                  parseInt(exercise.reps[i]) +
+                                                    parseInt(
+                                                      exercise.repsDrag[i]
+                                                    )
+                                                );
                                                 updateExerciseRepsDrag(
                                                   index,
                                                   i,
@@ -476,6 +484,16 @@ export default function Workout({
                                                 );
                                               }}
                                               onTouchEnd={() => {
+                                                updateExerciseWeights(
+                                                  index,
+                                                  i,
+                                                  parseInt(
+                                                    exercise.weights[i]
+                                                  ) +
+                                                    parseInt(
+                                                      exercise.weightsDrag[i]
+                                                    )
+                                                );
                                                 updateExerciseWeightsDrag(
                                                   index,
                                                   i,
