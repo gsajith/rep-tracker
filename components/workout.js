@@ -178,14 +178,14 @@ export default function Workout({
 
   const normalizeWeightsDrag = (value) => {
     if (value <= 150) {
-      return Math.ceil(value / 30);
+      return Math.floor(value / 30);
     } else {
-      return Math.ceil((value - 15) / 30) * 5;
+      return Math.floor((value - 150) / 30) * 5;
     }
   };
 
   const normalizeRepsDrag = (value) => {
-    return Math.ceil(value / 30);
+    return Math.floor(value / 30);
   };
 
   const updateExerciseRepsDrag = (exerciseIndex, setIndex, value) => {
