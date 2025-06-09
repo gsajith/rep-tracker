@@ -17,7 +17,9 @@ import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
-import DragRange from 'react-drag-range';
+import dynamic from 'next/dynamic';
+
+const DragRange = dynamic(() => import('react-drag-range'));
 
 const getExerciseStyle = (isDragging, exerciseStyle, draggableStyle) => ({
   userSelect: 'none',
