@@ -180,7 +180,7 @@ export default function Workout({
     if (value <= 150) {
       return Math.floor(value / 30);
     } else {
-      return Math.floor((value - 150) / 30) * 5;
+      return Math.ceil((value - 150) / 30) * 5;
     }
   };
 
