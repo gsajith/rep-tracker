@@ -261,8 +261,6 @@ export default function Workout({
     setExercises(newExercises);
   };
 
-  const [touchDrag, setTouchDrag] = useState(0);
-
   return (
     <div
       className={`${styles.container} ${!inWorkout && styles.startup}`}
@@ -274,7 +272,6 @@ export default function Workout({
         }
       }}
     >
-      {touchDrag}
       {modalShown && (
         <Modal setShown={setModalShown}>
           <div
@@ -422,22 +419,24 @@ export default function Workout({
                                           >
                                             <VariableInput
                                               onTouchMove={(event) => {
-                                                console.log(
-                                                  event.touches[0].clientX
-                                                );
                                                 const rect =
                                                   event.target.getBoundingClientRect();
-                                                setTouchDrag(
+                                                const dragValue =
                                                   event.touches[0].clientX -
-                                                    rect.left
+                                                  rect.left;
+                                                updateExerciseRepsDrag(
+                                                  index,
+                                                  i,
+                                                  dragValue
                                                 );
                                               }}
                                               onTouchEnd={() => {
-                                                setTouchDrag(0);
+                                                updateExerciseRepsDrag(
+                                                  index,
+                                                  i,
+                                                  0
+                                                );
                                               }}
-                                              onMouseMove={(event) =>
-                                                console.log(event)
-                                              }
                                               type="number"
                                               className={styles.setInputNumber}
                                               value={Math.max(
@@ -464,6 +463,25 @@ export default function Workout({
                                             </span>
 
                                             <VariableInput
+                                              onTouchMove={(event) => {
+                                                const rect =
+                                                  event.target.getBoundingClientRect();
+                                                const dragValue =
+                                                  event.touches[0].clientX -
+                                                  rect.left;
+                                                updateExerciseWeightsDrag(
+                                                  index,
+                                                  i,
+                                                  dragValue
+                                                );
+                                              }}
+                                              onTouchEnd={() => {
+                                                updateExerciseWeightsDrag(
+                                                  index,
+                                                  i,
+                                                  0
+                                                );
+                                              }}
                                               type="number"
                                               className={styles.setInputNumber}
                                               value={Math.max(
