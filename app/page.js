@@ -20,7 +20,6 @@ import { LetsIconsCopy } from '@/components/SVGIcons/LetsIconsCopy';
 
 const DEBUG = process.env.NODE_ENV === 'development' && false;
 
-// TODO: Long press workout to copy it over?
 export default function Home() {
   const [workouts, setWorkouts] = useState([]);
 
@@ -211,15 +210,21 @@ export default function Home() {
                 setInWorkout(false);
                 setInWorkout(true);
                 setWorkoutStartTime(Date.now());
-                setExercises(
-                  longPressedWorkout.exercises.map((exercise) => ({
-                    ...exercise,
-                    notes: '',
-                    expanded: true,
-                  }))
-                );
+                setExercises(() => {
+                  const newWorkout = structuredClone(longPressedWorkout);
+                  newWorkout.exercises = newWorkout.exercises.map(
+                    (exercise) => ({
+                      ...exercise,
+                      repsDrag: Array(exercise.reps.length).fill(0),
+                      weightsDrag: Array(exercise.weights.length).fill(0),
+                      notes: '',
+                      expanded: true,
+                    })
+                  );
+
+                  return newWorkout.exercises;
+                });
                 setModalShown(false);
-                console.log(longPressedWorkout);
               }}
             >
               <LetsIconsCopy />

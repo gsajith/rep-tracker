@@ -17,6 +17,7 @@ import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
+import DragRange from 'react-drag-range';
 
 const getExerciseStyle = (isDragging, exerciseStyle, draggableStyle) => ({
   userSelect: 'none',
@@ -103,6 +104,8 @@ export default function Workout({
                     preview.exercise.weights.length - 1
                   ] || 0,
                 ],
+                repsDrag: [0],
+                weightsDrag: [0],
                 notes: '',
                 expanded: true,
               }
@@ -113,6 +116,8 @@ export default function Workout({
                 oldNotes: null,
                 reps: [0],
                 weights: [0],
+                repsDrag: [0],
+                weightsDrag: [0],
                 notes: '',
                 expanded: true,
               }
@@ -172,19 +177,39 @@ export default function Workout({
     });
   };
 
+  const updateExerciseRepsDrag = (exerciseIndex, setIndex, value) => {
+    setExercises((oldExercises) => {
+      const newExercises = [...oldExercises];
+      newExercises[exerciseIndex].repsDrag[setIndex] = value;
+      return newExercises;
+    });
+  };
+
+  const updateExerciseWeightsDrag = (exerciseIndex, setIndex, value) => {
+    setExercises((oldExercises) => {
+      const newExercises = [...oldExercises];
+      newExercises[exerciseIndex].weightsDrag[setIndex] = value;
+      return newExercises;
+    });
+  };
+
   const addSet = (exerciseIndex, num) => {
     setExercises((oldExercises) => {
       const newExercises = [...oldExercises];
       const repsLength = newExercises[exerciseIndex].reps.length;
-      if (repsLength < num)
+      if (repsLength < num) {
         newExercises[exerciseIndex].reps.push(
           newExercises[exerciseIndex].reps[repsLength - 1]
         );
+        newExercises[exerciseIndex].repsDrag.push(0);
+      }
       const weightsLength = newExercises[exerciseIndex].weights.length;
-      if (weightsLength < num)
+      if (weightsLength < num) {
         newExercises[exerciseIndex].weights.push(
           newExercises[exerciseIndex].weights[weightsLength - 1]
         );
+        newExercises[exerciseIndex].weightsDrag.push(0);
+      }
       return newExercises;
     });
   };
@@ -381,18 +406,48 @@ export default function Workout({
                                           <div
                                             className={styles.setInputContainer}
                                           >
-                                            <VariableInput
-                                              type="number"
-                                              className={styles.setInputNumber}
-                                              value={exercise.reps[i]}
-                                              onChange={(e) => {
+                                            <DragRange
+                                              onDragEnd={() => {
                                                 updateExerciseReps(
                                                   index,
                                                   i,
-                                                  e.target.value
+                                                  parseInt(exercise.reps[i]) +
+                                                    parseInt(
+                                                      exercise.repsDrag[i]
+                                                    )
+                                                );
+                                                updateExerciseRepsDrag(
+                                                  index,
+                                                  i,
+                                                  0
                                                 );
                                               }}
-                                            />
+                                              onChange={(v) =>
+                                                updateExerciseRepsDrag(
+                                                  index,
+                                                  i,
+                                                  v
+                                                )
+                                              }
+                                            >
+                                              <VariableInput
+                                                type="number"
+                                                className={
+                                                  styles.setInputNumber
+                                                }
+                                                value={
+                                                  parseInt(exercise.reps[i]) +
+                                                  parseInt(exercise.repsDrag[i])
+                                                }
+                                                onChange={(e) => {
+                                                  updateExerciseReps(
+                                                    index,
+                                                    i,
+                                                    e.target.value
+                                                  );
+                                                }}
+                                              />
+                                            </DragRange>
                                             <span
                                               className={styles.setAdornment}
                                               style={{
@@ -402,18 +457,54 @@ export default function Workout({
                                             >
                                               ×
                                             </span>
-                                            <VariableInput
-                                              type="number"
-                                              className={styles.setInputNumber}
-                                              value={exercise.weights[i]}
-                                              onChange={(e) => {
+                                            <DragRange
+                                              onDragEnd={() => {
                                                 updateExerciseWeights(
                                                   index,
                                                   i,
-                                                  e.target.value
+                                                  parseInt(
+                                                    exercise.weights[i]
+                                                  ) +
+                                                    parseInt(
+                                                      exercise.weightsDrag[i]
+                                                    )
+                                                );
+                                                updateExerciseWeightsDrag(
+                                                  index,
+                                                  i,
+                                                  0
                                                 );
                                               }}
-                                            />
+                                              onChange={(v) =>
+                                                updateExerciseWeightsDrag(
+                                                  index,
+                                                  i,
+                                                  v
+                                                )
+                                              }
+                                            >
+                                              <VariableInput
+                                                type="number"
+                                                className={
+                                                  styles.setInputNumber
+                                                }
+                                                value={
+                                                  parseInt(
+                                                    exercise.weights[i]
+                                                  ) +
+                                                  parseInt(
+                                                    exercise.weightsDrag[i]
+                                                  )
+                                                }
+                                                onChange={(e) => {
+                                                  updateExerciseWeights(
+                                                    index,
+                                                    i,
+                                                    e.target.value
+                                                  );
+                                                }}
+                                              />
+                                            </DragRange>
                                             <span
                                               className={styles.setAdornment}
                                               style={{
