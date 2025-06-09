@@ -274,6 +274,7 @@ export default function Workout({
         }
       }}
     >
+      {touchDrag}
       {modalShown && (
         <Modal setShown={setModalShown}>
           <div
@@ -298,7 +299,6 @@ export default function Workout({
           </div>
         </Modal>
       )}
-
       {trashModalShown && (
         <Modal setShown={setTrashModalShown}>
           <div
