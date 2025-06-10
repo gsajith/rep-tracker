@@ -8,7 +8,7 @@ import {
   createWorkout,
   deleteExercise,
   deleteWorkout,
-  loadWorkoutWithExercises,
+  loadWorkoutWithExercisesWithLimit,
 } from '@/utils/supabase/database';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
@@ -44,6 +44,7 @@ export default function Home() {
     'storedWorkouts'
   );
   const [loading, setLoading] = useState(true);
+  const [loading2, setLoading2] = useState(false);
   const [exerciseNames, setExerciseNames] = useState(
     new Set(['bicep curl', 'squats', 'deadlift'])
   );
@@ -67,14 +68,26 @@ export default function Home() {
 
     async function loadWorkouts() {
       setLoading(true);
-      const { data, error } = await loadWorkoutWithExercises(
+      const { data, error } = await loadWorkoutWithExercisesWithLimit(
         client.current,
-        addExerciseName
+        addExerciseName,
+        3
       );
       if (!error) {
         setWorkouts(data);
       }
       setLoading(false);
+      setLoading2(true);
+      const { data: data2, error: error2 } =
+        await loadWorkoutWithExercisesWithLimit(
+          client.current,
+          addExerciseName,
+          100
+        );
+      if (!error2) {
+        setWorkouts(data2);
+      }
+      setLoading2(false);
     }
 
     loadWorkouts();
@@ -325,6 +338,27 @@ export default function Home() {
               }}
             />
           ))}
+
+      {loading2 && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            width: '100%',
+          }}
+        >
+          <div
+            className="shimmerBG"
+            style={{
+              maxWidth: 368,
+              width: '100%',
+              height: 150,
+              borderRadius: 16,
+            }}
+          ></div>
+        </div>
+      )}
 
       {!loading && workouts.length === 0 && <p> No workouts found</p>}
     </main>

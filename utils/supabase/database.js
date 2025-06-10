@@ -47,7 +47,19 @@ export async function deleteExercise(client, exerciseId) {
 }
 
 export async function loadWorkoutWithExercises(client, addExerciseName) {
-  const { data, error } = await client.from('workouts').select();
+  return loadWorkoutWithExercisesWithLimit(client, addExerciseName, 100);
+}
+
+export async function loadWorkoutWithExercisesWithLimit(
+  client,
+  addExerciseName,
+  limit
+) {
+  const { data, error } = await client
+    .from('workouts')
+    .select()
+    .order('start_time', { ascending: false })
+    .limit(limit);
   if (!error) {
     for (let i = 0; i < data.length; i++) {
       if (data[i].exercises) {
