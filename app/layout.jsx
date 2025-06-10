@@ -4,6 +4,7 @@ import { shadesOfPurple } from '@clerk/themes';
 import UserBadge from '@/components/userBadge';
 import SignIn from '@/components/signIn';
 import styles from './layout.module.css';
+import BottomBar from '@/components/bottombar';
 
 export const metadata = {
   title: 'RepTracker',
@@ -48,6 +49,7 @@ export default function RootLayout({ children }) {
           <SignedIn>
             <UserBadge />
             {children}
+            <BottomBar />
           </SignedIn>
         </body>
       </html>
