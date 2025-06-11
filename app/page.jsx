@@ -36,21 +36,24 @@ export default function Home() {
   // Tracks in storage exercises have been added to this workout
   const [exercises, setExercises] = useStickyState([], 'exercises');
 
+  const [exerciseNames, setExerciseNames] = useStickyState(
+    new Set(['bicep curl', 'squats', 'deadlift']),
+    'exerciseNames'
+  );
+
+  const [storedWorkouts, setStoredWorkouts] = useStickyState(
+    [],
+    'storedWorkouts'
+  );
+
   const [modalShown, setModalShown] = useState(false);
 
   const [allWorkoutsShown, setAllWorkoutsShown] = useState(false);
 
   const [longPressedWorkout, setLongPressedWorkout] = useState(null);
 
-  const [storedWorkouts, setStoredWorkouts] = useStickyState(
-    [],
-    'storedWorkouts'
-  );
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(false);
-  const [exerciseNames, setExerciseNames] = useState(
-    new Set(['bicep curl', 'squats', 'deadlift'])
-  );
   const latestExercises = useRef({});
 
   // The `useUser()` hook will be used to ensure that Clerk has loaded data about the logged in user
@@ -108,6 +111,12 @@ export default function Home() {
       };
     }
     setExerciseNames((oldExerciseNames) => {
+      if (
+        !oldExerciseNames ||
+        oldExerciseNames.size <= 0 ||
+        typeof oldExerciseNames.size === 'undefined'
+      )
+        return new Set([name]);
       return new Set([...oldExerciseNames, name]);
     });
   }
