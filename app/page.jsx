@@ -1,28 +1,27 @@
 'use client';
-import { useSession, useUser } from '@clerk/nextjs';
 import styles from './page.module.css';
-import { createClerkSupabaseClient } from '@/utils/supabase/clerk-client';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import {
   createExercise,
   createWorkout,
   deleteExercise,
   deleteWorkout,
-  loadWorkoutWithExercisesWithLimit,
 } from '@/utils/supabase/database';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
-import { parseISOString, readableDate } from '@/utils/utils';
+import { readableDate } from '@/utils/utils';
 import { useStickyState } from '@/hooks/useStickyState';
 import Modal from '@/components/modal';
 import { LetsIconsTrash } from '@/components/SVGIcons/LetsIconsTrash';
 import { LetsIconsCopy } from '@/components/SVGIcons/LetsIconsCopy';
 import classNames from 'classnames';
+import { WorkoutsContext } from '@/context/workoutsProvider';
 
 const DEBUG = process.env.NODE_ENV === 'development' && false;
 
 export default function Home() {
-  const [workouts, setWorkouts] = useState([]);
+  const { workouts, loading, loading2, exerciseNames, latestExercises } =
+    useContext(WorkoutsContext);
 
   // Tracks whether workout has been started or not
   const [inWorkout, setInWorkout] = useStickyState(false, 'inWorkout');
@@ -36,11 +35,6 @@ export default function Home() {
   // Tracks in storage exercises have been added to this workout
   const [exercises, setExercises] = useStickyState([], 'exercises');
 
-  const [exerciseNames, setExerciseNames] = useStickyState(
-    new Set(['bicep curl', 'squats', 'deadlift']),
-    'exerciseNames'
-  );
-
   const [storedWorkouts, setStoredWorkouts] = useStickyState(
     [],
     'storedWorkouts'
@@ -51,75 +45,6 @@ export default function Home() {
   const [allWorkoutsShown, setAllWorkoutsShown] = useState(false);
 
   const [longPressedWorkout, setLongPressedWorkout] = useState(null);
-
-  const [loading, setLoading] = useState(true);
-  const [loading2, setLoading2] = useState(false);
-  const latestExercises = useRef({});
-
-  // The `useUser()` hook will be used to ensure that Clerk has loaded data about the logged in user
-  const { user } = useUser();
-  // The `useSession()` hook will be used to get the Clerk `session` object
-  const { session } = useSession();
-
-  let client = useRef(null);
-
-  useEffect(() => {
-    if (session) {
-      client.current = createClerkSupabaseClient(session);
-    }
-  }, [session]);
-
-  useEffect(() => {
-    if (!user || !client.current) return;
-
-    async function loadWorkouts() {
-      setLoading(true);
-      const { data, error } = await loadWorkoutWithExercisesWithLimit(
-        client.current,
-        addExerciseName,
-        3
-      );
-      if (!error) {
-        setWorkouts(data);
-      }
-      setLoading(false);
-      setLoading2(true);
-      const { data: data2, error: error2 } =
-        await loadWorkoutWithExercisesWithLimit(
-          client.current,
-          addExerciseName,
-          100
-        );
-      if (!error2) {
-        setWorkouts(data2);
-      }
-      setLoading2(false);
-    }
-
-    loadWorkouts();
-  }, [user, client]);
-
-  function addExerciseName(name, workoutEndISO, exercise) {
-    if (
-      !(name in latestExercises.current) ||
-      latestExercises.current[name].time <
-        parseISOString(workoutEndISO).getTime()
-    ) {
-      latestExercises.current[name] = {
-        time: parseISOString(workoutEndISO).getTime(),
-        exercise: exercise,
-      };
-    }
-    setExerciseNames((oldExerciseNames) => {
-      if (
-        !oldExerciseNames ||
-        oldExerciseNames.size <= 0 ||
-        typeof oldExerciseNames.size === 'undefined'
-      )
-        return new Set([name]);
-      return new Set([...oldExerciseNames, name]);
-    });
-  }
 
   const saveWorkoutHandler = async () => {
     // TODO: Add loading for this and dont reload page

@@ -5,6 +5,7 @@ import UserBadge from '@/components/userBadge';
 import SignIn from '@/components/signIn';
 import styles from './layout.module.css';
 import BottomBar from '@/components/bottombar';
+import { WorkoutsProvider } from '@/context/workoutsProvider';
 
 export const metadata = {
   title: 'RepTracker',
@@ -48,7 +49,7 @@ export default function RootLayout({ children }) {
           </SignedOut>
           <SignedIn>
             <UserBadge />
-            {children}
+            <WorkoutsProvider>{children}</WorkoutsProvider>
             <BottomBar />
           </SignedIn>
         </body>
