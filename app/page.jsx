@@ -17,6 +17,7 @@ import { useStickyState } from '@/hooks/useStickyState';
 import Modal from '@/components/modal';
 import { LetsIconsTrash } from '@/components/SVGIcons/LetsIconsTrash';
 import { LetsIconsCopy } from '@/components/SVGIcons/LetsIconsCopy';
+import classNames from 'classnames';
 
 const DEBUG = process.env.NODE_ENV === 'development' && false;
 
@@ -279,41 +280,11 @@ export default function Home() {
       </div>
 
       {loading && (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-            width: '100%',
-          }}
-        >
-          <div
-            className="shimmerBG"
-            style={{
-              maxWidth: 368,
-              width: '100%',
-              height: 150,
-              borderRadius: 16,
-            }}
-          ></div>
-          <div
-            className="shimmerBG"
-            style={{
-              maxWidth: 368,
-              width: '100%',
-              height: 150,
-              borderRadius: 16,
-            }}
-          ></div>
-          <div
-            className="shimmerBG"
-            style={{
-              maxWidth: 368,
-              width: '100%',
-              height: 150,
-              borderRadius: 16,
-            }}
-          ></div>
+        <div className={styles.loadingContainer}>
+          <div className={classNames('shimmerBG', styles.shimmer)}></div>
+          <div className={classNames('shimmerBG', styles.shimmer)}></div>
+          <div className={classNames('shimmerBG', styles.shimmer)}></div>
+          <div className={classNames('shimmerBG', styles.shimmer)}></div>
         </div>
       )}
 
@@ -333,23 +304,8 @@ export default function Home() {
           ))}
 
       {loading2 && (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-            width: '100%',
-          }}
-        >
-          <div
-            className="shimmerBG"
-            style={{
-              maxWidth: 368,
-              width: '100%',
-              height: 150,
-              borderRadius: 16,
-            }}
-          ></div>
+        <div className={styles.loadingContainer}>
+          <div className={classNames('shimmerBG', styles.shimmer)}></div>
         </div>
       )}
 

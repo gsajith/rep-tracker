@@ -54,3 +54,17 @@
   justify-content: flex-end;
   gap: 24px;
 }
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.shimmer {
+  max-width: 368px;
+  width: 100%;
+  height: 150px;
+  border-radius: 16px;
+}
