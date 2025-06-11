@@ -202,20 +202,13 @@ export default function Home() {
     <main className={styles.main}>
       {modalShown && (
         <Modal setShown={setModalShown}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-end',
-              gap: 24,
-            }}
-          >
-            <div style={{ textAlign: 'left' }}>What would you like to do?</div>
-            <div>
-              Workout on{' '}
+          <div className={styles.copyWorkoutContentWrapper}>
+            <div style={{ textAlign: 'left' }}>
+              What would you like to do for your workout on{' '}
               <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>
                 {readableDate(longPressedWorkout.end_time)}
               </span>
+              ?
             </div>
             <button
               className={styles.workoutButton}
