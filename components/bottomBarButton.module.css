@@ -1,0 +1,24 @@
+.button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-inline: 12px;
+  margin: 4px;
+  padding-block: 4px;
+  color: var(--textSecondary);
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.button:hover, .button:focus {
+  background-color: var(--accentHoverLight);
+
+}
+
+.active {
+  color: var(--accent);
+}
