@@ -38,6 +38,8 @@ export default function Home() {
 
   const [modalShown, setModalShown] = useState(false);
 
+  const [allWorkoutsShown, setAllWorkoutsShown] = useState(false);
+
   const [longPressedWorkout, setLongPressedWorkout] = useState(null);
 
   const [storedWorkouts, setStoredWorkouts] = useStickyState(
@@ -292,6 +294,7 @@ export default function Home() {
         workouts.length > 0 &&
         workouts
           .sort((a, b) => b.end_time.valueOf() - a.end_time.valueOf())
+          .slice(0, allWorkoutsShown ? Number.MAX_SAFE_INTEGER : 10)
           .map((workout) => (
             <LoggedWorkout
               key={workout.id}
@@ -310,6 +313,20 @@ export default function Home() {
       )}
 
       {!loading && workouts.length === 0 && <p> No workouts found</p>}
+      {!allWorkoutsShown && !loading && !loading2 && (
+        <button
+          className={styles.showAllWorkoutsButton}
+          onClick={() => setAllWorkoutsShown(true)}
+        >
+          Show all your workouts
+        </button>
+      )}
+      <div
+        style={{
+          height: loading || loading2 || allWorkoutsShown ? 70 : 100,
+          width: 1,
+        }}
+      />
     </main>
   );
 }
