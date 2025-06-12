@@ -9,11 +9,12 @@
   margin-block: 6px;
   margin-inline-end: 12px;
   cursor: pointer;
-  border: 1px solid var(--textSecondary);
+  border: 1px solid var(--accent);
+  position: relative;
 }
 
 .active {
-  outline: 2px solid var(--textSecondary);
+  outline: 2px solid var(--accentHoverLight);
 }
 
 .themeButtonContainer:hover, .themeButtonContainer:focus {

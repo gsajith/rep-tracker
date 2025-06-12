@@ -2,24 +2,31 @@
 import ThemeButton from '@/components/themeButton';
 import { useTheme } from '@/context/themeProvider';
 import styles from './page.module.css';
+import { useEffect, useState } from 'react';
 
 export default function Settings() {
   const { themeName, setThemeName, allThemeNames } = useTheme();
 
+  const [mount, setMount] = useState(false);
+
+  useEffect(() => {
+    setMount(true);
+  }, []);
   return (
     <div className={styles.container}>
       <h2>Settings</h2>
       <div className={styles.themeSelector}>
         Color Theme:
         <div className={styles.themeList}>
-          {allThemeNames.map((theme) => (
-            <div data-theme={theme} key={theme}>
-              <ThemeButton
-                onClick={() => setThemeName(theme)}
-                active={themeName === theme}
-              />
-            </div>
-          ))}
+          {mount &&
+            allThemeNames.map((theme) => (
+              <div data-theme={theme} key={theme}>
+                <ThemeButton
+                  onClick={() => setThemeName(theme)}
+                  active={themeName === theme}
+                />
+              </div>
+            ))}
         </div>
       </div>
     </div>
