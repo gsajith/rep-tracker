@@ -17,8 +17,6 @@ import { LetsIconsCopy } from '@/components/SVGIcons/LetsIconsCopy';
 import classNames from 'classnames';
 import { WorkoutsContext } from '@/context/workoutsProvider';
 
-const DEBUG = process.env.NODE_ENV === 'development' && false;
-
 export default function Home() {
   const { workouts, loading, loading2, exerciseNames, latestExercises } =
     useContext(WorkoutsContext);
@@ -199,17 +197,6 @@ export default function Home() {
         latestExercises={latestExercises.current}
         saveWorkout={saveWorkoutHandler}
       />
-
-      {DEBUG && (
-        <>
-          <form onSubmit={handleCreateWorkout}>
-            <button type="submit">Add</button>
-          </form>
-          <form onSubmit={handleCreateExercise}>
-            <button type="submit">Add Exercise</button>
-          </form>
-        </>
-      )}
 
       {(loading || loading2 || (workouts !== null && workouts.length > 0)) && (
         <div className={styles.previousWorkoutsHeader}>
