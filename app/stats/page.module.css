@@ -1,0 +1,8 @@
+.container {
+  composes: container from "../page.module.css"
+}
+
+.calendarContainer {
+  border-radius: 8px;
+  padding-block: 8px;
+}

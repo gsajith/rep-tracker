@@ -7,7 +7,8 @@ export default function Settings() {
   const { themeName, setThemeName, allThemeNames } = useTheme();
 
   return (
-    <div className={styles.settingsContainer}>
+    <div className={styles.container}>
+      <h2>Settings</h2>
       <div className={styles.themeSelector}>
         Color Theme:
         <div className={styles.themeList}>

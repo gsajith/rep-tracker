@@ -84,3 +84,12 @@
 .showAllWorkoutsButton:hover {
   background: var(--secondaryHover);
 }
+
+.container {
+  background: var(--white);
+  margin-bottom: 16px;
+  padding: 16px;
+  max-width: calc(100vw - 48px);
+  width: 336px;
+  border-radius: 16px;
+}

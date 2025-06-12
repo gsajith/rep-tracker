@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-css-tags */
 import './globals.css';
 import { ClerkProvider, SignedIn, SignedOut } from '@clerk/nextjs';
 import { shadesOfPurple } from '@clerk/themes';
@@ -36,6 +37,13 @@ export default function RootLayout({ children }) {
     <ClerkProvider appearance={{ baseTheme: shadesOfPurple }}>
       <ThemeProvider>
         <html lang="en">
+          <head>
+            <link
+              rel="stylesheet"
+              href="node_modules/react-github-contribution-calendar/default.css"
+              type="text/css"
+            />
+          </head>
           <body>
             <SignedOut>
               <div className={styles.signedOutText}>

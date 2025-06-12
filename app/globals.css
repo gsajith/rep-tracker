@@ -38,7 +38,7 @@
   --text: #ebebeb;
   --textSecondary: #979797;
   --accent: #4586ee;
-  --accentHover: #b8cbea;
+  --accentHover: #8cabde;
   --accentHoverLight: #284b84;
   --secondary: #1414b3;
   --secondaryHover: #0f0f73;
@@ -112,6 +112,10 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+h2 {
+  margin-top: 0px;
 }
 
 
