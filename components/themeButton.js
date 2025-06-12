@@ -13,7 +13,7 @@ export default function ThemeButton({ active, ...rest }) {
     >
       {active && (
         <LetsIconsDoneRound
-          style={{ zIndex: 2, position: 'absolute', left: '15px' }}
+          style={{ zIndex: 2, position: 'absolute', left: '17px', top: -1 }}
         />
       )}
 
