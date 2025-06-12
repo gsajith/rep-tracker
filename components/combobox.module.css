@@ -6,6 +6,8 @@
   outline: none;
   width: calc(100% - 32px);
   transition: border-radius 100ms ease-in-out;
+  background: var(--white);
+  color: var(--text);
 }
 
 .comboBoxInput[data-open] {

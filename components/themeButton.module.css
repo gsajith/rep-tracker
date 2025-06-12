@@ -1,0 +1,42 @@
+.themeButtonContainer {
+  background: var(--white);
+  outline: none;
+  width: 60px;
+  height: 24px;
+  border-radius: 24px;
+  display: flex;
+  overflow: hidden;
+  margin-block: 6px;
+  margin-inline-end: 12px;
+  cursor: pointer;
+  border: 1px solid var(--textSecondary);
+}
+
+.active {
+  outline: 2px solid var(--textSecondary);
+}
+
+.themeButtonContainer:hover, .themeButtonContainer:focus {
+  outline: 2px solid var(--text)
+}
+
+.themeButtonAccent {
+  position: relative;
+  left: -5px;
+  top: -15px;
+  width: 30px;
+  height: 200%;
+  background: var(--accent);
+  transform: rotate(25deg);
+}
+
+
+.themeButtonSecondary {
+  position: relative;
+  right: -5px;
+  top: -5px;
+  width: 30px;
+  height: 200%;
+  background: var(--secondary);
+  transform: rotate(25deg);
+}

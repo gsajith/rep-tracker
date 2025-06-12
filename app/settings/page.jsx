@@ -1,15 +1,26 @@
 'use client';
+import ThemeButton from '@/components/themeButton';
 import { useTheme } from '@/context/themeProvider';
+import styles from './page.module.css';
 
 export default function Settings() {
-  const { setThemeName } = useTheme();
+  const { themeName, setThemeName, allThemeNames } = useTheme();
 
   return (
-    <div>
-      settings page!
-      <button onClick={() => setThemeName('default')}>Default</button>
-      <button onClick={() => setThemeName('blue')}>Blue</button>
-      <button onClick={() => setThemeName('purple')}>Purple</button>
+    <div className={styles.settingsContainer}>
+      <div className={styles.themeSelector}>
+        Color Theme:
+        <div className={styles.themeList}>
+          {allThemeNames.map((theme) => (
+            <div data-theme={theme} key={theme}>
+              <ThemeButton
+                onClick={() => setThemeName(theme)}
+                active={themeName === theme}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

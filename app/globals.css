@@ -1,7 +1,7 @@
 @import 'normalize.css';
 @import url('https://use.typekit.net/usl1ngp.css');
 
-:root, [data-theme="purple"], [data-theme="default"] {
+:root, [data-theme="purple-green"], [data-theme="default"] {
   --background: #ECEFF3;
   --backgroundShim: #ECEFF3AA;
   --white: #FFFFFF;
@@ -16,12 +16,34 @@
   --warning: #ac2746;
 }
 
-[data-theme="blue"] {
+[data-theme="blue-orange"] {
+  --background: #ECEFF3;
+  --backgroundShim: #ECEFF3AA;
+  --white: #FFFFFF;
+  --text: #1D1226;
+  --textSecondary: #908E96;
   --accent: #4586ee;
   --accentHover: #225dbc;
   --accentHoverLight: #c5d7f4;
   --secondary: #f8b581;
   --secondaryHover: #d3884f;
+  --textInverted: #FFFFFF;
+  --warning: #ac2746;
+}
+
+[data-theme="blue-dark"] {
+  --background: #1a1a1b;
+  --backgroundShim: #1f1f20aa;
+  --white: #000000;
+  --text: #ebebeb;
+  --textSecondary: #979797;
+  --accent: #4586ee;
+  --accentHover: #b8cbea;
+  --accentHoverLight: #284b84;
+  --secondary: #1414b3;
+  --secondaryHover: #0f0f73;
+  --textInverted: #000000;
+  --warning: #f488a1;
 }
 
 * {

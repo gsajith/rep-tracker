@@ -2,7 +2,13 @@
 import { useStickyState } from '@/hooks/useStickyState';
 import { createContext, useContext, useEffect } from 'react';
 
-export const ThemeContext = createContext({ setThemeName: () => {} });
+const ALL_THEME_NAMES = ['purple-green', 'blue-orange', 'blue-dark'];
+
+export const ThemeContext = createContext({
+  themeName: 'default',
+  setThemeName: () => {},
+  allThemeNames: ALL_THEME_NAMES,
+});
 
 export const useTheme = () => {
   return useContext(ThemeContext);
@@ -16,7 +22,9 @@ export const ThemeProvider = ({ children }) => {
   }, [themeName]);
 
   return (
-    <ThemeContext.Provider value={{ setThemeName }}>
+    <ThemeContext.Provider
+      value={{ themeName, setThemeName, allThemeNames: ALL_THEME_NAMES }}
+    >
       {children}
     </ThemeContext.Provider>
   );
