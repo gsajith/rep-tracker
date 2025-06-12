@@ -5,6 +5,7 @@
   flex-direction: row;
   justify-content: space-around;
   overflow: hidden;
+  margin-top: 8px;
 }
 
 .button {

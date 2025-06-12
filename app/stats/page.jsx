@@ -78,6 +78,7 @@ export default function Stats() {
         </div>
       </div>
       <div className={styles.exerciseStatsContainer}>
+        Individual exercises:
         <GroupedButtons
           selectedItem={selectedExerciseStatFormat}
           setSelectedItem={setSelectedExerciseStatFormat}
