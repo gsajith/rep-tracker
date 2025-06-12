@@ -4,8 +4,8 @@ import { shadesOfPurple } from '@clerk/themes';
 import UserBadge from '@/components/userBadge';
 import SignIn from '@/components/signIn';
 import styles from './layout.module.css';
-import BottomBar from '@/components/bottombar';
 import { WorkoutsProvider } from '@/context/workoutsProvider';
+import BottomBar from '@/components/bottomBar';
 
 export const metadata = {
   title: 'RepTracker',
