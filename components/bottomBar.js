@@ -9,7 +9,6 @@ import { LetsIconsStats } from './SVGIcons/LetsIconsStats';
 export default function BottomBar() {
   const pathname = usePathname();
 
-  console.log(pathname);
   return (
     <div className={styles.bottomBarContainer}>
       <BottomBarButton active={pathname === '/'} href={'/'}>
