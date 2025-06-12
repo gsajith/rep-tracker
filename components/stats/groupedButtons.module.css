@@ -1,6 +1,6 @@
 .groupedButtonsContainer {
   border-radius: 6px;
-  border: 2px solid var(--textSecondary);
+  border: 2px solid var(--accent);
   display: flex;
   flex-direction: row;
   justify-content: space-around;

@@ -10,3 +10,12 @@
   align-items: center;
   padding-bottom: 16px;
 }
+
+.indicator {
+  background: var(--accent);
+  position: absolute;
+  transition: all 300ms ease-in-out, opacity 300ms 300ms ease-in-out;
+  border-radius: 2px;
+  height: 4px;
+  bottom: 20px;
+}

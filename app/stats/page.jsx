@@ -7,10 +7,7 @@ import classNames from 'classnames';
 import GroupedButtons from '@/components/stats/groupedButtons';
 
 export default function Stats() {
-  const { workouts, loading, loading2, exerciseNames, latestExercises } =
-    useContext(WorkoutsContext);
-
-  console.log(workouts);
+  const { workouts, loading, loading2 } = useContext(WorkoutsContext);
 
   const gh_workoutTimes = useMemo(() => {
     const v = {};
