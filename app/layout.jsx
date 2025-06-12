@@ -6,6 +6,7 @@ import SignIn from '@/components/signIn';
 import styles from './layout.module.css';
 import { WorkoutsProvider } from '@/context/workoutsProvider';
 import BottomBar from '@/components/bottomBar';
+import { ThemeProvider } from '@/context/themeProvider';
 
 export const metadata = {
   title: 'RepTracker',
@@ -34,26 +35,28 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider appearance={{ baseTheme: shadesOfPurple }}>
-      <html lang="en">
-        <body>
-          <SignedOut>
-            <div className={styles.signedOutText}>
-              Welcome to <b>Rep Tracker</b>!
-              <br />
-              <br />
-              Sign in to get started tracking your workouts.
-              <br />
-              <br />
-            </div>
-            <SignIn />
-          </SignedOut>
-          <SignedIn>
-            <UserBadge />
-            <WorkoutsProvider>{children}</WorkoutsProvider>
-            <BottomBar />
-          </SignedIn>
-        </body>
-      </html>
+      <ThemeProvider>
+        <html lang="en">
+          <body>
+            <SignedOut>
+              <div className={styles.signedOutText}>
+                Welcome to <b>Rep Tracker</b>!
+                <br />
+                <br />
+                Sign in to get started tracking your workouts.
+                <br />
+                <br />
+              </div>
+              <SignIn />
+            </SignedOut>
+            <SignedIn>
+              <UserBadge />
+              <WorkoutsProvider>{children}</WorkoutsProvider>
+              <BottomBar />
+            </SignedIn>
+          </body>
+        </html>
+      </ThemeProvider>
     </ClerkProvider>
   );
 }

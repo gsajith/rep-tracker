@@ -1,6 +1,6 @@
 'use client';
 import styles from './page.module.css';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   createExercise,
   createWorkout,

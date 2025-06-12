@@ -1,7 +1,7 @@
 @import 'normalize.css';
 @import url('https://use.typekit.net/usl1ngp.css');
 
-:root {
+:root, [data-theme="purple"], [data-theme="default"] {
   --background: #ECEFF3;
   --backgroundShim: #ECEFF3AA;
   --white: #FFFFFF;
@@ -14,6 +14,14 @@
   --secondaryHover: #b7d755;
   --textInverted: #FFFFFF;
   --warning: #ac2746;
+}
+
+[data-theme="blue"] {
+  --accent: #4586ee;
+  --accentHover: #225dbc;
+  --accentHoverLight: #c5d7f4;
+  --secondary: #f8b581;
+  --secondaryHover: #d3884f;
 }
 
 * {
