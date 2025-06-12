@@ -4,7 +4,6 @@
   left: 12px;
   display: flex;
   align-items: center;
-  gap: 10px;
   background: var(--backgroundShim);
   padding-right: 24px;
   padding: 8px;

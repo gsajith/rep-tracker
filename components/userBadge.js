@@ -30,8 +30,9 @@ export default function UserBadge() {
       <div
         className={styles.userInfoWrapper}
         style={{
-          maxWidth: allInfoShown ? '200px' : '0px',
+          maxWidth: allInfoShown ? '300px' : '0px',
           opacity: allInfoShown ? 1 : 0,
+          marginInlineStart: allInfoShown ? 10 : 0,
         }}
       >
         {user && <span className={styles.welcomeText}>Welcome 👋</span>}
