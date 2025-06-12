@@ -25,8 +25,6 @@ export default function BottomBar() {
     });
   }, [pathname]);
 
-  console.log(indicatorWidth, indicatorLeft);
-
   return (
     <div className={styles.bottomBarContainer}>
       <BottomBarButton
