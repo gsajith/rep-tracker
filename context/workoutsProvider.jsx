@@ -44,17 +44,19 @@ export const WorkoutsProvider = ({ children }) => {
         setWorkouts(data);
       }
       setLoading(false);
-      setLoading2(true);
-      const { data: data2, error: error2 } =
-        await loadWorkoutWithExercisesWithLimit(
-          client.current,
-          addExerciseName,
-          100
-        );
-      if (!error2) {
-        setWorkouts(data2);
+      if (data !== null && data.length > 0) {
+        setLoading2(true);
+        const { data: data2, error: error2 } =
+          await loadWorkoutWithExercisesWithLimit(
+            client.current,
+            addExerciseName,
+            100
+          );
+        if (!error2) {
+          setWorkouts(data2);
+        }
+        setLoading2(false);
       }
-      setLoading2(false);
     }
 
     loadWorkouts();

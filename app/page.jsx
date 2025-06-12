@@ -211,9 +211,11 @@ export default function Home() {
         </>
       )}
 
-      <div className={styles.previousWorkoutsHeader}>
-        Your previous workouts
-      </div>
+      {(loading || loading2 || (workouts !== null && workouts.length > 0)) && (
+        <div className={styles.previousWorkoutsHeader}>
+          Your previous workouts
+        </div>
+      )}
 
       {loading && (
         <div className={styles.loadingContainer}>
@@ -246,8 +248,12 @@ export default function Home() {
         </div>
       )}
 
-      {!loading && workouts.length === 0 && <p> No workouts found</p>}
-      {!allWorkoutsShown && !loading && !loading2 && (
+      {!loading && workouts.length === 0 && (
+        <p style={{ marginTop: 24 }}>
+          No previous workouts found, why not start one?
+        </p>
+      )}
+      {!allWorkoutsShown && !loading && !loading2 && workouts.length > 0 && (
         <button
           className={styles.showAllWorkoutsButton}
           onClick={() => setAllWorkoutsShown(true)}
