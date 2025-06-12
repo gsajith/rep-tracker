@@ -16,6 +16,7 @@
 
 .button:hover, .button:focus {
   background-color: var(--accentHoverLight);
+  color: var(--accent);
 
 }
 

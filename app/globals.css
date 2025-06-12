@@ -1,7 +1,6 @@
 @import 'normalize.css';
 @import url('https://use.typekit.net/usl1ngp.css');
 
-/** TODO: Find and replace in-line style colors with these too **/
 :root {
   --background: #ECEFF3;
   --backgroundShim: #ECEFF3AA;
@@ -21,6 +20,10 @@
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
+}
+
+a {
+  text-decoration: none;
 }
 
 html, body {
