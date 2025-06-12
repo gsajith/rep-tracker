@@ -4,6 +4,7 @@ import { useContext, useMemo } from 'react';
 import styles from './page.module.css';
 import Calendar from 'react-github-contribution-calendar';
 import classNames from 'classnames';
+import { parseISOString } from '@/utils/utils';
 
 export default function Stats() {
   const { workouts, loading, loading2, exerciseNames, latestExercises } =
@@ -12,7 +13,10 @@ export default function Stats() {
   const values = useMemo(() => {
     const v = {};
     workouts.forEach((workout) => {
-      const timeString = workout.start_time.toISOString().split('T')[0];
+      const tzo = workout.start_time.getTimezoneOffset() * 60000;
+      const timeString = new Date(workout.start_time - tzo)
+        .toISOString()
+        .split('T')[0];
       if (timeString in v) {
         v[timeString] += 1;
       } else {
@@ -21,7 +25,8 @@ export default function Stats() {
     });
     return v;
   }, [workouts]);
-  const until = new Date().toISOString().split('T')[0];
+  const tzoffset = new Date().getTimezoneOffset() * 60000;
+  const until = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
 
   const panelColors = [
     'rgb(from var(--accentHoverLight) r g b / 50%)',
