@@ -257,7 +257,7 @@ export default function Home() {
       )}
       <div
         style={{
-          height: loading || loading2 || allWorkoutsShown ? 70 : 100,
+          height: loading || loading2 || allWorkoutsShown ? 85 : 115,
           width: 1,
         }}
       />
