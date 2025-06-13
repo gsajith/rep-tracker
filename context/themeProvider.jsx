@@ -7,6 +7,8 @@ const ALL_THEME_NAMES = [
   'blue-orange',
   'blue-dark',
   'red-dark',
+  'cosmo-wanda',
+  'green-dark',
 ];
 
 export const ThemeContext = createContext({

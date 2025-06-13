@@ -110,7 +110,7 @@
   background: none;
 }
 .exerciseName:hover {
-  background: rgba(0,0,0,.2);
+  background: rgb(from var(--secondaryHover) r g b / 80%);
   outline: none;
 }
 .exerciseName > svg {
