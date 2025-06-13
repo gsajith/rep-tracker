@@ -91,7 +91,7 @@ export default function LoggedWorkout({ data, onLongPress }) {
       </div>
       <div className={styles.exercisesContainer}>
         <div className={styles.exercises}>
-          {data.exercises.map((exercise) => {
+          {data.exercises.map((exercise, index) => {
             let numSets = 0;
             let truncateSets = false;
             let extraSets = 0;
@@ -109,6 +109,7 @@ export default function LoggedWorkout({ data, onLongPress }) {
 
             return (
               <Exercise
+                key={exercise.id}
                 exercise={exercise}
                 truncateSets={truncateSets}
                 extraSets={extraSets}
