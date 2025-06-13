@@ -17,6 +17,7 @@ import {
   YAxis,
 } from 'recharts';
 import Toggle from '@/components/toggle';
+import { useStickyState } from '@/hooks/useStickyState';
 
 export default function Stats() {
   const { workouts, loading, loading2 } = useContext(WorkoutsContext);
@@ -25,7 +26,10 @@ export default function Stats() {
   const [selectedExerciseStatFormat, setSelectedExerciseStatFormat] =
     useState(0);
   const [selectedExercise, setSelectedExercise] = useState(null);
-  const [showEmptyDays, setShowEmptyDays] = useState(true);
+  const [showEmptyDays, setShowEmptyDays] = useStickyState(
+    false,
+    'showEmptyDays'
+  );
 
   useEffect(() => {
     setMount(true);
