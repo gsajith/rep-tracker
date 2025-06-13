@@ -6,6 +6,7 @@ import { LetsIconsHome } from './SVGIcons/LetsIconsHome';
 import { LetsIconsSettings } from './SVGIcons/LetsIconsSettings';
 import { LetsIconsStats } from './SVGIcons/LetsIconsStats';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLoadDelay } from '@/hooks/useLoadDelay';
 
 export default function BottomBar() {
   const pathname = usePathname();
@@ -14,6 +15,8 @@ export default function BottomBar() {
 
   const [indicatorWidth, setIndicatorWidth] = useState(0);
   const [indicatorLeft, setIndicatorLeft] = useState(0);
+
+  const shown = useLoadDelay();
 
   const moveIndicator = useCallback(() => {
     itemRefs.current.forEach((item) => {
@@ -38,45 +41,47 @@ export default function BottomBar() {
   }, [pathname]);
 
   return (
-    <div className={styles.bottomBarContainer}>
-      <BottomBarButton
-        active={pathname === '/'}
-        href={'/'}
-        ref={(el) => {
-          itemRefs.current[0] = el;
-          moveIndicator();
-        }}
-      >
-        <LetsIconsHome /> Home
-      </BottomBarButton>
-      <BottomBarButton
-        active={pathname === '/stats'}
-        href={'/stats'}
-        ref={(el) => {
-          itemRefs.current[1] = el;
-          moveIndicator();
-        }}
-      >
-        <LetsIconsStats /> Stats
-      </BottomBarButton>
-      <BottomBarButton
-        active={pathname === '/settings'}
-        href={'/settings'}
-        ref={(el) => {
-          itemRefs.current[2] = el;
-          moveIndicator();
-        }}
-      >
-        <LetsIconsSettings /> Settings
-      </BottomBarButton>
-      <div
-        className={styles.indicator}
-        style={{
-          width: indicatorWidth,
-          left: indicatorLeft,
-          opacity: indicatorWidth > 0 ? '1' : '0',
-        }}
-      />
-    </div>
+    shown && (
+      <div className={styles.bottomBarContainer}>
+        <BottomBarButton
+          active={pathname === '/'}
+          href={'/'}
+          ref={(el) => {
+            itemRefs.current[0] = el;
+            moveIndicator();
+          }}
+        >
+          <LetsIconsHome /> Home
+        </BottomBarButton>
+        <BottomBarButton
+          active={pathname === '/stats'}
+          href={'/stats'}
+          ref={(el) => {
+            itemRefs.current[1] = el;
+            moveIndicator();
+          }}
+        >
+          <LetsIconsStats /> Stats
+        </BottomBarButton>
+        <BottomBarButton
+          active={pathname === '/settings'}
+          href={'/settings'}
+          ref={(el) => {
+            itemRefs.current[2] = el;
+            moveIndicator();
+          }}
+        >
+          <LetsIconsSettings /> Settings
+        </BottomBarButton>
+        <div
+          className={styles.indicator}
+          style={{
+            width: indicatorWidth,
+            left: indicatorLeft,
+            opacity: indicatorWidth > 0 ? '1' : '0',
+          }}
+        />
+      </div>
+    )
   );
 }

@@ -18,10 +18,12 @@ import {
 } from 'recharts';
 import Toggle from '@/components/toggle';
 import { useStickyState } from '@/hooks/useStickyState';
+import { useLoadDelay } from '@/hooks/useLoadDelay';
 
 export default function Stats() {
   const { workouts, loading, loading2 } = useContext(WorkoutsContext);
   const [mount, setMount] = useState(false);
+  const shown = useLoadDelay();
 
   const [selectedExerciseStatFormat, setSelectedExerciseStatFormat] =
     useState(0);
@@ -163,145 +165,147 @@ export default function Stats() {
   }, [exerciseHistory, selectedExercise, showEmptyDays]);
 
   return (
-    <div className={styles.container}>
-      <h2>Stats</h2>
-      <div
-        className={classNames(
-          loading || loading2 ? 'shimmerBG' : '',
-          styles.calendarContainer
-        )}
-      >
-        <GHCalendar
-          values={gh_workoutTimes}
-          until={gh_until}
-          panelColors={gh_panelColors}
-          panelAttributes={gh_panelAttributes}
-        />
-        <div style={{ textAlign: 'center' }}>
-          {loading || loading2 ? 'Loading...' : ''}
+    shown && (
+      <div className={styles.container}>
+        <h2>Stats</h2>
+        <div
+          className={classNames(
+            loading || loading2 ? 'shimmerBG' : '',
+            styles.calendarContainer
+          )}
+        >
+          <GHCalendar
+            values={gh_workoutTimes}
+            until={gh_until}
+            panelColors={gh_panelColors}
+            panelAttributes={gh_panelAttributes}
+          />
+          <div style={{ textAlign: 'center' }}>
+            {loading || loading2 ? 'Loading...' : ''}
+          </div>
         </div>
-      </div>
-      <div className={styles.exerciseStatsContainer}>
-        Individual exercise stats for...
-        {mount && (
-          <>
-            <Select
-              isSearchable={false}
-              options={selectOptions}
-              placeholder="Select an exercise"
-              components={{
-                IndicatorSeparator: () => null,
-              }}
-              onChange={(option) => setSelectedExercise(option.value)}
-              styles={{
-                control: (baseStyles, state) => ({
-                  ...baseStyles,
-                  marginTop: 8,
-                  background: 'var(--white)',
-                  boxShadow: state.isFocused
-                    ? '0 0 0 2px var(--accent)'
-                    : 'none',
-                  border: '1px solid var(--textSecondary)',
-                  '&:hover': {
-                    border: state.isFocused
-                      ? '1px solid var(--accent)'
-                      : '1px solid #aaa',
-                  },
-                }),
-                singleValue: (baseStyles, state) => ({
-                  ...baseStyles,
-                  color: 'var(--accent)',
-                  fontWeight: '600',
-                }),
-                menu: (baseStyles, state) => ({
-                  ...baseStyles,
-                  background: 'var(--white)',
-                  zIndex: 3,
-                }),
-                option: (baseStyles, state) => ({
-                  ...baseStyles,
-                  backgroundColor: state.isSelected
-                    ? 'var(--accent)'
-                    : 'var(--white)',
-                  '&:hover': {
+        <div className={styles.exerciseStatsContainer}>
+          Individual exercise stats for...
+          {mount && (
+            <>
+              <Select
+                isSearchable={false}
+                options={selectOptions}
+                placeholder="Select an exercise"
+                components={{
+                  IndicatorSeparator: () => null,
+                }}
+                onChange={(option) => setSelectedExercise(option.value)}
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    marginTop: 8,
+                    background: 'var(--white)',
+                    boxShadow: state.isFocused
+                      ? '0 0 0 2px var(--accent)'
+                      : 'none',
+                    border: '1px solid var(--textSecondary)',
+                    '&:hover': {
+                      border: state.isFocused
+                        ? '1px solid var(--accent)'
+                        : '1px solid #aaa',
+                    },
+                  }),
+                  singleValue: (baseStyles, state) => ({
+                    ...baseStyles,
+                    color: 'var(--accent)',
+                    fontWeight: '600',
+                  }),
+                  menu: (baseStyles, state) => ({
+                    ...baseStyles,
+                    background: 'var(--white)',
+                    zIndex: 3,
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
                     backgroundColor: state.isSelected
                       ? 'var(--accent)'
-                      : 'var(--accentHoverLight)',
-                  },
-                }),
-              }}
-            />
-            <GroupedButtons
-              selectedItem={selectedExerciseStatFormat}
-              setSelectedItem={setSelectedExerciseStatFormat}
-              options={['Weight', 'Volume (reps × weight)', 'Table']}
-            />
-            <Toggle
-              label={'Show empty days?'}
-              enabled={showEmptyDays}
-              setEnabled={setShowEmptyDays}
-            />
-          </>
-        )}
-        {selectedExercise !== null && selectedExerciseStatFormat !== 2 && (
-          <div
-            className={styles.exerciseStatsContainer}
-            style={{ width: '100%', height: 315 }}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={selectedExerciseData.slice(-100)}
-                margin={{
-                  top: 12,
-                  right: 0,
-                  left: -20,
-                  bottom: 5,
+                      : 'var(--white)',
+                    '&:hover': {
+                      backgroundColor: state.isSelected
+                        ? 'var(--accent)'
+                        : 'var(--accentHoverLight)',
+                    },
+                  }),
                 }}
-              >
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={(value) => {
-                    return value.split(',')[0];
+              />
+              <GroupedButtons
+                selectedItem={selectedExerciseStatFormat}
+                setSelectedItem={setSelectedExerciseStatFormat}
+                options={['Weight', 'Volume (reps × weight)', 'Table']}
+              />
+              <Toggle
+                label={'Show empty days?'}
+                enabled={showEmptyDays}
+                setEnabled={setShowEmptyDays}
+              />
+            </>
+          )}
+          {selectedExercise !== null && selectedExerciseStatFormat !== 2 && (
+            <div
+              className={styles.exerciseStatsContainer}
+              style={{ width: '100%', height: 315 }}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={selectedExerciseData.slice(-100)}
+                  margin={{
+                    top: 12,
+                    right: 0,
+                    left: -20,
+                    bottom: 5,
                   }}
-                />
-                <YAxis />
-                <Tooltip
-                  labelFormatter={(value) => {
-                    return `Date: ${value}`;
-                  }}
-                  formatter={(value, name, ...props) => {
-                    return [
-                      value,
-                      getFormatLabel(selectedExerciseStatFormat),
-                      ...props,
-                    ];
-                  }}
-                  contentStyle={{
-                    background: 'var(--background)',
-                    borderRadius: 8,
-                  }}
-                  wrapperStyle={{
-                    borderRadius: 8,
-                    overflow: 'hidden',
-                    border: 'none',
-                  }}
-                  border={'none'}
-                />
-                <Bar
-                  dataKey={getFormatKey(selectedExerciseStatFormat)}
-                  fill="var(--accent)"
-                  activeBar={
-                    <Rectangle
-                      fill="var(--secondary)"
-                      stroke="var(--secondaryHover)"
-                    />
-                  }
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+                >
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(value) => {
+                      return value.split(',')[0];
+                    }}
+                  />
+                  <YAxis />
+                  <Tooltip
+                    labelFormatter={(value) => {
+                      return `Date: ${value}`;
+                    }}
+                    formatter={(value, name, ...props) => {
+                      return [
+                        value,
+                        getFormatLabel(selectedExerciseStatFormat),
+                        ...props,
+                      ];
+                    }}
+                    contentStyle={{
+                      background: 'var(--background)',
+                      borderRadius: 8,
+                    }}
+                    wrapperStyle={{
+                      borderRadius: 8,
+                      overflow: 'hidden',
+                      border: 'none',
+                    }}
+                    border={'none'}
+                  />
+                  <Bar
+                    dataKey={getFormatKey(selectedExerciseStatFormat)}
+                    fill="var(--accent)"
+                    activeBar={
+                      <Rectangle
+                        fill="var(--secondary)"
+                        stroke="var(--secondaryHover)"
+                      />
+                    }
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    )
   );
 }

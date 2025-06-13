@@ -1,6 +1,6 @@
 'use client';
 import styles from './page.module.css';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   createExercise,
   createWorkout,
@@ -16,6 +16,7 @@ import { LetsIconsTrash } from '@/components/SVGIcons/LetsIconsTrash';
 import { LetsIconsCopy } from '@/components/SVGIcons/LetsIconsCopy';
 import classNames from 'classnames';
 import { WorkoutsContext } from '@/context/workoutsProvider';
+import { useLoadDelay } from '@/hooks/useLoadDelay';
 
 export default function Home() {
   const {
@@ -26,6 +27,8 @@ export default function Home() {
     latestExercises,
     client,
   } = useContext(WorkoutsContext);
+
+  const shown = useLoadDelay();
 
   // Tracks whether workout has been started or not
   const [inWorkout, setInWorkout] = useStickyState(false, 'inWorkout');
@@ -140,126 +143,132 @@ export default function Home() {
   };
 
   return (
-    <main className={styles.main}>
-      {modalShown && (
-        <Modal setShown={setModalShown}>
-          <div className={styles.copyWorkoutContentWrapper}>
-            <div style={{ textAlign: 'left' }}>
-              What would you like to do for your workout on{' '}
-              <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>
-                {readableDate(longPressedWorkout.end_time)}
-              </span>
-              ?
+    shown && (
+      <main className={styles.main}>
+        {modalShown && (
+          <Modal setShown={setModalShown}>
+            <div className={styles.copyWorkoutContentWrapper}>
+              <div style={{ textAlign: 'left' }}>
+                What would you like to do for your workout on{' '}
+                <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>
+                  {readableDate(longPressedWorkout.end_time)}
+                </span>
+                ?
+              </div>
+              <button
+                className={styles.workoutButton}
+                onClick={() => {
+                  setInWorkout(false);
+                  setInWorkout(true);
+                  setWorkoutStartTime(Date.now());
+                  setExercises(() => {
+                    const newWorkout = structuredClone(longPressedWorkout);
+                    newWorkout.exercises = newWorkout.exercises.map(
+                      (exercise) => ({
+                        ...exercise,
+                        repsDrag: Array(exercise.reps.length).fill(0),
+                        weightsDrag: Array(exercise.weights.length).fill(0),
+                        notes: '',
+                        expanded: true,
+                      })
+                    );
+
+                    return newWorkout.exercises;
+                  });
+                  setModalShown(false);
+                }}
+              >
+                <LetsIconsCopy />
+                Copy workout
+              </button>
+              <button
+                className={`${styles.workoutButton} ${styles.delete}`}
+                onClick={() => {
+                  deleteWorkoutHandler(longPressedWorkout);
+                }}
+              >
+                <LetsIconsTrash />
+                Delete workout
+              </button>
             </div>
-            <button
-              className={styles.workoutButton}
-              onClick={() => {
-                setInWorkout(false);
-                setInWorkout(true);
-                setWorkoutStartTime(Date.now());
-                setExercises(() => {
-                  const newWorkout = structuredClone(longPressedWorkout);
-                  newWorkout.exercises = newWorkout.exercises.map(
-                    (exercise) => ({
-                      ...exercise,
-                      repsDrag: Array(exercise.reps.length).fill(0),
-                      weightsDrag: Array(exercise.weights.length).fill(0),
-                      notes: '',
-                      expanded: true,
-                    })
-                  );
+          </Modal>
+        )}
+        <Workout
+          inWorkout={inWorkout}
+          setInWorkout={setInWorkout}
+          exercises={exercises}
+          setExercises={setExercises}
+          workoutStartTime={workoutStartTime}
+          setWorkoutStartTime={setWorkoutStartTime}
+          exerciseNames={Array.from(exerciseNames).map(
+            (exerciseName, index) => ({
+              id: index,
+              name: exerciseName,
+            })
+          )}
+          latestExercises={latestExercises.current}
+          saveWorkout={saveWorkoutHandler}
+        />
 
-                  return newWorkout.exercises;
-                });
-                setModalShown(false);
-              }}
-            >
-              <LetsIconsCopy />
-              Copy workout
-            </button>
-            <button
-              className={`${styles.workoutButton} ${styles.delete}`}
-              onClick={() => {
-                deleteWorkoutHandler(longPressedWorkout);
-              }}
-            >
-              <LetsIconsTrash />
-              Delete workout
-            </button>
+        {(loading ||
+          loading2 ||
+          (workouts !== null && workouts.length > 0)) && (
+          <div className={styles.previousWorkoutsHeader}>
+            Your previous workouts
           </div>
-        </Modal>
-      )}
-      <Workout
-        inWorkout={inWorkout}
-        setInWorkout={setInWorkout}
-        exercises={exercises}
-        setExercises={setExercises}
-        workoutStartTime={workoutStartTime}
-        setWorkoutStartTime={setWorkoutStartTime}
-        exerciseNames={Array.from(exerciseNames).map((exerciseName, index) => ({
-          id: index,
-          name: exerciseName,
-        }))}
-        latestExercises={latestExercises.current}
-        saveWorkout={saveWorkoutHandler}
-      />
+        )}
 
-      {(loading || loading2 || (workouts !== null && workouts.length > 0)) && (
-        <div className={styles.previousWorkoutsHeader}>
-          Your previous workouts
-        </div>
-      )}
+        {loading && (
+          <div className={styles.loadingContainer}>
+            <div className={classNames('shimmerBG', styles.shimmer)}></div>
+            <div className={classNames('shimmerBG', styles.shimmer)}></div>
+            <div className={classNames('shimmerBG', styles.shimmer)}></div>
+            <div className={classNames('shimmerBG', styles.shimmer)}></div>
+          </div>
+        )}
 
-      {loading && (
-        <div className={styles.loadingContainer}>
-          <div className={classNames('shimmerBG', styles.shimmer)}></div>
-          <div className={classNames('shimmerBG', styles.shimmer)}></div>
-          <div className={classNames('shimmerBG', styles.shimmer)}></div>
-          <div className={classNames('shimmerBG', styles.shimmer)}></div>
-        </div>
-      )}
+        {!loading &&
+          workouts.length > 0 &&
+          workouts
+            .sort((a, b) => b.end_time.valueOf() - a.end_time.valueOf())
+            .slice(0, allWorkoutsShown ? Number.MAX_SAFE_INTEGER : 10)
+            .map((workout) => (
+              <LoggedWorkout
+                key={workout.id}
+                data={workout}
+                onLongPress={() => {
+                  setLongPressedWorkout(workout);
+                  setModalShown(true);
+                }}
+              />
+            ))}
 
-      {!loading &&
-        workouts.length > 0 &&
-        workouts
-          .sort((a, b) => b.end_time.valueOf() - a.end_time.valueOf())
-          .slice(0, allWorkoutsShown ? Number.MAX_SAFE_INTEGER : 10)
-          .map((workout) => (
-            <LoggedWorkout
-              key={workout.id}
-              data={workout}
-              onLongPress={() => {
-                setLongPressedWorkout(workout);
-                setModalShown(true);
-              }}
-            />
-          ))}
+        {loading2 && (
+          <div className={styles.loadingContainer}>
+            <div className={classNames('shimmerBG', styles.shimmer)}></div>
+          </div>
+        )}
 
-      {loading2 && (
-        <div className={styles.loadingContainer}>
-          <div className={classNames('shimmerBG', styles.shimmer)}></div>
-        </div>
-      )}
-
-      {!loading && workouts.length === 0 && (
-        <p style={{ marginTop: 24 }}>
-          No previous workouts found, why not start one?
-        </p>
-      )}
-      {!allWorkoutsShown && !loading && !loading2 && workouts.length > 0 && (
-        <button
-          className={styles.showAllWorkoutsButton}
-          onClick={() => setAllWorkoutsShown(true)}
-        >
-          Show all your workouts
-        </button>
-      )}
-      <div
-        style={{
-          height: loading || loading2 || allWorkoutsShown ? 85 : 115,
-          width: 1,
-        }}
-      />
-    </main>
+        {!loading && workouts.length === 0 && (
+          <p style={{ marginTop: 24 }}>
+            No previous workouts found, why not start one?
+          </p>
+        )}
+        {!allWorkoutsShown && !loading && !loading2 && workouts.length > 0 && (
+          <button
+            className={styles.showAllWorkoutsButton}
+            onClick={() => setAllWorkoutsShown(true)}
+          >
+            Show all your workouts
+          </button>
+        )}
+        <div
+          style={{
+            height: loading || loading2 || allWorkoutsShown ? 85 : 115,
+            width: 1,
+          }}
+        />
+      </main>
+    )
   );
 }
