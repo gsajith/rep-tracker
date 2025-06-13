@@ -35,6 +35,8 @@ export const ThemeProvider = ({ children }) => {
     metaTag.setAttribute('content', themeColor);
   };
 
+  resetThemeColor();
+
   useEffect(() => {
     resetThemeColor();
   }, []);
