@@ -20,10 +20,26 @@
   scrollbar-width: none;
   /* Firefox */
   position: relative;
+  margin-top: 12px;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
 }
 
 .exerciseHistoryTable {
   display: flex;
   gap: 12px;
   align-items: baseline;
+}
+
+.exerciseHistory>.exerciseHistoryTable > * {
+  scroll-snap-align: start;
+}
+
+.exerciseHistory > .exerciseHistoryTable > *:first-child {
+  margin-inline-start: 50px;
+}
+
+.exerciseHistory>.exerciseHistoryTable>*:last-child {
+  scroll-snap-align: end;
+  margin-inline-end: 50px;
 }

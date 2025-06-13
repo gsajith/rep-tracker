@@ -250,11 +250,13 @@ export default function Stats() {
                 setSelectedItem={setSelectedExerciseStatFormat}
                 options={['Weight', 'Volume (reps × weight)', 'Table']}
               />
-              <Toggle
-                label={'Show empty days?'}
-                enabled={showEmptyDays}
-                setEnabled={setShowEmptyDays}
-              />
+              {selectedExerciseStatFormat !== 2 && (
+                <Toggle
+                  label={'Show empty days?'}
+                  enabled={showEmptyDays}
+                  setEnabled={setShowEmptyDays}
+                />
+              )}
             </>
           )}
           {selectedExercise !== null && selectedExerciseStatFormat !== 2 && (
@@ -318,9 +320,10 @@ export default function Stats() {
           {selectedExercise !== null && selectedExerciseStatFormat === 2 && (
             <div className={styles.exerciseHistory}>
               <div className={styles.exerciseHistoryTable}>
-                {selectedExerciseData.map((e) => {
+                {selectedExerciseData.map((e, index) => {
                   return (
                     <Exercise
+                      key={e.date + '' + index}
                       exercise={e}
                       truncateSets={false}
                       extraSets={0}
