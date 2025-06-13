@@ -36,6 +36,8 @@
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   scrollbar-width: none; /* Firefox */
   position: relative;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
 }
 
 .exercisesContainer::state(webkit-scrollbar) {
@@ -55,6 +57,19 @@
   max-width: 100px;
   width: 100px;
   position: relative;
+}
+
+.exercisesContainer>.exercises>.exercise {
+  scroll-snap-align: start;
+}
+
+.exercisesContainer>.exercises>.exercise:first-child {
+  margin-inline-start: 50px;
+}
+
+.exercisesContainer>.exercises>.exercise:last-child {
+  scroll-snap-align: end;
+  margin-inline-end: 50px;
 }
 
 .exerciseName {
