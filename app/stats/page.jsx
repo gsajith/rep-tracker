@@ -19,6 +19,7 @@ import {
 import Toggle from '@/components/toggle';
 import { useStickyState } from '@/hooks/useStickyState';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
+import { Exercise } from '@/components/loggedWorkout';
 
 export default function Stats() {
   const { workouts, loading, loading2 } = useContext(WorkoutsContext);
@@ -140,19 +141,24 @@ export default function Stats() {
   const selectedExerciseData = useMemo(() => {
     if (selectedExercise) {
       const history = exerciseHistory[selectedExercise];
-      const mappedHistory = history
-        .map((historyItem) => {
-          return {
-            ...historyItem,
-            maxWeight: Math.max(1, Math.max(...historyItem.weights)),
-            volume: calculateVolume(historyItem.reps, historyItem.weights),
-          };
-        })
-        .reverse();
+      const mappedHistory = history.map((historyItem) => {
+        return {
+          ...historyItem,
+          maxWeight: Math.max(1, Math.max(...historyItem.weights)),
+          volume: calculateVolume(historyItem.reps, historyItem.weights),
+        };
+      });
+      if (selectedExerciseStatFormat !== 2) {
+        mappedHistory.reverse();
+      }
       const filledHistory = [];
-      for (let i = 0; i < mappedHistory.length - 1; i++) {
+      for (let i = 0; i <= mappedHistory.length - 1; i++) {
         filledHistory.push(mappedHistory[i]);
-        if (showEmptyDays) {
+        if (
+          showEmptyDays &&
+          i < mappedHistory.length - 1 &&
+          selectedExerciseStatFormat !== 2
+        ) {
           filledHistory.push(
             ...generateEmptyDays(mappedHistory[i], mappedHistory[i + 1])
           );
@@ -162,7 +168,12 @@ export default function Stats() {
     } else {
       return [];
     }
-  }, [exerciseHistory, selectedExercise, showEmptyDays]);
+  }, [
+    exerciseHistory,
+    selectedExercise,
+    showEmptyDays,
+    selectedExerciseStatFormat,
+  ]);
 
   return (
     shown && (
@@ -302,6 +313,25 @@ export default function Stats() {
                   />
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+          )}
+          {selectedExercise !== null && selectedExerciseStatFormat === 2 && (
+            <div className={styles.exerciseHistory}>
+              <div className={styles.exerciseHistoryTable}>
+                {selectedExerciseData.map((e) => {
+                  return (
+                    <Exercise
+                      exercise={e}
+                      truncateSets={false}
+                      extraSets={0}
+                      numSets={e.reps.length}
+                      name={selectedExercise}
+                      showDate={true}
+                      showNote={true}
+                    />
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

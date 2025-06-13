@@ -9,6 +9,72 @@ import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
 import { useLongPress } from 'use-long-press';
 
+export function Exercise({
+  exercise,
+  truncateSets = false,
+  extraSets = 0,
+  numSets,
+  showDate = false,
+  showNote = false,
+}) {
+  return (
+    <div
+      className={styles.exercise}
+      key={exercise.id || (showDate ? exercise.date : '')}
+    >
+      <div className={styles.exerciseName}>
+        {exercise.name}
+        {showDate && exercise.name && ' '}
+        {showDate && exercise.date}
+      </div>
+      {exercise.notes && exercise.notes.length > 0 && !showNote && (
+        <div className={styles.commentIcon} title={exercise.notes}>
+          <LetsIconsComment />
+        </div>
+      )}
+      {numSets > 0 && (
+        <div className={styles.setsContainer}>
+          {[...Array(numSets)].map((_e, i) => (
+            <div className={styles.setContainer} key={i}>
+              <span style={{ fontSize: 18 }}>{exercise.reps[i]}</span>
+              <span
+                className={styles.setAdornment}
+                style={{
+                  marginTop: 2,
+                  fontSize: 16,
+                }}
+              >
+                ×
+              </span>
+              <span style={{ fontSize: 18 }}>{exercise.weights[i]}</span>
+              <span
+                className={styles.setAdornment}
+                style={{
+                  marginLeft: -3,
+                  marginTop: 5,
+                }}
+              >
+                lbs
+              </span>
+            </div>
+          ))}
+          {truncateSets && (
+            <div className={styles.setContainer}>
+              <span style={{ fontSize: 18 }}>+ {extraSets} more</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {exercise.notes && exercise.notes.length > 0 && showNote && (
+        <div className={styles.notesContainer}>
+          <b>Note:</b> {exercise.notes}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function LoggedWorkout({ data, onLongPress }) {
   const bind = useLongPress(() => {
     onLongPress();
@@ -42,49 +108,12 @@ export default function LoggedWorkout({ data, onLongPress }) {
             }
 
             return (
-              <div className={styles.exercise} key={exercise.id}>
-                <div className={styles.exerciseName}>{exercise.name}</div>
-                {exercise.notes && exercise.notes.length > 0 && (
-                  <div className={styles.commentIcon} title={exercise.notes}>
-                    <LetsIconsComment />
-                  </div>
-                )}
-                {numSets > 0 && (
-                  <div className={styles.setsContainer}>
-                    {[...Array(numSets)].map((_e, i) => (
-                      <div className={styles.setContainer} key={i}>
-                        <span style={{ fontSize: 18 }}>{exercise.reps[i]}</span>
-                        <span
-                          className={styles.setAdornment}
-                          style={{
-                            marginTop: 2,
-                            fontSize: 16,
-                          }}
-                        >
-                          ×
-                        </span>
-                        <span style={{ fontSize: 18 }}>
-                          {exercise.weights[i]}
-                        </span>
-                        <span
-                          className={styles.setAdornment}
-                          style={{
-                            marginLeft: -3,
-                            marginTop: 5,
-                          }}
-                        >
-                          lbs
-                        </span>
-                      </div>
-                    ))}
-                    {truncateSets && (
-                      <div className={styles.setContainer}>
-                        <span style={{ fontSize: 18 }}>+ {extraSets} more</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <Exercise
+                exercise={exercise}
+                truncateSets={truncateSets}
+                extraSets={extraSets}
+                numSets={numSets}
+              />
             );
           })}
         </div>
