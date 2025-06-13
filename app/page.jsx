@@ -18,8 +18,14 @@ import classNames from 'classnames';
 import { WorkoutsContext } from '@/context/workoutsProvider';
 
 export default function Home() {
-  const { workouts, loading, loading2, exerciseNames, latestExercises } =
-    useContext(WorkoutsContext);
+  const {
+    workouts,
+    loading,
+    loading2,
+    exerciseNames,
+    latestExercises,
+    client,
+  } = useContext(WorkoutsContext);
 
   // Tracks whether workout has been started or not
   const [inWorkout, setInWorkout] = useStickyState(false, 'inWorkout');

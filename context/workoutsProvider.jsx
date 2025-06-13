@@ -80,7 +80,14 @@ export const WorkoutsProvider = ({ children }) => {
 
   return (
     <WorkoutsContext.Provider
-      value={{ workouts, loading, loading2, exerciseNames, latestExercises }}
+      value={{
+        workouts,
+        loading,
+        loading2,
+        exerciseNames,
+        latestExercises,
+        client,
+      }}
     >
       {children}
     </WorkoutsContext.Provider>
