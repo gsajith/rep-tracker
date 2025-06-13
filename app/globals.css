@@ -46,6 +46,21 @@
   --warning: #f488a1;
 }
 
+[data-theme="red-dark"] {
+  --background: #1a1a1b;
+  --backgroundShim: #1f1f20aa;
+  --white: #000000;
+  --text: #ebebeb;
+  --textSecondary: #979797;
+  --accent: #ee455c;
+  --accentHover: #de8c8c;
+  --accentHoverLight: #842828;
+  --secondary: #b31434;
+  --secondaryHover: #730f2a;
+  --textInverted: #000000;
+  --warning: #f488a1;
+}
+
 * {
   user-select: none;
   -moz-user-select: none;

@@ -369,6 +369,7 @@ export default function Workout({
                                   : {},
                                 provided.draggableProps.style
                               )}
+                              tabIndex="-1"
                             >
                               <div
                                 className={styles.exercise}

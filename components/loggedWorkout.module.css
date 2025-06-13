@@ -104,7 +104,7 @@
 }
 
 .setAdornment {
-  color: var(--textSecondary);
+  color: rgb(from var(--text) r g b / 50%);
 }
 
 .minutesLabel {

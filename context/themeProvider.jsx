@@ -2,7 +2,12 @@
 import { useStickyState } from '@/hooks/useStickyState';
 import { createContext, useContext, useEffect } from 'react';
 
-const ALL_THEME_NAMES = ['purple-green', 'blue-orange', 'blue-dark'];
+const ALL_THEME_NAMES = [
+  'purple-green',
+  'blue-orange',
+  'blue-dark',
+  'red-dark',
+];
 
 export const ThemeContext = createContext({
   themeName: 'default',
