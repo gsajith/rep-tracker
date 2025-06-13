@@ -182,6 +182,7 @@ export default function Stats() {
         {mount && (
           <>
             <Select
+              isSearchable={false}
               options={selectOptions}
               placeholder="Select an exercise"
               components={{
@@ -249,7 +250,7 @@ export default function Stats() {
                 margin={{
                   top: 12,
                   right: 0,
-                  left: -25,
+                  left: -20,
                   bottom: 5,
                 }}
               >
