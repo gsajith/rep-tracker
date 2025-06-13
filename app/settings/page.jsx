@@ -19,7 +19,7 @@ export default function Settings() {
       <div className={styles.container}>
         <h2>Settings</h2>
         <div className={styles.themeSelector}>
-          Color Theme:
+          Color style:
           <div className={styles.themeList}>
             {mount &&
               allThemeNames.map((theme) => (
