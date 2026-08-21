@@ -165,9 +165,13 @@ export default function Home() {
     }
   };
 
+  // Only ever clears the flag. Setting it from the result would be wrong: a
+  // retry that fails after a plain load failure would start claiming a change
+  // went through when none had. The write paths set it, this only resolves it.
   const retryRefresh = async () => {
     if (loading2) return;
-    setListStale(Boolean(await refresh()));
+    const error = await refresh();
+    if (!error) setListStale(false);
   };
 
   return (
