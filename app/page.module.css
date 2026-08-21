@@ -35,8 +35,12 @@
    because .addButton already has --secondary in its base rule and sets no
    colour, so it dims in place. These buttons set color: --textInverted, and
    swapping the background to --secondary underneath it puts white on light
-   lime in the default theme. Opacity fades the whole element, so the label
-   keeps its contrast against the button. */
+   lime in the default theme, around 1.2:1.
+
+   Opacity fades the element as a group, so the label's contrast against the
+   button drops as well rather than holding: roughly 3.9:1 to 2.0:1 on the
+   default theme. That is the ordinary disabled band, and WCAG exempts
+   inactive controls, so it is the trade being made here knowingly. */
 .workoutButton:disabled {
   opacity: 0.55;
 }
