@@ -706,7 +706,7 @@ export default function Workout({
                   // Drop a message from a previous attempt, the same way the
                   // long-press modal clears its delete error. Otherwise "You
                   // are offline" is still sitting there after reconnecting.
-                  onOpenSaveConfirm?.();
+                  onOpenSaveConfirm();
                   setModalShown(true);
                 }}
                 className={styles.endWorkoutButton}

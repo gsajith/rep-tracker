@@ -150,9 +150,13 @@ export default function Home() {
     let deleted = false;
     try {
       // Exercises belonging to the workout are removed in the same transaction.
-      const { error } = await removeWorkout(workout.id);
+      const { error, status } = await removeWorkout(workout.id);
 
-      if (error) {
+      // A 404 means the row is already gone, most likely deleted from another
+      // device. That is indistinguishable from success here, and the message
+      // below would be false and would stay false however many times the user
+      // retried, since the row is never coming back.
+      if (error && status !== 404) {
         console.error(error);
         setDeleteError(
           'Could not delete this workout. It is still in your list, so you can try again.'

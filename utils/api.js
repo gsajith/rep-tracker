@@ -13,13 +13,17 @@ async function request(url, options) {
     const res = await fetch(url, options);
     const body = await res.json().catch(() => ({}));
     if (!res.ok) {
-      return { data: null, error: body.error ?? `HTTP ${res.status}` };
+      return {
+        data: null,
+        error: body.error ?? `HTTP ${res.status}`,
+        status: res.status,
+      };
     }
-    return { data: body.data, error: null };
+    return { data: body.data, error: null, status: res.status };
   } catch (error) {
     // fetch only rejects on network failure; the app already gates on
     // navigator.onLine, this covers the rest.
-    return { data: null, error: error?.message ?? 'Network error' };
+    return { data: null, error: error?.message ?? 'Network error', status: 0 };
   }
 }
 
