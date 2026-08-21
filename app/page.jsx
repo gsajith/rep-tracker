@@ -14,8 +14,14 @@ import { WorkoutsContext } from '@/context/workoutsProvider';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
 
 export default function Home() {
-  const { workouts, loading, loading2, exerciseNames, latestExercises } =
-    useContext(WorkoutsContext);
+  const {
+    workouts,
+    loading,
+    loading2,
+    exerciseNames,
+    latestExercises,
+    refresh,
+  } = useContext(WorkoutsContext);
 
   const shown = useLoadDelay();
 
@@ -42,14 +48,18 @@ export default function Home() {
 
   const [longPressedWorkout, setLongPressedWorkout] = useState(null);
 
+  // Separate flags so an in-flight delete cannot disable the save button.
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const saveWorkoutHandler = async () => {
-    // TODO: Add loading for this and dont reload page
+    if (saving) return;
     if (!window.navigator.onLine) {
-      // TODO: Handle error fallback
+      // TODO: Handle error fallback (#2)
       return;
     }
 
-    console.log('Saving...');
+    setSaving(true);
     // The workout and all of its exercises are created in one transaction now,
     // so a failure can no longer leave orphaned exercise rows behind.
     const { error } = await saveWorkout({
@@ -65,39 +75,48 @@ export default function Home() {
     });
 
     if (error) {
-      // TODO: Handle error fallback
+      // TODO: Handle error fallback (#2)
       console.error(error);
+      setSaving(false);
       return;
     }
 
+    // Clearing `inWorkout` runs the reset effect in <Workout />, which empties
+    // the exercises and the start time. Nothing races that effect now the
+    // reload is gone, so the cleared state is guaranteed to reach localStorage.
     setInWorkout(false);
-    location.reload();
+    await refresh();
+    setSaving(false);
   };
 
   const deleteWorkoutHandler = async (workout) => {
-    // TODO: add loading for this and dont reload page
+    if (deleting) return;
     if (!window.navigator.onLine) {
-      // TODO: Handle error fallback
+      // TODO: Handle error fallback (#2)
       return;
     }
 
-    console.log('Deleting...', workout);
+    setDeleting(true);
     // Exercises belonging to the workout are removed in the same transaction.
     const { error } = await removeWorkout(workout.id);
 
     if (error) {
-      // TODO: Handle error fallback
+      // TODO: Handle error fallback (#2)
       console.error(error);
+      setDeleting(false);
       return;
     }
 
-    location.reload();
+    setModalShown(false);
+    setLongPressedWorkout(null);
+    await refresh();
+    setDeleting(false);
   };
 
   return (
     shown && (
       <main className={styles.main}>
-        {modalShown && (
+        {modalShown && longPressedWorkout && (
           <Modal setShown={setModalShown}>
             <div className={styles.copyWorkoutContentWrapper}>
               <div style={{ textAlign: 'left' }}>
@@ -135,12 +154,13 @@ export default function Home() {
               </button>
               <button
                 className={`${styles.workoutButton} ${styles.delete}`}
+                disabled={deleting}
                 onClick={() => {
                   deleteWorkoutHandler(longPressedWorkout);
                 }}
               >
                 <LetsIconsTrash />
-                Delete workout
+                {deleting ? 'Deleting...' : 'Delete workout'}
               </button>
             </div>
           </Modal>
@@ -160,6 +180,7 @@ export default function Home() {
           )}
           latestExercises={latestExercises.current}
           saveWorkout={saveWorkoutHandler}
+          saving={saving}
         />
 
         {(loading ||
