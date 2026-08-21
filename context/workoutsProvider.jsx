@@ -69,6 +69,14 @@ export const WorkoutsProvider = ({ children }) => {
       setWorkouts(data);
       setLoadError(null);
       return null;
+    } catch (thrown) {
+      // Never reject. Callers await this to decide what to tell the user, and a
+      // rejected promise here would surface as no message at all, which is the
+      // bug this issue exists to remove.
+      console.error(thrown);
+      const message = thrown?.message ?? 'Could not refresh workouts';
+      setLoadError(message);
+      return message;
     } finally {
       setLoading2(false);
     }
@@ -96,6 +104,11 @@ export const WorkoutsProvider = ({ children }) => {
           setWorkouts(data);
           setLoadError(null);
         }
+      } catch (thrown) {
+        // Without this the page renders "No previous workouts found" to someone
+        // who has workouts, which is the same lie in a different place.
+        console.error(thrown);
+        setLoadError(thrown?.message ?? 'Could not load workouts');
       } finally {
         setLoading(false);
       }
@@ -111,6 +124,9 @@ export const WorkoutsProvider = ({ children }) => {
             setWorkouts(data2);
             setLoadError(null);
           }
+        } catch (thrown) {
+          console.error(thrown);
+          setLoadError(thrown?.message ?? 'Could not load workouts');
         } finally {
           setLoading2(false);
         }

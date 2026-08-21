@@ -122,6 +122,16 @@ export default function Home() {
       // that, which is the difference between a confusing screen and one that
       // looks like the workout vanished.
       setStaleAfter((await refresh()) ? 'save' : null);
+    } catch (thrown) {
+      // Anything that throws rather than returning an error, chiefly
+      // toISOString on a corrupt workoutStartTime. Without this the promise
+      // rejects unhandled and the user is back to a modal that does nothing.
+      // Safe to blame the save: refresh() no longer rejects, so every throw
+      // that reaches here happened before the workout was cleared.
+      console.error(thrown);
+      setSaveError(
+        'Could not save this workout. It is still here, so you can try again.'
+      );
     } finally {
       setSaving(false);
     }
@@ -153,6 +163,11 @@ export default function Home() {
       setModalShown(false);
       setLongPressedWorkout(null);
       deleted = true;
+    } catch (thrown) {
+      console.error(thrown);
+      setDeleteError(
+        'Could not delete this workout. It is still in your list, so you can try again.'
+      );
     } finally {
       setDeleting(false);
     }
@@ -267,21 +282,27 @@ export default function Home() {
           saveWorkout={saveWorkoutHandler}
           saving={saving}
           saveError={saveError}
+          onOpenSaveConfirm={() => setSaveError(null)}
         />
 
-        {!loading && listNotice && (
-          <div className={styles.listNotice} role="status">
-            <span>{listNotice}</span>
-            <button
-              className={styles.retryButton}
-              onClick={retryRefresh}
-              disabled={loading2}
-              aria-busy={loading2}
-            >
-              {loading2 ? 'Retrying' : 'Retry'}
-            </button>
-          </div>
-        )}
+        {/* The live region is mounted for the life of the page and only its
+            text changes. Mounting the region together with its message is the
+            case screen readers announce unreliably. */}
+        <div role="status" aria-live="polite">
+          {!loading && listNotice && (
+            <div className={styles.listNotice}>
+              <span>{listNotice}</span>
+              <button
+                className={styles.retryButton}
+                onClick={retryRefresh}
+                disabled={loading2}
+                aria-busy={loading2}
+              >
+                {loading2 ? 'Retrying' : 'Retry'}
+              </button>
+            </div>
+          )}
+        </div>
 
         {(loading ||
           loading2 ||
@@ -323,7 +344,7 @@ export default function Home() {
           </div>
         )}
 
-        {!loading && !loadError && workouts.length === 0 && (
+        {!loading && !listNotice && workouts.length === 0 && (
           <p style={{ marginTop: 24 }}>
             No previous workouts found, why not start one?
           </p>
