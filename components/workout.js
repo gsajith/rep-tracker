@@ -289,6 +289,7 @@ export default function Workout({
             <button
               className={styles.endWorkoutConfirmButton}
               disabled={saving}
+              aria-busy={saving}
               onClick={() => {
                 saveWorkout();
               }}

@@ -48,43 +48,60 @@ export const WorkoutsProvider = ({ children }) => {
   // Refetches everything and replaces the list. Deliberately leaves `loading`
   // alone: the list is already on screen when this runs, and flipping `loading`
   // would swap it for shimmer placeholders on every save.
+  // try/finally throughout: a throw out of indexExercises would otherwise leave
+  // a loading flag stuck on, and the page reload that used to clear it is gone.
   const refresh = useCallback(async () => {
     setLoading2(true);
-    const { data, error } = await loadWorkouts(100);
-    if (!error) {
-      indexExercises(data);
-      setWorkouts(data);
-    }
-    setLoading2(false);
-  }, [indexExercises]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    // Loads a few workouts first so the page paints quickly, then backfills
-    // the rest. Each call is a single request, not one round trip per exercise.
-    async function load() {
-      setLoading(true);
-      const { data, error } = await loadWorkouts(3);
+    try {
+      const { data, error } = await loadWorkouts(100);
       if (!error) {
         indexExercises(data);
         setWorkouts(data);
       }
-      setLoading(false);
+    } finally {
+      setLoading2(false);
+    }
+  }, [indexExercises]);
 
-      if (data !== null && data.length > 0) {
-        setLoading2(true);
-        const { data: data2, error: error2 } = await loadWorkouts(100);
-        if (!error2) {
-          indexExercises(data2);
-          setWorkouts(data2);
+  // Keyed on the id, not the user object: Clerk hands back a new object
+  // identity on a session refresh, which would refetch everything.
+  const userId = user?.id;
+
+  useEffect(() => {
+    if (!userId) return;
+
+    // Loads a few workouts first so the page paints quickly, then backfills
+    // the rest. Each call is a single request, not one round trip per exercise.
+    async function load() {
+      let first;
+      setLoading(true);
+      try {
+        const { data, error } = await loadWorkouts(3);
+        first = data;
+        if (!error) {
+          indexExercises(data);
+          setWorkouts(data);
         }
-        setLoading2(false);
+      } finally {
+        setLoading(false);
+      }
+
+      if (first !== null && first !== undefined && first.length > 0) {
+        setLoading2(true);
+        try {
+          const { data: data2, error: error2 } = await loadWorkouts(100);
+          if (!error2) {
+            indexExercises(data2);
+            setWorkouts(data2);
+          }
+        } finally {
+          setLoading2(false);
+        }
       }
     }
 
     load();
-  }, [user, indexExercises]);
+  }, [userId, indexExercises]);
 
   return (
     <WorkoutsContext.Provider

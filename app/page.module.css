@@ -16,7 +16,6 @@
   border-radius: 14px;
   transition: background 150ms ease-in-out, border 150ms ease-in-out;
   border: 2px solid var(--accent);
-  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -25,8 +24,21 @@
   padding-left: 8px;
 }
 
-.workoutButton:hover,
-.workoutButton:focus {
+.workoutButton:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Matches the pattern already used by .addButton in workout.module.css.
+   Without the :not(:disabled) guards a disabled button keeps the pointer
+   cursor and still lights up on hover, so it reads as clickable. */
+.workoutButton:disabled {
+  background: var(--secondary);
+  border: 2px solid var(--secondary);
+  opacity: 0.75;
+}
+
+.workoutButton:not(:disabled):hover,
+.workoutButton:not(:disabled):focus {
   color: var(--textInverted);
   outline: none;
   background: var(--accentHover);
@@ -38,7 +50,7 @@
   border: 2px solid var(--textSecondary);
 }
 
-.delete:hover, .delete:focus {
+.delete:not(:disabled):hover, .delete:not(:disabled):focus {
   background: var(--warning)
 }
 

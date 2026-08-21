@@ -60,33 +60,42 @@ export default function Home() {
     }
 
     setSaving(true);
-    // The workout and all of its exercises are created in one transaction now,
-    // so a failure can no longer leave orphaned exercise rows behind.
-    const { error } = await saveWorkout({
-      startTime: new Date(workoutStartTime).toISOString(),
-      endTime: new Date().toISOString(),
-      exercises: exercises.map((exercise) => ({
-        name: exercise.name,
-        reps: exercise.reps.map((rep) => parseInt(rep) || 0),
-        weights: exercise.weights.map((weight) => parseFloat(weight) || 0),
-        notes: exercise.notes,
-      })),
-      notes: '',
-    });
+    // finally, not a trailing call: an invalid workoutStartTime makes
+    // toISOString throw, and without this the button stays disabled for the
+    // rest of the session now that the page no longer reloads.
+    try {
+      // The workout and all of its exercises are created in one transaction
+      // now, so a failure can no longer leave orphaned exercise rows behind.
+      const { error } = await saveWorkout({
+        startTime: new Date(workoutStartTime).toISOString(),
+        endTime: new Date().toISOString(),
+        exercises: exercises.map((exercise) => ({
+          name: exercise.name,
+          reps: exercise.reps.map((rep) => parseInt(rep) || 0),
+          weights: exercise.weights.map((weight) => parseFloat(weight) || 0),
+          notes: exercise.notes,
+        })),
+        notes: '',
+      });
 
-    if (error) {
-      // TODO: Handle error fallback (#2)
-      console.error(error);
+      if (error) {
+        // TODO: Handle error fallback (#2)
+        console.error(error);
+        return;
+      }
+
+      // Clearing `inWorkout` runs the reset effect in <Workout />, which empties
+      // the exercises and the start time. Nothing races that effect now the
+      // reload is gone, so the cleared state is guaranteed to reach localStorage.
+      setInWorkout(false);
+    } finally {
       setSaving(false);
-      return;
     }
 
-    // Clearing `inWorkout` runs the reset effect in <Workout />, which empties
-    // the exercises and the start time. Nothing races that effect now the
-    // reload is gone, so the cleared state is guaranteed to reach localStorage.
-    setInWorkout(false);
+    // Outside the guard: the workout is already saved, and refresh has its own
+    // loading indicator. Keeping the button disabled through the refetch would
+    // only delay the modal closing.
     await refresh();
-    setSaving(false);
   };
 
   const deleteWorkoutHandler = async (workout) => {
@@ -97,20 +106,25 @@ export default function Home() {
     }
 
     setDeleting(true);
-    // Exercises belonging to the workout are removed in the same transaction.
-    const { error } = await removeWorkout(workout.id);
+    try {
+      // Exercises belonging to the workout are removed in the same transaction.
+      const { error } = await removeWorkout(workout.id);
 
-    if (error) {
-      // TODO: Handle error fallback (#2)
-      console.error(error);
+      if (error) {
+        // TODO: Handle error fallback (#2)
+        console.error(error);
+        return;
+      }
+
+      setModalShown(false);
+      setLongPressedWorkout(null);
+    } finally {
       setDeleting(false);
-      return;
     }
 
-    setModalShown(false);
-    setLongPressedWorkout(null);
+    // Cleared before the refetch, so long-pressing another workout during it
+    // does not open a modal already showing "Deleting...".
     await refresh();
-    setDeleting(false);
   };
 
   return (
@@ -155,6 +169,7 @@ export default function Home() {
               <button
                 className={`${styles.workoutButton} ${styles.delete}`}
                 disabled={deleting}
+                aria-busy={deleting}
                 onClick={() => {
                   deleteWorkoutHandler(longPressedWorkout);
                 }}

@@ -304,7 +304,6 @@
   border-radius: 14px;
   transition: background 150ms ease-in-out, border 150ms ease-in-out;
   border: 2px solid var(--accent);
-  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -312,8 +311,19 @@
   padding-left: 2px;
 }
 
-.endWorkoutConfirmButton:hover,
-.endWorkoutConfirmButton:focus {
+.endWorkoutConfirmButton:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Same pattern as .addButton above. */
+.endWorkoutConfirmButton:disabled {
+  background: var(--secondary);
+  border: 2px solid var(--secondary);
+  opacity: 0.75;
+}
+
+.endWorkoutConfirmButton:not(:disabled):hover,
+.endWorkoutConfirmButton:not(:disabled):focus {
   color: var(--textInverted);
   outline: none;
   background: var(--accentHover);
