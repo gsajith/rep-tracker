@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - run: npm run lint
+
+      # next build type-checks and compiles every route. The app has no test
+      # suite, so lint and build are the whole gate. No environment variables
+      # are needed: utils/db.js creates the Neon client lazily, so a missing
+      # DATABASE_URL does not break the build, and Clerk does not require its
+      # keys to compile.
+      - run: npm run build
