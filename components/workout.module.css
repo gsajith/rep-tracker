@@ -315,11 +315,12 @@
   cursor: pointer;
 }
 
-/* Same pattern as .addButton above. */
+/* Dim only, no background swap. .addButton above can set --secondary when
+   disabled because that is already its base background and it sets no colour.
+   This button sets color: --textInverted, so a --secondary background would
+   put white on light lime in the default theme. */
 .endWorkoutConfirmButton:disabled {
-  background: var(--secondary);
-  border: 2px solid var(--secondary);
-  opacity: 0.75;
+  opacity: 0.55;
 }
 
 .endWorkoutConfirmButton:not(:disabled):hover,

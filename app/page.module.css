@@ -28,13 +28,17 @@
   cursor: pointer;
 }
 
-/* Matches the pattern already used by .addButton in workout.module.css.
-   Without the :not(:disabled) guards a disabled button keeps the pointer
-   cursor and still lights up on hover, so it reads as clickable. */
+/* Without the :not(:disabled) guards a disabled button keeps the pointer
+   cursor and still lights up on hover, so it reads as clickable.
+
+   Dim only. Do not copy .addButton's disabled background: that rule works
+   because .addButton already has --secondary in its base rule and sets no
+   colour, so it dims in place. These buttons set color: --textInverted, and
+   swapping the background to --secondary underneath it puts white on light
+   lime in the default theme. Opacity fades the whole element, so the label
+   keeps its contrast against the button. */
 .workoutButton:disabled {
-  background: var(--secondary);
-  border: 2px solid var(--secondary);
-  opacity: 0.75;
+  opacity: 0.55;
 }
 
 .workoutButton:not(:disabled):hover,

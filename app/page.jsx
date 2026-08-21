@@ -88,14 +88,16 @@ export default function Home() {
       // the exercises and the start time. Nothing races that effect now the
       // reload is gone, so the cleared state is guaranteed to reach localStorage.
       setInWorkout(false);
+
+      // Refresh inside the guard, unlike the delete path below. That effect is
+      // passive, so it closes the confirm modal a commit later than this one.
+      // Releasing `saving` first would render the modal once more with the
+      // button enabled while the exercises are still populated, and a tap
+      // landing in that gap would post the same workout twice.
+      await refresh();
     } finally {
       setSaving(false);
     }
-
-    // Outside the guard: the workout is already saved, and refresh has its own
-    // loading indicator. Keeping the button disabled through the refetch would
-    // only delay the modal closing.
-    await refresh();
   };
 
   const deleteWorkoutHandler = async (workout) => {
@@ -122,8 +124,10 @@ export default function Home() {
       setDeleting(false);
     }
 
-    // Cleared before the refetch, so long-pressing another workout during it
-    // does not open a modal already showing "Deleting...".
+    // Safe outside the guard, unlike the save path: this handler closes its own
+    // modal, so `modalShown` and `deleting` land in the same commit and the
+    // button is gone before the flag is released. Clearing first also stops a
+    // long-press during the refetch opening a modal that says "Deleting...".
     await refresh();
   };
 
