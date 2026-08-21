@@ -57,9 +57,10 @@ export default function Home() {
   const [saveError, setSaveError] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
 
-  // The write landed but the refetch after it did not, so the list below is
-  // known stale. Distinct from loadError, which means the list never arrived.
-  const [listStale, setListStale] = useState(false);
+  // Which write left this list stale, or null. Carries the verb rather than a
+  // bare boolean so the banner can name what actually happened instead of
+  // saying "that change" and making the user guess.
+  const [staleAfter, setStaleAfter] = useState(null);
 
   // Drop a stale message once the workout is saved or trashed, so reopening the
   // confirm modal later does not show the error from a previous attempt.
@@ -120,7 +121,7 @@ export default function Home() {
       // stale list rather than a lost workout. The banner below says exactly
       // that, which is the difference between a confusing screen and one that
       // looks like the workout vanished.
-      setListStale(Boolean(await refresh()));
+      setStaleAfter((await refresh()) ? 'save' : null);
     } finally {
       setSaving(false);
     }
@@ -161,7 +162,7 @@ export default function Home() {
     // button is gone before the flag is released. Clearing first also stops a
     // long-press during the refetch opening a modal that says "Deleting...".
     if (deleted) {
-      setListStale(Boolean(await refresh()));
+      setStaleAfter((await refresh()) ? 'delete' : null);
     }
   };
 
@@ -171,8 +172,25 @@ export default function Home() {
   const retryRefresh = async () => {
     if (loading2) return;
     const error = await refresh();
-    if (!error) setListStale(false);
+    if (!error) setStaleAfter(null);
   };
+
+  // Four distinct situations, and saying the wrong one is the whole bug this
+  // issue is about. Note the third: the mount path loads three workouts and
+  // then backfills the rest, so a failure on the second call leaves a real,
+  // partial list on screen. Telling someone their workouts could not be loaded
+  // while three of them are visible is its own kind of lie.
+  let listNotice = null;
+  if (staleAfter === 'save') {
+    listNotice = 'Your workout was saved, but this list could not be refreshed.';
+  } else if (staleAfter === 'delete') {
+    listNotice =
+      'That workout was deleted, but this list could not be refreshed.';
+  } else if (loadError && workouts.length > 0) {
+    listNotice = 'Some of your workouts could not be loaded.';
+  } else if (loadError) {
+    listNotice = 'Could not load your workouts.';
+  }
 
   return (
     shown && (
@@ -251,13 +269,9 @@ export default function Home() {
           saveError={saveError}
         />
 
-        {!loading && (listStale || loadError) && (
+        {!loading && listNotice && (
           <div className={styles.listNotice} role="status">
-            <span>
-              {listStale
-                ? 'That change went through, but this list could not be refreshed.'
-                : 'Could not load your workouts.'}
-            </span>
+            <span>{listNotice}</span>
             <button
               className={styles.retryButton}
               onClick={retryRefresh}
