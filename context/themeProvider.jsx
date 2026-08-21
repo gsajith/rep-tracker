@@ -42,8 +42,9 @@ export const ThemeProvider = ({ children }) => {
     metaTag.setAttribute('content', themeColor);
   };
 
-  resetThemeColor();
-
+  // Deliberately not called during render: this touches document/getComputedStyle,
+  // which do not exist while Next server-renders this component. The mount effect
+  // below already applies the colour as soon as there is a DOM to apply it to.
   useEffect(() => {
     resetThemeColor();
   }, []);
