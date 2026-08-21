@@ -18,6 +18,7 @@ export default function Home() {
     workouts,
     loading,
     loading2,
+    loadError,
     exerciseNames,
     latestExercises,
     refresh,
@@ -52,10 +53,28 @@ export default function Home() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // One message per write, shown in the modal that started it.
+  const [saveError, setSaveError] = useState(null);
+  const [deleteError, setDeleteError] = useState(null);
+
+  // The write landed but the refetch after it did not, so the list below is
+  // known stale. Distinct from loadError, which means the list never arrived.
+  const [listStale, setListStale] = useState(false);
+
+  // Drop a stale message once the workout is saved or trashed, so reopening the
+  // confirm modal later does not show the error from a previous attempt.
+  useEffect(() => {
+    if (!inWorkout) setSaveError(null);
+  }, [inWorkout]);
+
   const saveWorkoutHandler = async () => {
     if (saving) return;
+    setSaveError(null);
+
     if (!window.navigator.onLine) {
-      // TODO: Handle error fallback (#2)
+      setSaveError(
+        'You are offline. This workout is still on this device, so nothing is lost. Try again once you are back online.'
+      );
       return;
     }
 
@@ -79,8 +98,10 @@ export default function Home() {
       });
 
       if (error) {
-        // TODO: Handle error fallback (#2)
         console.error(error);
+        setSaveError(
+          'Could not save this workout. It is still here, so you can try again.'
+        );
         return;
       }
 
@@ -94,7 +115,12 @@ export default function Home() {
       // Releasing `saving` first would render the modal once more with the
       // button enabled while the exercises are still populated, and a tap
       // landing in that gap would post the same workout twice.
-      await refresh();
+      //
+      // The workout is already saved by this point, so a failed refetch means a
+      // stale list rather than a lost workout. The banner below says exactly
+      // that, which is the difference between a confusing screen and one that
+      // looks like the workout vanished.
+      setListStale(Boolean(await refresh()));
     } finally {
       setSaving(false);
     }
@@ -102,24 +128,30 @@ export default function Home() {
 
   const deleteWorkoutHandler = async (workout) => {
     if (deleting) return;
+    setDeleteError(null);
+
     if (!window.navigator.onLine) {
-      // TODO: Handle error fallback (#2)
+      setDeleteError('You are offline. Try again once you are back online.');
       return;
     }
 
     setDeleting(true);
+    let deleted = false;
     try {
       // Exercises belonging to the workout are removed in the same transaction.
       const { error } = await removeWorkout(workout.id);
 
       if (error) {
-        // TODO: Handle error fallback (#2)
         console.error(error);
+        setDeleteError(
+          'Could not delete this workout. It is still in your list, so you can try again.'
+        );
         return;
       }
 
       setModalShown(false);
       setLongPressedWorkout(null);
+      deleted = true;
     } finally {
       setDeleting(false);
     }
@@ -128,7 +160,14 @@ export default function Home() {
     // modal, so `modalShown` and `deleting` land in the same commit and the
     // button is gone before the flag is released. Clearing first also stops a
     // long-press during the refetch opening a modal that says "Deleting...".
-    await refresh();
+    if (deleted) {
+      setListStale(Boolean(await refresh()));
+    }
+  };
+
+  const retryRefresh = async () => {
+    if (loading2) return;
+    setListStale(Boolean(await refresh()));
   };
 
   return (
@@ -170,6 +209,11 @@ export default function Home() {
                 <LetsIconsCopy />
                 Copy workout
               </button>
+              {deleteError && (
+                <div className={styles.modalError} role="alert">
+                  {deleteError}
+                </div>
+              )}
               <button
                 className={`${styles.workoutButton} ${styles.delete}`}
                 disabled={deleting}
@@ -200,7 +244,26 @@ export default function Home() {
           latestExercises={latestExercises.current}
           saveWorkout={saveWorkoutHandler}
           saving={saving}
+          saveError={saveError}
         />
+
+        {!loading && (listStale || loadError) && (
+          <div className={styles.listNotice} role="status">
+            <span>
+              {listStale
+                ? 'That change went through, but this list could not be refreshed.'
+                : 'Could not load your workouts.'}
+            </span>
+            <button
+              className={styles.retryButton}
+              onClick={retryRefresh}
+              disabled={loading2}
+              aria-busy={loading2}
+            >
+              {loading2 ? 'Retrying' : 'Retry'}
+            </button>
+          </div>
+        )}
 
         {(loading ||
           loading2 ||
@@ -229,6 +292,7 @@ export default function Home() {
                 key={workout.id}
                 data={workout}
                 onLongPress={() => {
+                  setDeleteError(null);
                   setLongPressedWorkout(workout);
                   setModalShown(true);
                 }}
@@ -241,7 +305,7 @@ export default function Home() {
           </div>
         )}
 
-        {!loading && workouts.length === 0 && (
+        {!loading && !loadError && workouts.length === 0 && (
           <p style={{ marginTop: 24 }}>
             No previous workouts found, why not start one?
           </p>

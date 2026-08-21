@@ -30,6 +30,7 @@ export default function Workout({
   latestExercises,
   saveWorkout,
   saving,
+  saveError,
   inWorkout,
   setInWorkout,
   exercises,
@@ -286,6 +287,11 @@ export default function Workout({
             <div style={{ textAlign: 'left' }}>
               Are you sure you want to end this workout?
             </div>
+            {saveError && (
+              <div className={styles.modalError} role="alert">
+                {saveError}
+              </div>
+            )}
             <button
               className={styles.endWorkoutConfirmButton}
               disabled={saving}
