@@ -4,35 +4,65 @@
 
 ---
 
-First, run the development server:
+## Architecture
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js 14** (App Router), plain JavaScript
+- **Clerk** for auth
+- **Neon** (Postgres) for data, reached through the app's own API routes
+
+Data flow:
+
+```
+browser  ──fetch──►  /api/workouts        ──►  Neon
+utils/api.js         app/api/workouts/…        utils/db.js
+                     auth() → Clerk userId
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`utils/db.js` is server-only. `DATABASE_URL` must never be exposed as a
+`NEXT_PUBLIC_` variable.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Authorization
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+This app previously ran on Supabase, where the browser queried PostgREST
+directly and Postgres row-level security enforced
+`requesting_user_id() = user_id`. Neon has no such layer, so **every query in a
+route handler is scoped by the Clerk user id** resolved server-side via
+`auth()`. That scoping is the only thing standing between users' data — do not
+remove a `where user_id = $1` clause.
 
-## Learn More
+### Timestamps
 
-To learn more about Next.js, take a look at the following resources:
+`start_time` / `end_time` are `timestamp without time zone`, and the client's
+`parseISOString()` reads their wall-clock digits as UTC. Route handlers format
+them in Postgres with `to_char(...)` so the driver never turns them into a JS
+`Date` in the server's local timezone — which would otherwise render different
+times in dev and in production. Keep using the `ts()` helper in `utils/db.js`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```bash
+npm install
+cp .env.example .env.local   # then fill in the Clerk keys and DATABASE_URL
+npm run dev
+```
 
-## Deploy on Vercel
+Use Neon's **pooled** connection string (its host contains `-pooler`).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Restoring the data dump
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The recovered Supabase data lives in `.migrate/` (gitignored — it contains
+personal workout data). To load it into a fresh Neon database:
+
+```bash
+node .migrate/restore.mjs --dry-run   # parse + integrity-check, touches nothing
+node .migrate/restore.mjs             # create schema, load data, verify counts
+node .migrate/restore.mjs --verify    # re-check row counts later
+```
+
+The load is idempotent (`on conflict (id) do nothing`), so re-running it is
+safe. It should report 621 exercises and 69 workouts.
+
+## Deploy
+
+Deployed on Vercel. `DATABASE_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and
+`CLERK_SECRET_KEY` must be set in the Vercel project's environment variables.

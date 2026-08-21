@@ -1,12 +1,7 @@
 'use client';
 import styles from './page.module.css';
 import { useContext, useEffect, useState } from 'react';
-import {
-  createExercise,
-  createWorkout,
-  deleteExercise,
-  deleteWorkout,
-} from '@/utils/supabase/database';
+import { removeWorkout, saveWorkout } from '@/utils/api';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
 import { readableDate } from '@/utils/utils';
@@ -19,14 +14,8 @@ import { WorkoutsContext } from '@/context/workoutsProvider';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
 
 export default function Home() {
-  const {
-    workouts,
-    loading,
-    loading2,
-    exerciseNames,
-    latestExercises,
-    client,
-  } = useContext(WorkoutsContext);
+  const { workouts, loading, loading2, exerciseNames, latestExercises } =
+    useContext(WorkoutsContext);
 
   const shown = useLoadDelay();
 
@@ -55,91 +44,54 @@ export default function Home() {
 
   const saveWorkoutHandler = async () => {
     // TODO: Add loading for this and dont reload page
-    let hasError = false;
-    if (window.navigator.onLine) {
-      console.log('Saving...');
-      const errors = [];
-      const exerciseIds = [];
-      for (let i = 0; i < exercises.length; i++) {
-        const { data: exercise, error: exerciseError } = await createExercise(
-          client.current,
-          exercises[i].name,
-          exercises[i].reps.map((rep) => parseInt(rep) || 0),
-          exercises[i].weights.map((weight) => parseFloat(weight) || 0),
-          exercises[i].notes
-        );
-        if (!exerciseError) {
-          exerciseIds.push(exercise[0].id);
-        } else {
-          hasError = true;
-          errors.push(exerciseError);
-          console.error(exerciseError);
-        }
-      }
-      if (!hasError) {
-        const { data: _w, error: workoutError } = await createWorkout(
-          client.current,
-          new Date(workoutStartTime).toISOString(),
-          new Date().toISOString(),
-          exerciseIds,
-          ''
-        );
-        if (!workoutError) {
-          // TODO: Handle error fallback
-        } else {
-          hasError = true;
-          errors.push(workoutError);
-          console.error(workoutError);
-        }
-
-        // TODO: Only do this if no errors
-        setInWorkout(false);
-        location.reload();
-      }
-    }
-    if (!window.navigator.onLine || hasError) {
+    if (!window.navigator.onLine) {
       // TODO: Handle error fallback
+      return;
     }
+
+    console.log('Saving...');
+    // The workout and all of its exercises are created in one transaction now,
+    // so a failure can no longer leave orphaned exercise rows behind.
+    const { error } = await saveWorkout({
+      startTime: new Date(workoutStartTime).toISOString(),
+      endTime: new Date().toISOString(),
+      exercises: exercises.map((exercise) => ({
+        name: exercise.name,
+        reps: exercise.reps.map((rep) => parseInt(rep) || 0),
+        weights: exercise.weights.map((weight) => parseFloat(weight) || 0),
+        notes: exercise.notes,
+      })),
+      notes: '',
+    });
+
+    if (error) {
+      // TODO: Handle error fallback
+      console.error(error);
+      return;
+    }
+
+    setInWorkout(false);
+    location.reload();
   };
 
   const deleteWorkoutHandler = async (workout) => {
     // TODO: add loading for this and dont reload page
-    let hasError = false;
-    if (window.navigator.onLine) {
-      console.log('Deleting...', workout);
-      const errors = [];
-      const exercises = workout.exercises;
-      for (let i = 0; i < exercises.length; i++) {
-        const { data: _e, error: exerciseError } = await deleteExercise(
-          client.current,
-          exercises[i].id
-        );
-        if (exerciseError) {
-          hasError = true;
-          errors.push(exerciseError);
-          console.error(exerciseError);
-        }
-      }
-      if (!hasError) {
-        const { data: _w, error: workoutError } = await deleteWorkout(
-          client.current,
-          workout.id
-        );
-        if (!workoutError) {
-          // TODO: Handle error fallback
-        } else {
-          hasError = true;
-          errors.push(workoutError);
-          console.error(workoutError);
-        }
-
-        // TODO: Only do this if no errors
-        location.reload();
-      }
-    }
-    if (!window.navigator.onLine || hasError) {
+    if (!window.navigator.onLine) {
       // TODO: Handle error fallback
+      return;
     }
+
+    console.log('Deleting...', workout);
+    // Exercises belonging to the workout are removed in the same transaction.
+    const { error } = await removeWorkout(workout.id);
+
+    if (error) {
+      // TODO: Handle error fallback
+      console.error(error);
+      return;
+    }
+
+    location.reload();
   };
 
   return (

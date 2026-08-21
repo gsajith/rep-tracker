@@ -35,3 +35,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# db migration workspace (secrets + dumps)
+.migrate/
+.env*
+!.env.example
+
+# neonctl scratch file
+.neon
