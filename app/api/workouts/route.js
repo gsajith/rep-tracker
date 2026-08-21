@@ -4,9 +4,9 @@ import { getSql, ts } from '@/utils/db';
 
 export const dynamic = 'force-dynamic';
 
-// Clerk v5's auth() is synchronous (it only became async in v6).
-function requireUser() {
-  const { userId } = auth();
+// Clerk's auth() is async as of v6.
+async function requireUser() {
+  const { userId } = await auth();
   return userId;
 }
 
@@ -17,7 +17,7 @@ const unauthorized = () =>
 // Returns workouts newest-first with their exercises inlined, in the order the
 // workout's uuid[] recorded them. Always two queries, whatever the limit.
 export async function GET(request) {
-  const userId = requireUser();
+  const userId = await requireUser();
   if (!userId) return unauthorized();
 
   const sql = getSql();
@@ -62,7 +62,7 @@ export async function GET(request) {
 // Creates the workout and all of its exercises in one transaction, so a failure
 // partway through cannot leave orphaned exercise rows behind.
 export async function POST(request) {
-  const userId = requireUser();
+  const userId = await requireUser();
   if (!userId) return unauthorized();
 
   const body = await request.json().catch(() => null);

@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 // A single data-modifying statement, so it is atomic: a workout can never be
 // left pointing at exercises that were already deleted.
 export async function DELETE(_request, { params }) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) {
     return Response.json({ data: null, error: 'Unauthorized' }, { status: 401 });
   }
