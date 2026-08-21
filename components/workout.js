@@ -30,6 +30,8 @@ export default function Workout({
   latestExercises,
   saveWorkout,
   saving,
+  saveError,
+  onOpenSaveConfirm,
   inWorkout,
   setInWorkout,
   exercises,
@@ -286,6 +288,11 @@ export default function Workout({
             <div style={{ textAlign: 'left' }}>
               Are you sure you want to end this workout?
             </div>
+            {saveError && (
+              <div className={styles.modalError} role="alert">
+                {saveError}
+              </div>
+            )}
             <button
               className={styles.endWorkoutConfirmButton}
               disabled={saving}
@@ -695,7 +702,13 @@ export default function Workout({
               }}
             >
               <button
-                onClick={() => setModalShown(true)}
+                onClick={() => {
+                  // Drop a message from a previous attempt, the same way the
+                  // long-press modal clears its delete error. Otherwise "You
+                  // are offline" is still sitting there after reconnecting.
+                  onOpenSaveConfirm();
+                  setModalShown(true);
+                }}
                 className={styles.endWorkoutButton}
               >
                 End workout

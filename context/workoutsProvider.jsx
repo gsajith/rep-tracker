@@ -16,6 +16,11 @@ export const WorkoutsProvider = ({ children }) => {
     new Set(DEFAULT_EXERCISE_NAMES)
   );
 
+  // Non-null when the most recent load or refetch failed. Cleared by the next
+  // successful one. Without it a failed first load is indistinguishable from an
+  // account with no workouts in it.
+  const [loadError, setLoadError] = useState(null);
+
   // The `useUser()` hook will be used to ensure that Clerk has loaded data about the logged in user
   const { user } = useUser();
 
@@ -50,14 +55,28 @@ export const WorkoutsProvider = ({ children }) => {
   // would swap it for shimmer placeholders on every save.
   // try/finally throughout: a throw out of indexExercises would otherwise leave
   // a loading flag stuck on, and the page reload that used to clear it is gone.
+  // Resolves to the error string, or null on success, so a caller can tell
+  // "the write failed" from "the write worked but this list is now stale".
   const refresh = useCallback(async () => {
     setLoading2(true);
     try {
       const { data, error } = await loadWorkouts(100);
-      if (!error) {
-        indexExercises(data);
-        setWorkouts(data);
+      if (error) {
+        setLoadError(error);
+        return error;
       }
+      indexExercises(data);
+      setWorkouts(data);
+      setLoadError(null);
+      return null;
+    } catch (thrown) {
+      // Never reject. Callers await this to decide what to tell the user, and a
+      // rejected promise here would surface as no message at all, which is the
+      // bug this issue exists to remove.
+      console.error(thrown);
+      const message = thrown?.message ?? 'Could not refresh workouts';
+      setLoadError(message);
+      return message;
     } finally {
       setLoading2(false);
     }
@@ -78,10 +97,18 @@ export const WorkoutsProvider = ({ children }) => {
       try {
         const { data, error } = await loadWorkouts(3);
         first = data;
-        if (!error) {
+        if (error) {
+          setLoadError(error);
+        } else {
           indexExercises(data);
           setWorkouts(data);
+          setLoadError(null);
         }
+      } catch (thrown) {
+        // Without this the page renders "No previous workouts found" to someone
+        // who has workouts, which is the same lie in a different place.
+        console.error(thrown);
+        setLoadError(thrown?.message ?? 'Could not load workouts');
       } finally {
         setLoading(false);
       }
@@ -90,10 +117,16 @@ export const WorkoutsProvider = ({ children }) => {
         setLoading2(true);
         try {
           const { data: data2, error: error2 } = await loadWorkouts(100);
-          if (!error2) {
+          if (error2) {
+            setLoadError(error2);
+          } else {
             indexExercises(data2);
             setWorkouts(data2);
+            setLoadError(null);
           }
+        } catch (thrown) {
+          console.error(thrown);
+          setLoadError(thrown?.message ?? 'Could not load workouts');
         } finally {
           setLoading2(false);
         }
@@ -109,6 +142,7 @@ export const WorkoutsProvider = ({ children }) => {
         workouts,
         loading,
         loading2,
+        loadError,
         exerciseNames,
         latestExercises,
         refresh,

@@ -18,7 +18,11 @@ const nextConfig = {
   reactStrictMode: true, // Enable React strict mode for improved error handling
   swcMinify: true, // Enable SWC minification for improved performance
   compiler: {
-    removeConsole: process.env.NODE_ENV !== 'development', // Remove console.log in production
+    // Strip console.log from production, but keep console.error. Stripping
+    // everything is what made the old silent failures impossible to diagnose:
+    // the handlers logged and the log never existed in the deployed app.
+    removeConsole:
+      process.env.NODE_ENV === 'development' ? false : { exclude: ['error'] },
   },
 };
 

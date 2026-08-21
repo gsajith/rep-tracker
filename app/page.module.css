@@ -113,3 +113,47 @@
   width: 336px;
   border-radius: 16px;
 }
+
+/* Error text inside the long-press modal. --warning is defined per theme in
+   globals.css, so this reads correctly on the dark themes too. */
+.modalError {
+  color: var(--warning);
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Banner above the previous-workouts list, for when the list on screen is
+   known to be out of date or never arrived at all. */
+.listNotice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 2px solid var(--warning);
+  border-radius: 14px;
+  color: var(--warning);
+  font-weight: 600;
+  text-align: left;
+}
+
+.retryButton {
+  flex-shrink: 0;
+  border: 2px solid var(--warning);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--warning);
+  font-weight: bold;
+  font-size: 16px;
+  padding: 6px 12px;
+}
+
+.retryButton:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Dim only, no colour swap, for the reason spelled out on .workoutButton. */
+.retryButton:disabled {
+  opacity: 0.55;
+}

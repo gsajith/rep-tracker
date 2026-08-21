@@ -363,3 +363,10 @@
   outline: none;
   border: 2px solid var(--text);
 }
+
+/* Error text inside the end-workout confirm modal. */
+.modalError {
+  color: var(--warning);
+  font-weight: 600;
+  text-align: left;
+}
