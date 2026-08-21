@@ -164,6 +164,14 @@ export default function Home() {
         return;
       }
 
+      if (status === 404) {
+        // Not a failure, but worth a trace: it means this device was looking at
+        // a workout something else had already removed. console.error rather
+        // than warn because error is the only level that survives the
+        // production build.
+        console.error('Delete returned 404, workout already gone:', workout.id);
+      }
+
       setModalShown(false);
       setLongPressedWorkout(null);
       deleted = true;
