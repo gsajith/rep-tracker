@@ -2,11 +2,11 @@
 import { parseISOString } from './utils';
 
 // Browser-side calls to our own API routes. Clerk's session cookie rides along
-// automatically, so there is no token to attach and no database credential in the
-// browser -- both of which the old Supabase client had to handle itself.
+// automatically, so there is no token to attach and no database credential in
+// the browser.
 //
-// Every function keeps the { data, error } shape the Supabase calls returned, so
-// the call sites read the same way they always did.
+// Every function resolves to a { data, error } pair rather than throwing, which
+// is the shape the call sites expect.
 
 async function request(url, options) {
   try {
@@ -27,8 +27,8 @@ export async function loadWorkouts(limit = 100) {
   const { data, error } = await request(`/api/workouts?limit=${limit}`);
   if (error) return { data: null, error };
 
-  // The API returns naive wall-clock strings, exactly what PostgREST used to
-  // return, so parseISOString keeps behaving the way it always has.
+  // The API returns naive wall-clock strings, which is what parseISOString
+  // expects -- see the timestamp note in utils/db.js.
   return {
     data: data.map((workout) => ({
       ...workout,
@@ -39,8 +39,7 @@ export async function loadWorkouts(limit = 100) {
   };
 }
 
-// One request creates the workout and its exercises together, replacing the old
-// loop of one insert per exercise followed by a separate workout insert.
+// One request creates the workout and all of its exercises together.
 export async function saveWorkout({ startTime, endTime, exercises, notes = '' }) {
   return request('/api/workouts', {
     method: 'POST',

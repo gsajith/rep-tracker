@@ -23,12 +23,11 @@ utils/api.js         app/api/workouts/…        utils/db.js
 
 ### Authorization
 
-This app previously ran on Supabase, where the browser queried PostgREST
-directly and Postgres row-level security enforced
-`requesting_user_id() = user_id`. Neon has no such layer, so **every query in a
-route handler is scoped by the Clerk user id** resolved server-side via
-`auth()`. That scoping is the only thing standing between users' data — do not
-remove a `where user_id = $1` clause.
+There is no row-level security in the database — it returns whatever it is asked
+for. **Every query in a route handler is scoped by the Clerk user id** resolved
+server-side via `auth()`. That scoping is the only thing standing between users'
+data: never remove a `where user_id = $1` clause, and never query the database
+from a client component.
 
 ### Timestamps
 
@@ -50,7 +49,7 @@ Use Neon's **pooled** connection string (its host contains `-pooler`).
 
 ## Restoring the data dump
 
-The recovered Supabase data lives in `.migrate/` (gitignored — it contains
+A recovered database dump lives in `.migrate/` (gitignored — it contains
 personal workout data). To load it into a fresh Neon database:
 
 ```bash

@@ -21,9 +21,8 @@ export const WorkoutsProvider = ({ children }) => {
   useEffect(() => {
     if (!user) return;
 
-    // Loads a few workouts first so the page paints quickly, then backfills the
-    // rest. Unchanged in spirit from the Supabase version -- but each call is now
-    // a single request instead of one round trip per exercise.
+    // Loads a few workouts first so the page paints quickly, then backfills
+    // the rest. Each call is a single request, not one round trip per exercise.
     async function load() {
       setLoading(true);
       const { data, error } = await loadWorkouts(3);

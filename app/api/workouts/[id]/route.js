@@ -4,13 +4,11 @@ import { getSql } from '@/utils/db';
 export const dynamic = 'force-dynamic';
 
 // DELETE /api/workouts/:id
-// Removes the workout and the exercises it owns. Both scoped by the Clerk user id,
-// so one user can never delete another's rows -- this is what the RLS policy
-// `enforce_user_id_delete` used to guarantee inside Postgres.
+// Removes the workout and the exercises it owns. Both scoped by the Clerk user
+// id, so one user can never delete another's rows.
 //
-// A single data-modifying statement, so it is atomic: the old browser-side flow
-// deleted each exercise in a loop and then the workout, which could leave a
-// workout pointing at already-deleted exercises if it failed midway.
+// A single data-modifying statement, so it is atomic: a workout can never be
+// left pointing at exercises that were already deleted.
 export async function DELETE(_request, { params }) {
   const { userId } = auth();
   if (!userId) {

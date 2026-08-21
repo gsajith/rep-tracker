@@ -15,10 +15,7 @@ const unauthorized = () =>
 
 // GET /api/workouts?limit=100
 // Returns workouts newest-first with their exercises inlined, in the order the
-// workout's uuid[] recorded them.
-//
-// The Supabase version issued one query per exercise inside a sequential loop --
-// ~900 round trips for 100 workouts. This is always two queries.
+// workout's uuid[] recorded them. Always two queries, whatever the limit.
 export async function GET(request) {
   const userId = requireUser();
   if (!userId) return unauthorized();
@@ -54,8 +51,7 @@ export async function GET(request) {
   return Response.json({
     data: workouts.map((w) => ({
       ...w,
-      // filter(Boolean) guards against a uuid whose exercise row is missing;
-      // the old code would have thrown on exercise[0].name in that case.
+      // filter(Boolean) guards against a uuid whose exercise row is missing.
       exercises: (w.exercises ?? []).map((id) => byId.get(id)).filter(Boolean),
     })),
     error: null,
@@ -63,9 +59,8 @@ export async function GET(request) {
 }
 
 // POST /api/workouts
-// Creates the workout and all of its exercises in one transaction. The Supabase
-// flow inserted each exercise from the browser and then the workout, so a failure
-// partway through left orphaned exercise rows behind.
+// Creates the workout and all of its exercises in one transaction, so a failure
+// partway through cannot leave orphaned exercise rows behind.
 export async function POST(request) {
   const userId = requireUser();
   if (!userId) return unauthorized();
