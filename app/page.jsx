@@ -14,8 +14,14 @@ import { WorkoutsContext } from '@/context/workoutsProvider';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
 
 export default function Home() {
-  const { workouts, loading, loading2, exerciseNames, latestExercises } =
-    useContext(WorkoutsContext);
+  const {
+    workouts,
+    loading,
+    loading2,
+    exerciseNames,
+    latestExercises,
+    refresh,
+  } = useContext(WorkoutsContext);
 
   const shown = useLoadDelay();
 
@@ -42,62 +48,93 @@ export default function Home() {
 
   const [longPressedWorkout, setLongPressedWorkout] = useState(null);
 
+  // Separate flags so an in-flight delete cannot disable the save button.
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const saveWorkoutHandler = async () => {
-    // TODO: Add loading for this and dont reload page
+    if (saving) return;
     if (!window.navigator.onLine) {
-      // TODO: Handle error fallback
+      // TODO: Handle error fallback (#2)
       return;
     }
 
-    console.log('Saving...');
-    // The workout and all of its exercises are created in one transaction now,
-    // so a failure can no longer leave orphaned exercise rows behind.
-    const { error } = await saveWorkout({
-      startTime: new Date(workoutStartTime).toISOString(),
-      endTime: new Date().toISOString(),
-      exercises: exercises.map((exercise) => ({
-        name: exercise.name,
-        reps: exercise.reps.map((rep) => parseInt(rep) || 0),
-        weights: exercise.weights.map((weight) => parseFloat(weight) || 0),
-        notes: exercise.notes,
-      })),
-      notes: '',
-    });
+    setSaving(true);
+    // finally, not a trailing call: an invalid workoutStartTime makes
+    // toISOString throw, and without this the button stays disabled for the
+    // rest of the session now that the page no longer reloads.
+    try {
+      // The workout and all of its exercises are created in one transaction
+      // now, so a failure can no longer leave orphaned exercise rows behind.
+      const { error } = await saveWorkout({
+        startTime: new Date(workoutStartTime).toISOString(),
+        endTime: new Date().toISOString(),
+        exercises: exercises.map((exercise) => ({
+          name: exercise.name,
+          reps: exercise.reps.map((rep) => parseInt(rep) || 0),
+          weights: exercise.weights.map((weight) => parseFloat(weight) || 0),
+          notes: exercise.notes,
+        })),
+        notes: '',
+      });
 
-    if (error) {
-      // TODO: Handle error fallback
-      console.error(error);
-      return;
+      if (error) {
+        // TODO: Handle error fallback (#2)
+        console.error(error);
+        return;
+      }
+
+      // Clearing `inWorkout` runs the reset effect in <Workout />, which empties
+      // the exercises and the start time. Nothing races that effect now the
+      // reload is gone, so the cleared state is guaranteed to reach localStorage.
+      setInWorkout(false);
+
+      // Refresh inside the guard, unlike the delete path below. That effect is
+      // passive, so it closes the confirm modal a commit later than this one.
+      // Releasing `saving` first would render the modal once more with the
+      // button enabled while the exercises are still populated, and a tap
+      // landing in that gap would post the same workout twice.
+      await refresh();
+    } finally {
+      setSaving(false);
     }
-
-    setInWorkout(false);
-    location.reload();
   };
 
   const deleteWorkoutHandler = async (workout) => {
-    // TODO: add loading for this and dont reload page
+    if (deleting) return;
     if (!window.navigator.onLine) {
-      // TODO: Handle error fallback
+      // TODO: Handle error fallback (#2)
       return;
     }
 
-    console.log('Deleting...', workout);
-    // Exercises belonging to the workout are removed in the same transaction.
-    const { error } = await removeWorkout(workout.id);
+    setDeleting(true);
+    try {
+      // Exercises belonging to the workout are removed in the same transaction.
+      const { error } = await removeWorkout(workout.id);
 
-    if (error) {
-      // TODO: Handle error fallback
-      console.error(error);
-      return;
+      if (error) {
+        // TODO: Handle error fallback (#2)
+        console.error(error);
+        return;
+      }
+
+      setModalShown(false);
+      setLongPressedWorkout(null);
+    } finally {
+      setDeleting(false);
     }
 
-    location.reload();
+    // Safe outside the guard, unlike the save path: this handler closes its own
+    // modal, so `modalShown` and `deleting` land in the same commit and the
+    // button is gone before the flag is released. Clearing first also stops a
+    // long-press during the refetch opening a modal that says "Deleting...".
+    await refresh();
   };
 
   return (
     shown && (
       <main className={styles.main}>
-        {modalShown && (
+        {modalShown && longPressedWorkout && (
           <Modal setShown={setModalShown}>
             <div className={styles.copyWorkoutContentWrapper}>
               <div style={{ textAlign: 'left' }}>
@@ -135,12 +172,14 @@ export default function Home() {
               </button>
               <button
                 className={`${styles.workoutButton} ${styles.delete}`}
+                disabled={deleting}
+                aria-busy={deleting}
                 onClick={() => {
                   deleteWorkoutHandler(longPressedWorkout);
                 }}
               >
                 <LetsIconsTrash />
-                Delete workout
+                {deleting ? 'Deleting...' : 'Delete workout'}
               </button>
             </div>
           </Modal>
@@ -160,6 +199,7 @@ export default function Home() {
           )}
           latestExercises={latestExercises.current}
           saveWorkout={saveWorkoutHandler}
+          saving={saving}
         />
 
         {(loading ||

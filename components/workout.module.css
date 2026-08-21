@@ -304,7 +304,6 @@
   border-radius: 14px;
   transition: background 150ms ease-in-out, border 150ms ease-in-out;
   border: 2px solid var(--accent);
-  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -312,8 +311,20 @@
   padding-left: 2px;
 }
 
-.endWorkoutConfirmButton:hover,
-.endWorkoutConfirmButton:focus {
+.endWorkoutConfirmButton:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Dim only, no background swap. .addButton above can set --secondary when
+   disabled because that is already its base background and it sets no colour.
+   This button sets color: --textInverted, so a --secondary background would
+   put white on light lime in the default theme. */
+.endWorkoutConfirmButton:disabled {
+  opacity: 0.55;
+}
+
+.endWorkoutConfirmButton:not(:disabled):hover,
+.endWorkoutConfirmButton:not(:disabled):focus {
   color: var(--textInverted);
   outline: none;
   background: var(--accentHover);

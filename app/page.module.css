@@ -16,7 +16,6 @@
   border-radius: 14px;
   transition: background 150ms ease-in-out, border 150ms ease-in-out;
   border: 2px solid var(--accent);
-  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -25,8 +24,29 @@
   padding-left: 8px;
 }
 
-.workoutButton:hover,
-.workoutButton:focus {
+.workoutButton:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Without the :not(:disabled) guards a disabled button keeps the pointer
+   cursor and still lights up on hover, so it reads as clickable.
+
+   Dim only. Do not copy .addButton's disabled background: that rule works
+   because .addButton already has --secondary in its base rule and sets no
+   colour, so it dims in place. These buttons set color: --textInverted, and
+   swapping the background to --secondary underneath it puts white on light
+   lime in the default theme, around 1.2:1.
+
+   Opacity fades the element as a group, so the label's contrast against the
+   button drops as well rather than holding: roughly 3.9:1 to 2.0:1 on the
+   default theme. That is the ordinary disabled band, and WCAG exempts
+   inactive controls, so it is the trade being made here knowingly. */
+.workoutButton:disabled {
+  opacity: 0.55;
+}
+
+.workoutButton:not(:disabled):hover,
+.workoutButton:not(:disabled):focus {
   color: var(--textInverted);
   outline: none;
   background: var(--accentHover);
@@ -38,7 +58,7 @@
   border: 2px solid var(--textSecondary);
 }
 
-.delete:hover, .delete:focus {
+.delete:not(:disabled):hover, .delete:not(:disabled):focus {
   background: var(--warning)
 }
 

@@ -29,6 +29,7 @@ export default function Workout({
   exerciseNames,
   latestExercises,
   saveWorkout,
+  saving,
   inWorkout,
   setInWorkout,
   exercises,
@@ -287,11 +288,13 @@ export default function Workout({
             </div>
             <button
               className={styles.endWorkoutConfirmButton}
+              disabled={saving}
+              aria-busy={saving}
               onClick={() => {
                 saveWorkout();
               }}
             >
-              <LetsIconsDoneRound /> Save & end!
+              <LetsIconsDoneRound /> {saving ? 'Saving...' : 'Save & end!'}
             </button>
           </div>
         </Modal>
