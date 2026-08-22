@@ -328,9 +328,9 @@ export default function Home() {
         </div>
 
         {/* No null guard on `workouts`: the provider initialises it to [] and
-            only ever replaces it with an array, and the memo above already
-            dereferences it on every render, so a null here would have thrown
-            long before this line. */}
+            only ever replaces it with an array. Three other lines here already
+            dereference it unguarded, one of them before any JSX, so this was
+            the odd one out rather than the last line of defence. */}
         {(loading || loading2 || workouts.length > 0) && (
           <div className={styles.previousWorkoutsHeader}>
             Your previous workouts
