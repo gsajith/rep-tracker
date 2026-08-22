@@ -38,8 +38,9 @@ export default function Home() {
 
   // Tracks in storage exercises have been added to this workout
   // The only sticky key with a validator. The other five hold primitives, where
-  // a wrong-shaped value is inert; this one holds objects that the render maps
-  // over, so a bad value crashes the page and stays in storage across reloads.
+  // a wrong-shaped value is inert; this one holds objects that <Workout /> maps
+  // over once `inWorkout` is true, so a bad value crashes the page and stays in
+  // storage across reloads.
   const [exercises, setExercises] = useStickyState(
     [],
     'exercises',
