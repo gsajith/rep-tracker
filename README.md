@@ -65,3 +65,8 @@ safe. It should report 621 exercises and 69 workouts.
 
 Deployed on Vercel. `DATABASE_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and
 `CLERK_SECRET_KEY` must be set in the Vercel project's environment variables.
+
+`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is needed to **build**, not only to run.
+Since `@clerk/nextjs` v6, `next build` exits 1 while prerendering the pages
+inside `<ClerkProvider>` when it is absent. `DATABASE_URL` is still runtime-only,
+because `utils/db.js` creates the Neon client lazily.
