@@ -24,7 +24,10 @@ const ISO_RE =
 // a `timestamp without time zone` column, and the round trip back out through
 // to_char and parseISOString depends on exactly what went in.
 export function timestampMs(value) {
-  if (typeof value !== 'string' || value.trim() === '') return null;
+  // No trimming. A padded string would pass a trimmed check and then reach SQL
+  // with its padding intact, which is the same check-and-use mismatch that this
+  // file has already been bitten by. The regex rejects whitespace outright.
+  if (typeof value !== 'string') return null;
   if (!ISO_RE.test(value)) return null;
 
   const ms = Date.parse(value);
@@ -61,98 +64,134 @@ export const LIMITS = {
   maxWeight: 100000,
 };
 
-// Each entry must coerce to a finite number inside the column's range. The
-// handler coerces with parseInt/parseFloat, which happily turns 1e20 into a
-// value bigint cannot hold.
-function outOfRangeEntry(list, label, max, min = 0) {
-  for (const entry of list) {
-    const n = Number(entry);
-    if (!Number.isFinite(n)) return `${label} must all be numbers`;
-    if (n < min || n > max) {
+// The coercions the stored rows are built from. They live here, next to the
+// range checks that guard them, because the previous arrangement had this file
+// checking Number(entry) while the handler stored parseInt(entry, 10) || 0.
+// Those disagree: "99999999999999999999e-40" is 1e-20 to one and 1e20 to the
+// other, so it passed a 0..100000 range check and then overflowed bigint.
+const toReps = (value) => parseInt(value, 10) || 0;
+const toWeight = (value) => parseFloat(value) || 0;
+
+// Range-checks the COERCED value, never the raw one. Checking anything other
+// than the exact number that gets stored is how all four of this file's bugs
+// happened.
+function outOfRange(values, label, max, min) {
+  for (const value of values) {
+    if (!Number.isFinite(value)) return `${label} must all be numbers`;
+    if (value < min || value > max) {
       return `${label} must all be between ${min} and ${max}`;
     }
   }
   return null;
 }
 
-// Returns an error string, or null when the payload is acceptable. One function
-// rather than a chain, so the handler stays a short list of guard clauses.
+// Returns `{ error }` on rejection, or `{ error: null, exercises }` where those
+// exercises are the coerced rows the handler should insert.
+//
+// Returning the rows is the point. Validating here and coercing again in the
+// handler meant two independent readings of the same input, and every value
+// that got past this file did so through that gap. There is now one coercion,
+// and the range checks guard exactly the numbers that get stored.
 export function validateWorkoutPayload({
   startTime,
   endTime,
   exercises,
   notes,
 }) {
+  const reject = (error) => ({ error, exercises: null });
+
   const startMs = timestampMs(startTime);
-  if (startMs === null) return 'startTime must be a valid timestamp';
+  if (startMs === null) return reject('startTime must be a valid timestamp');
 
   const endMs = timestampMs(endTime);
-  if (endMs === null) return 'endTime must be a valid timestamp';
+  if (endMs === null) return reject('endTime must be a valid timestamp');
 
-  if (endMs < startMs) return 'endTime must not be before startTime';
+  if (endMs < startMs) return reject('endTime must not be before startTime');
 
-  if (!Array.isArray(exercises)) return 'exercises must be an array';
+  if (!Array.isArray(exercises)) return reject('exercises must be an array');
   if (exercises.length > LIMITS.exercisesPerWorkout) {
-    return `exercises must contain at most ${LIMITS.exercisesPerWorkout} items`;
+    return reject(
+      `exercises must contain at most ${LIMITS.exercisesPerWorkout} items`
+    );
   }
 
   // Type first, then length. Checking length behind `typeof === 'string'` alone
   // would let a non-string slip past both checks and reach the insert.
   if (notes !== undefined && typeof notes !== 'string') {
-    return 'notes must be a string';
+    return reject('notes must be a string');
   }
   if (notes !== undefined && notes.length > LIMITS.notesLength) {
-    return `notes must be at most ${LIMITS.notesLength} characters`;
+    return reject(`notes must be at most ${LIMITS.notesLength} characters`);
   }
+
+  const coerced = [];
 
   for (const exercise of exercises) {
     if (exercise === null || typeof exercise !== 'object') {
-      return 'each exercise must be an object';
+      return reject('each exercise must be an object');
     }
     // Type before length, the same order as notes. Written the other way round
     // this cap does nothing at all for a non-string: the handler wraps name in
     // String(), so an array of 50,000 entries becomes a 99,999-character name
     // that no length check ever saw.
     if (exercise.name !== undefined && typeof exercise.name !== 'string') {
-      return 'exercise name must be a string';
+      return reject('exercise name must be a string');
     }
     if (
       exercise.name !== undefined &&
       exercise.name.length > LIMITS.nameLength
     ) {
-      return `exercise name must be at most ${LIMITS.nameLength} characters`;
+      return reject(
+        `exercise name must be at most ${LIMITS.nameLength} characters`
+      );
     }
     if (exercise.reps !== undefined && !Array.isArray(exercise.reps)) {
-      return 'exercise reps must be an array';
+      return reject('exercise reps must be an array');
     }
     if (exercise.weights !== undefined && !Array.isArray(exercise.weights)) {
-      return 'exercise weights must be an array';
+      return reject('exercise weights must be an array');
     }
     if ((exercise.reps?.length ?? 0) > LIMITS.setsPerExercise) {
-      return `an exercise may have at most ${LIMITS.setsPerExercise} sets`;
+      return reject(`an exercise may have at most ${LIMITS.setsPerExercise} sets`);
     }
     if ((exercise.weights?.length ?? 0) > LIMITS.setsPerExercise) {
-      return `an exercise may have at most ${LIMITS.setsPerExercise} sets`;
+      return reject(`an exercise may have at most ${LIMITS.setsPerExercise} sets`);
     }
-    const badReps = outOfRangeEntry(exercise.reps ?? [], 'reps', LIMITS.maxReps);
-    if (badReps) return badReps;
-    const badWeights = outOfRangeEntry(
-      exercise.weights ?? [],
-      'weights',
-      LIMITS.maxWeight,
-      -LIMITS.maxWeight
-    );
-    if (badWeights) return badWeights;
     if (exercise.notes !== undefined && typeof exercise.notes !== 'string') {
-      return 'exercise notes must be a string';
+      return reject('exercise notes must be a string');
     }
     if (
       exercise.notes !== undefined &&
       exercise.notes.length > LIMITS.notesLength
     ) {
-      return `exercise notes must be at most ${LIMITS.notesLength} characters`;
+      return reject(
+        `exercise notes must be at most ${LIMITS.notesLength} characters`
+      );
     }
+
+    // Coerce, then range-check what the coercion produced, then keep that exact
+    // value. Nothing downstream re-reads the raw input.
+    const reps = (exercise.reps ?? []).map(toReps);
+    const weights = (exercise.weights ?? []).map(toWeight);
+
+    const badReps = outOfRange(reps, 'reps', LIMITS.maxReps, 0);
+    if (badReps) return reject(badReps);
+
+    const badWeights = outOfRange(
+      weights,
+      'weights',
+      LIMITS.maxWeight,
+      -LIMITS.maxWeight
+    );
+    if (badWeights) return reject(badWeights);
+
+    coerced.push({
+      name: String(exercise.name ?? ''),
+      reps,
+      weights,
+      notes: exercise.notes ?? '',
+    });
   }
 
-  return null;
+  return { error: null, exercises: coerced };
 }

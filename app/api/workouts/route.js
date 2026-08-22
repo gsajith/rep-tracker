@@ -79,7 +79,7 @@ export async function POST(request) {
   // Everything Postgres would have rejected is rejected here instead. Without
   // this an unparseable startTime reaches the $2::timestamp cast, fails inside
   // the database, and surfaces as a 500 for what is plainly a client error.
-  const invalid = validateWorkoutPayload({
+  const { error: invalid, exercises: validExercises } = validateWorkoutPayload({
     startTime,
     endTime,
     exercises,
@@ -89,12 +89,13 @@ export async function POST(request) {
 
   // Ids are generated here so both inserts can go in one transaction without
   // needing the first statement's RETURNING values.
-  const rows = exercises.map((e) => ({
+  //
+  // The rows come from the validator already coerced. Re-deriving them here
+  // would mean two independent readings of the same input, which is exactly how
+  // a value that passed a range check went on to overflow bigint.
+  const rows = validExercises.map((exercise) => ({
     id: randomUUID(),
-    name: String(e?.name ?? ''),
-    reps: (e?.reps ?? []).map((r) => parseInt(r, 10) || 0),
-    weights: (e?.weights ?? []).map((w) => parseFloat(w) || 0),
-    notes: e?.notes ?? '',
+    ...exercise,
     user_id: userId,
   }));
 
