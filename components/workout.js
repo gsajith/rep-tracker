@@ -147,6 +147,20 @@ export default function Workout({
     }
   }, [selectedItem]);
 
+  // What the Add button would add right now. The combobox clears `query`
+  // when it closes, so a non-empty query always means the user has typed
+  // something since the last selection: trust it over a stale selection, and
+  // let a name that was never picked from the dropdown be added at all.
+  // Previously the button stayed disabled until an option was chosen, which
+  // stranded every new user, since a fresh account has no options to choose.
+  const typedName = query.trim();
+  const pendingName = typedName || exerciseName.current;
+  // A typed name that exactly matches an existing exercise still gets its
+  // history, so the sets pre-fill whether it was typed or picked.
+  const pendingPreview = typedName
+    ? latestExercises?.[typedName]
+    : exerciseToPreview;
+
   const notAlreadyAdded = (name) => {
     const exists = exercises.findIndex(
       (e) => e.name.toLowerCase() === name.toLowerCase()
@@ -674,30 +688,31 @@ export default function Workout({
               setQuery={setQuery}
             />
             <button
-              disabled={exerciseToPreview === null}
+              disabled={!typedName && exerciseToPreview === null}
               className={styles.addButton}
               onClick={() => {
                 addExercise(
-                  exerciseToPreview
-                    ? exerciseToPreview.exercise.name
-                    : exerciseName.current,
-                  exerciseToPreview
+                  pendingPreview
+                    ? pendingPreview.exercise.name
+                    : pendingName,
+                  pendingPreview
                 );
               }}
             >
               Add
             </button>
           </div>
-          {exerciseToPreview &&
-            notAlreadyAdded(exerciseToPreview.exercise.name) && (
-              <ExerciseToPreview exerciseToPreview={exerciseToPreview} />
+          {pendingPreview &&
+            notAlreadyAdded(pendingPreview.exercise.name) && (
+              <ExerciseToPreview exerciseToPreview={pendingPreview} />
             )}
-          {exerciseToPreview === undefined &&
-            notAlreadyAdded(exerciseName.current) && (
-              <div className={styles.firstTime}>
-                This is your first time doing <b>{exerciseName.current}</b>!
-              </div>
-            )}
+          {/* !pendingPreview covers both null (nothing chosen) and undefined
+              (chosen or typed, but never done before). */}
+          {!pendingPreview && pendingName && notAlreadyAdded(pendingName) && (
+            <div className={styles.firstTime}>
+              This is your first time doing <b>{pendingName}</b>!
+            </div>
+          )}
           <div className={styles.endWorkoutContainer}>
             <div className={styles.timer}>
               <LetsIconsTimeAtack />
