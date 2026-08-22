@@ -1,0 +1,68 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 320px;
+  margin: 48px auto;
+  padding: 20px;
+  border: 2px solid var(--warning);
+  border-radius: 14px;
+  text-align: left;
+}
+
+.heading {
+  margin: 0;
+  color: var(--warning);
+  font-size: 20px;
+}
+
+.body {
+  margin: 0;
+  color: var(--text);
+}
+
+.retry {
+  align-self: stretch;
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--textInverted);
+  font-weight: bold;
+  font-size: 18px;
+  padding: 12px 20px;
+  transition: background 150ms ease-in-out;
+}
+
+.retry:not(:disabled) {
+  cursor: pointer;
+}
+
+.retry:not(:disabled):hover,
+.retry:not(:disabled):focus {
+  outline: none;
+  background: var(--accentHover);
+}
+
+/* The rest of the app drops the focus ring and signals focus with a shade
+   change alone. That is thin everywhere, but on the one control that recovers
+   a broken page it is worth an actual visible ring. focus-visible, so pointer
+   users see no change. */
+/* The :not(:disabled) is load-bearing, not copied for symmetry. The rule above
+   is (0,3,0), because :not() contributes its argument's specificity, so a plain
+   .retry:focus-visible at (0,2,0) loses to its `outline: none` no matter where
+   it sits in the file, and paints nothing at all. Matching at (0,3,0) and
+   winning on source order is the only reason this ring exists. */
+.retry:not(:disabled):focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* --textSecondary on the page background is about 2.8:1, under AA. It is
+   readable enough for a timestamp; it is not good enough for the sentence
+   telling someone how to un-break the app. */
+.hint {
+  margin: 0;
+  color: var(--text);
+  font-size: 14px;
+}
