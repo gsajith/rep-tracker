@@ -44,8 +44,20 @@
   background: var(--accentHover);
 }
 
+/* The rest of the app drops the focus ring and signals focus with a shade
+   change alone. That is thin everywhere, but on the one control that recovers
+   a broken page it is worth an actual visible ring. focus-visible, so pointer
+   users see no change. */
+.retry:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* --textSecondary on the page background is about 2.8:1, under AA. It is
+   readable enough for a timestamp; it is not good enough for the sentence
+   telling someone how to un-break the app. */
 .hint {
   margin: 0;
-  color: var(--textSecondary);
+  color: var(--text);
   font-size: 14px;
 }

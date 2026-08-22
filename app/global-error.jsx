@@ -49,7 +49,10 @@ export default function GlobalError({ error, reset }) {
           >
             Try again
           </button>
-          <p style={{ margin: '16px 0 0', fontSize: 14, color: '#908E96' }}>
+          {/* Body colour rather than the muted grey: #908E96 on this
+              background is about 2.8:1, and this is the sentence explaining
+              how to recover. */}
+          <p style={{ margin: '16px 0 0', fontSize: 14, color: '#1D1226' }}>
             If this keeps happening, clearing this site&apos;s data in your
             browser settings will reset the app.
           </p>
