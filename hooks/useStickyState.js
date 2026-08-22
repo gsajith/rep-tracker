@@ -4,7 +4,9 @@ import React from 'react';
 // than reaching for `window` themselves, so the behaviour that caused this bug
 // can be executed directly without a React renderer.
 
-export function readStickyValue(key, defaultValue, storage) {
+// `isValid` is optional. Pass one for a key whose value is structured enough
+// that the wrong shape would crash a render.
+export function readStickyValue(key, defaultValue, storage, isValid) {
   if (!storage) return defaultValue;
 
   try {
@@ -13,7 +15,23 @@ export function readStickyValue(key, defaultValue, storage) {
     // `typeof window !== 'undefined' && getItem(key)`, which is `false` on the
     // server, and `false !== null` passes, so it returned JSON.parse(false),
     // which is `false`. The default was unreachable during server rendering.
-    return stored === null ? defaultValue : JSON.parse(stored);
+    if (stored === null) return defaultValue;
+
+    const parsed = JSON.parse(stored);
+
+    // Parsing is not the same as being usable. JSON.parse returns whatever was
+    // stored, and a value of the wrong shape then crashes the render. The
+    // boundary added in #11 catches that, but the bad value is still in storage
+    // on the next load, so the page stays broken until site data is cleared.
+    // Falling back here costs the stored value and keeps the app working.
+    if (isValid && !isValid(parsed)) {
+      console.error(
+        `useStickyState: stored "${key}" is not the expected shape, using default.`
+      );
+      return defaultValue;
+    }
+
+    return parsed;
   } catch (error) {
     // Either the stored string is not JSON, or getItem itself threw. Some
     // browsers throw on storage access rather than returning null.
@@ -59,9 +77,9 @@ function browserStorage() {
   }
 }
 
-export const useStickyState = (defaultValue, key) => {
+export const useStickyState = (defaultValue, key, isValid) => {
   const [value, setValue] = React.useState(() =>
-    readStickyValue(key, defaultValue, browserStorage())
+    readStickyValue(key, defaultValue, browserStorage(), isValid)
   );
 
   React.useEffect(() => {

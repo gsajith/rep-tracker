@@ -195,3 +195,47 @@ export function validateWorkoutPayload({
 
   return { error: null, exercises: coerced };
 }
+
+// Shape check for the in-progress workout kept in localStorage under
+// "exercises". Distinct from validateWorkoutPayload above, which guards what a
+// client sends to the API: this guards what the app reads back out of its own
+// storage, and the two shapes differ. The stored one also carries repsDrag,
+// weightsDrag and expanded, none of which ever reach the server.
+//
+// Checks every field whose absence throws while rendering an exercise, all of
+// them in components/workout.js:
+//
+//   name       :87, :152   name.toLowerCase() in addExercise / notAlreadyAdded
+//   reps       :355, :463  reps.length, then reps[i]
+//   weights    :356, :518  weights.length, then weights[i]
+//   repsDrag   :450, :464  repsDrag[i]
+//   weightsDrag :505, :520 weightsDrag[i]
+//   notes      :576, :588  notes.length
+//
+// The last three sit inside the `expanded &&` block at :420, which reads as
+// conditional but is not: addExercise and the copy path in app/page.jsx both
+// write `expanded: true`, so it is the normal state. A gate that stopped at
+// name/reps/weights let `{name, reps, weights, expanded: true}` through and it
+// still threw, which is worse than no gate, because it implies a safety it does
+// not provide.
+//
+// oldReps and oldWeights are deliberately NOT required. They are read at :614
+// behind `time && expanded`, and numOldSets at :346 collapses to 0 via `|| 0`
+// when Math.min sees an undefined length, so a missing pair renders nothing
+// rather than throwing.
+export function isStoredExerciseList(value) {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (exercise) =>
+        exercise !== null &&
+        typeof exercise === 'object' &&
+        typeof exercise.name === 'string' &&
+        typeof exercise.notes === 'string' &&
+        Array.isArray(exercise.reps) &&
+        Array.isArray(exercise.weights) &&
+        Array.isArray(exercise.repsDrag) &&
+        Array.isArray(exercise.weightsDrag)
+    )
+  );
+}
