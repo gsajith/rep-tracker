@@ -48,7 +48,12 @@
    change alone. That is thin everywhere, but on the one control that recovers
    a broken page it is worth an actual visible ring. focus-visible, so pointer
    users see no change. */
-.retry:focus-visible {
+/* The :not(:disabled) is load-bearing, not copied for symmetry. The rule above
+   is (0,3,0), because :not() contributes its argument's specificity, so a plain
+   .retry:focus-visible at (0,2,0) loses to its `outline: none` no matter where
+   it sits in the file, and paints nothing at all. Matching at (0,3,0) and
+   winning on source order is the only reason this ring exists. */
+.retry:not(:disabled):focus-visible {
   outline: 3px solid var(--text);
   outline-offset: 2px;
 }

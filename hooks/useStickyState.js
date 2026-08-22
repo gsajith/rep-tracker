@@ -22,6 +22,11 @@ export function readStickyValue(key, defaultValue, storage) {
     // design, and the effect below then writes the default over whatever was
     // there, so without this line the corrupt value is destroyed leaving no
     // evidence it ever existed. console.error survives production builds.
+    //
+    // Note for whenever error reporting gets added: V8 puts a fragment of the
+    // input into a JSON.parse SyntaxError, so `error` carries part of the
+    // stored value. Harmless in the user's own console with the user's own
+    // data; it would need scrubbing before being shipped anywhere.
     console.error(`useStickyState: could not read "${key}", using default.`, error);
     return defaultValue;
   }
