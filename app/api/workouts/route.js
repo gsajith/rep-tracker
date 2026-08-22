@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { randomUUID } from 'node:crypto';
 import { getSql, ts } from '@/utils/db';
+import { validateWorkoutPayload } from '@/utils/validate';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,9 @@ async function requireUser() {
 
 const unauthorized = () =>
   Response.json({ data: null, error: 'Unauthorized' }, { status: 401 });
+
+const badRequest = (error) =>
+  Response.json({ data: null, error }, { status: 400 });
 
 // GET /api/workouts?limit=100
 // Returns workouts newest-first with their exercises inlined, in the order the
@@ -71,18 +75,17 @@ export async function POST(request) {
   }
 
   const { startTime, endTime, exercises = [], notes = '' } = body;
-  if (!startTime || !endTime) {
-    return Response.json(
-      { data: null, error: 'startTime and endTime are required' },
-      { status: 400 }
-    );
-  }
-  if (!Array.isArray(exercises)) {
-    return Response.json(
-      { data: null, error: 'exercises must be an array' },
-      { status: 400 }
-    );
-  }
+
+  // Everything Postgres would have rejected is rejected here instead. Without
+  // this an unparseable startTime reaches the $2::timestamp cast, fails inside
+  // the database, and surfaces as a 500 for what is plainly a client error.
+  const invalid = validateWorkoutPayload({
+    startTime,
+    endTime,
+    exercises,
+    notes,
+  });
+  if (invalid) return badRequest(invalid);
 
   // Ids are generated here so both inserts can go in one transaction without
   // needing the first statement's RETURNING values.
@@ -124,8 +127,10 @@ export async function POST(request) {
     ]);
   } catch (error) {
     console.error('POST /api/workouts failed:', error);
+    // Fixed string, not error.message. A Postgres error names columns, types
+    // and constraints, and the client has no use for any of it.
     return Response.json(
-      { data: null, error: error.message ?? 'Insert failed' },
+      { data: null, error: 'Could not save the workout' },
       { status: 500 }
     );
   }
