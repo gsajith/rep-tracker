@@ -13,6 +13,8 @@
   left: 0;
   z-index: 40;
   border: 3px solid var(--accent);
+  /* Fallback only. tour.jsx overrides this per step with the anchor's own
+     corner radii plus the padding, so the cutout stays concentric. */
   border-radius: 20px;
   /* Never intercepts a tap: the whole point is that the user works the real
      controls underneath. The huge spread is the scrim; the middle shadow is

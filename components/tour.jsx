@@ -70,6 +70,14 @@ function findAnchor(ids) {
   return null;
 }
 
+// Percentages only show up on pills and circles here, where a large px value
+// gives the same clamped result once the browser caps it to half the box.
+function radiusOf(value) {
+  if (!value) return 0;
+  if (value.includes('%')) return 9999;
+  return parseFloat(value) || 0;
+}
+
 function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
@@ -107,19 +115,31 @@ export default function Tour({ status, setStatus, inWorkout, exerciseCount }) {
         return;
       }
       const next = el.getBoundingClientRect();
+      // The cutout is concentric with whatever it points at rather than a
+      // fixed rounded rectangle, so the pill-shaped start card gets a
+      // pill-shaped spotlight and a square-cornered row gets square corners.
+      const style = window.getComputedStyle(el);
+      const radius = [
+        style.borderTopLeftRadius,
+        style.borderTopRightRadius,
+        style.borderBottomRightRadius,
+        style.borderBottomLeftRadius,
+      ].map(radiusOf);
       setRect((prev) =>
         prev &&
         prev.top === next.top &&
         prev.left === next.left &&
         prev.width === next.width &&
         prev.height === next.height &&
-        prev.viewport === window.innerHeight
+        prev.viewport === window.innerHeight &&
+        String(prev.radius) === String(radius)
           ? prev
           : {
               top: next.top,
               left: next.left,
               width: next.width,
               height: next.height,
+              radius,
               viewport: window.innerHeight,
             }
       );
@@ -188,6 +208,9 @@ export default function Tour({ status, setStatus, inWorkout, exerciseCount }) {
           transform: `translate3d(${rect.left - pad}px, ${rect.top - pad}px, 0)`,
           width: rect.width + pad * 2,
           height: rect.height + pad * 2,
+          // Each corner grows by the padding, keeping the ring parallel to
+          // the anchor's own curve instead of cutting across it.
+          borderRadius: rect.radius.map((r) => `${r + pad}px`).join(' '),
         }}
       />
       <div
