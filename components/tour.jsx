@@ -25,19 +25,19 @@ const ACTS = {
     {
       id: 'start',
       anchors: ['tour-start'],
-      text: 'Tap the card to start. The clock runs until you end the workout.',
+      text: 'Tap here when you start lifting. A timer runs until you end the workout.',
       done: (state) => state.inWorkout,
     },
     {
       id: 'add',
       anchors: ['tour-add'],
-      text: 'Type what you are lifting, then Add. A name it has never seen is fine, it keeps it for next time.',
+      text: "Type the lift you're doing, then 'Add'. A new exercise name is fine too — it will be saved for next time.",
       done: (state) => state.exerciseCount > 0,
     },
     {
       id: 'scrub',
       anchors: ['tour-set'],
-      text: 'Drag sideways across a number to change it, or tap it to type. Add your sets, then end the workout.',
+      text: "Drag sideways on a number to change it, or tap to type. Add a set for each one you do, then tap 'End workout'.",
       icon: true,
       ack: 'Got it',
       ackStatus: 'act1-taught',
@@ -47,7 +47,7 @@ const ACTS = {
     {
       id: 'copy',
       anchors: ['tour-workout'],
-      text: 'Press and hold a workout to copy the whole thing into today.',
+      text: 'Doing this one again? Press and hold it to copy every exercise into today.',
       done: (state) => state.inWorkout,
     },
     {
@@ -55,7 +55,7 @@ const ACTS = {
       // Whichever arrived first: the preview under the exercise picker, or the
       // previous sets inside an exercise that came from a copied workout.
       anchors: ['tour-preview', 'tour-past'],
-      text: 'Here is the part worth staying for. Last time is right there, and today starts from those numbers.',
+      text: "This is what you did last time. Today's sets start from those numbers, so you only change what's different.",
       ack: 'Done',
       ackStatus: 'done',
     },
