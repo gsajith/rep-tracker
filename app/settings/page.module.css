@@ -12,3 +12,49 @@
 .container {
   composes: container from "../page.module.css"
 }
+
+.tour {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.tourTitle {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Same reasoning as .emptyBody in page.module.css: faded --text clears 4.5:1
+   on every theme, --textSecondary does not. */
+.tourBody {
+  margin: 4px 0 0;
+  font-size: 15px;
+  line-height: 1.45;
+  opacity: 0.72;
+}
+
+.replayButton {
+  flex-shrink: 0;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: bold;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: transparent;
+  border: 2px solid var(--text);
+  color: var(--text);
+  cursor: pointer;
+  transition: box-shadow 150ms ease-in-out;
+}
+
+.replayButton:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.replayButton:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}

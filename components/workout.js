@@ -267,6 +267,7 @@ export default function Workout({
   return (
     <div
       className={`${styles.container} ${!inWorkout && styles.startup}`}
+      id={inWorkout ? undefined : 'tour-start'}
       onClick={() => {
         if (!inWorkout) {
           setInWorkout(!inWorkout);
@@ -424,6 +425,11 @@ export default function Workout({
                                         <div
                                           key={index + '-' + 'set' + i}
                                           className={styles.setInputWrapper}
+                                          id={
+                                            index === 0 && i === 0
+                                              ? 'tour-set'
+                                              : undefined
+                                          }
                                         >
                                           <div
                                             className={styles.setInputContainer}
@@ -598,7 +604,10 @@ export default function Workout({
                                 )}
                               </div>
                               {exercise.time && exercise.expanded && (
-                                <div className={styles.pastExercise}>
+                                <div
+                                  className={styles.pastExercise}
+                                  id={index === 0 ? 'tour-past' : undefined}
+                                >
                                   <span>
                                     Previously:{' '}
                                     {readableDate(new Date(exercise.time))} (
@@ -656,7 +665,7 @@ export default function Workout({
               </Droppable>
             </DragDropContext>
           )}
-          <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex' }} id="tour-add">
             <ComboBox
               options={exerciseNames}
               selectedItem={selectedItem}

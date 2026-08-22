@@ -4,7 +4,8 @@ import styles from './exerciseToPreview.module.css';
 
 export default function ExerciseToPreview({ exerciseToPreview }) {
   return (
-    <div className={styles.exercisePreview}>
+    // id is the tour's anchor for the payoff step; harmless otherwise.
+    <div className={styles.exercisePreview} id="tour-preview">
       <b className={styles.exercisePreviewTitle}>
         Last time you did this:{' '}
         <span>
