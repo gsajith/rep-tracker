@@ -53,7 +53,12 @@ export function validateWorkoutPayload({
     return `exercises must contain at most ${LIMITS.exercisesPerWorkout} items`;
   }
 
-  if (typeof notes === 'string' && notes.length > LIMITS.notesLength) {
+  // Type first, then length. Checking length behind `typeof === 'string'` alone
+  // would let a non-string slip past both checks and reach the insert.
+  if (notes !== undefined && typeof notes !== 'string') {
+    return 'notes must be a string';
+  }
+  if (notes !== undefined && notes.length > LIMITS.notesLength) {
     return `notes must be at most ${LIMITS.notesLength} characters`;
   }
 
@@ -79,8 +84,11 @@ export function validateWorkoutPayload({
     if ((exercise.weights?.length ?? 0) > LIMITS.setsPerExercise) {
       return `an exercise may have at most ${LIMITS.setsPerExercise} sets`;
     }
+    if (exercise.notes !== undefined && typeof exercise.notes !== 'string') {
+      return 'exercise notes must be a string';
+    }
     if (
-      typeof exercise.notes === 'string' &&
+      exercise.notes !== undefined &&
       exercise.notes.length > LIMITS.notesLength
     ) {
       return `exercise notes must be at most ${LIMITS.notesLength} characters`;
