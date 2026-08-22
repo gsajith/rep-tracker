@@ -75,13 +75,13 @@ export function Exercise({
   );
 }
 
-export default function LoggedWorkout({ data, onLongPress }) {
+export default function LoggedWorkout({ data, onLongPress, id }) {
   const bind = useLongPress(() => {
     onLongPress();
   });
 
   return (
-    <div className={styles.container} {...bind()}>
+    <div className={styles.container} id={id} {...bind()}>
       <div className={styles.header}>
         <span className={styles.title}>{readableDate(data.end_time)}</span>
         <div className={styles.times}>

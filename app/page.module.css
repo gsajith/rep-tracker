@@ -157,3 +157,30 @@
 .retryButton:disabled {
   opacity: 0.55;
 }
+
+/* The empty previous-workouts list. Sized and aligned to the workout cards it
+   stands in for, so the column keeps its shape once the first one lands. The
+   purple start card directly above is already the call to action, so this
+   explains what the list is for rather than growing a second button. */
+.emptyState {
+  width: 336px;
+  max-width: calc(100vw - 48px);
+  margin-top: 24px;
+  text-align: left;
+}
+
+.emptyTitle {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* --text faded rather than --textSecondary, which lands at 3.2:1 against the
+   page and fails as body text. Fading --text instead computes to 6.7:1 on the
+   light themes and 8.0:1 on the dark ones. */
+.emptyBody {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.72;
+}

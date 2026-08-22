@@ -13,6 +13,7 @@ import { LetsIconsCopy } from '@/components/SVGIcons/LetsIconsCopy';
 import classNames from 'classnames';
 import { WorkoutsContext } from '@/context/workoutsProvider';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
+import Tour from '@/components/tour';
 
 export default function Home() {
   const {
@@ -52,6 +53,10 @@ export default function Home() {
     'storedWorkouts'
   );
 
+  // Two-act first run. A plain string, so no validator: see components/tour.jsx
+  // for the states and why the payoff cannot be shown on day one.
+  const [tourStatus, setTourStatus] = useStickyState(null, 'tourStatus');
+
   const [modalShown, setModalShown] = useState(false);
 
   const [allWorkoutsShown, setAllWorkoutsShown] = useState(false);
@@ -87,6 +92,15 @@ export default function Home() {
   useEffect(() => {
     if (!inWorkout) setSaveError(null);
   }, [inWorkout]);
+
+  // Decide once, after the first load actually resolves. An account with
+  // history never sees the tour; replaying it is a settings control rather
+  // than something the app guesses at. Held off while loading and after a
+  // failed load, where an empty list means "unknown" rather than "new here".
+  useEffect(() => {
+    if (loading || loadError || tourStatus !== null) return;
+    setTourStatus(workouts.length === 0 ? 'act1' : 'done');
+  }, [loading, loadError, tourStatus, workouts.length, setTourStatus]);
 
   const saveWorkoutHandler = async () => {
     if (saving) return;
@@ -130,6 +144,16 @@ export default function Home() {
       // the exercises and the start time. Nothing races that effect now the
       // reload is gone, so the cleared state is guaranteed to reach localStorage.
       setInWorkout(false);
+
+      // The first save graduates act 1 into act 2, which waits for the next
+      // workout to show what last time's numbers look like. The second save
+      // retires the tour whether or not that step ever found its anchor, so a
+      // user who never re-adds an old exercise is not followed around.
+      if (tourStatus === 'act1' || tourStatus === 'act1-taught') {
+        setTourStatus('act2');
+      } else if (tourStatus === 'act2') {
+        setTourStatus('done');
+      }
 
       // Refresh inside the guard, unlike the delete path below. That effect is
       // passive, so it closes the confirm modal a commit later than this one.
@@ -359,9 +383,10 @@ export default function Home() {
           sortedWorkouts.length > 0 &&
           sortedWorkouts
             .slice(0, allWorkoutsShown ? Number.MAX_SAFE_INTEGER : 10)
-            .map((workout) => (
+            .map((workout, index) => (
               <LoggedWorkout
                 key={workout.id}
+                id={index === 0 ? 'tour-workout' : undefined}
                 data={workout}
                 onLongPress={() => {
                   setDeleteError(null);
@@ -377,10 +402,17 @@ export default function Home() {
           </div>
         )}
 
+        {/* The start card directly above is already the call to action, so
+            this says what the list is for instead of repeating the button. */}
         {!loading && !listNotice && workouts.length === 0 && (
-          <p style={{ marginTop: 24 }}>
-            No previous workouts found, why not start one?
-          </p>
+          <div className={styles.emptyState}>
+            <h2 className={styles.emptyTitle}>Nothing logged yet</h2>
+            <p className={styles.emptyBody}>
+              Finish a workout and it lands here. Do that exercise again next
+              week and Rep Tracker fills in what you lifted last time, so the
+              only thing left to decide is whether to add a rep.
+            </p>
+          </div>
         )}
         {!allWorkoutsShown && !loading && !loading2 && workouts.length > 0 && (
           <button
@@ -390,6 +422,12 @@ export default function Home() {
             Show all your workouts
           </button>
         )}
+        <Tour
+          status={tourStatus}
+          setStatus={setTourStatus}
+          inWorkout={inWorkout}
+          exerciseCount={exercises.length}
+        />
         <div
           style={{
             height: loading || loading2 || allWorkoutsShown ? 85 : 115,

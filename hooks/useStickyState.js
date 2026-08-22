@@ -66,8 +66,9 @@ export function writeStickyValue(key, value, storage) {
 }
 
 // Accessing window.localStorage can itself throw when site data is blocked, so
-// even reaching for it is guarded.
-function browserStorage() {
+// even reaching for it is guarded. Exported for the rare caller that has to
+// write outside a hook, where the effect below would never get to run.
+export function browserStorage() {
   if (typeof window === 'undefined') return null;
   try {
     return window.localStorage;
