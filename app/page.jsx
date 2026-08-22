@@ -63,9 +63,11 @@ export default function Home() {
   const [staleAfter, setStaleAfter] = useState(null);
 
   // Sorted copy, never the context array itself. See the note on the helper.
+  //
   // Memoised on `workouts` alone: this page also re-renders on saving,
-  // deleting, saveError, deleteError and staleAfter, none of which change the
-  // order.
+  // deleting, saveError, deleteError and staleAfter, and re-sorting on each of
+  // those is pure waste. The stable identity is not currently doing any work,
+  // since nothing downstream is memoised on it.
   const sortedWorkouts = useMemo(
     () => sortWorkoutsByEndTime(workouts),
     [workouts]
@@ -325,9 +327,11 @@ export default function Home() {
           )}
         </div>
 
-        {(loading ||
-          loading2 ||
-          (workouts !== null && workouts.length > 0)) && (
+        {/* No null guard on `workouts`: the provider initialises it to [] and
+            only ever replaces it with an array, and the memo above already
+            dereferences it on every render, so a null here would have thrown
+            long before this line. */}
+        {(loading || loading2 || workouts.length > 0) && (
           <div className={styles.previousWorkoutsHeader}>
             Your previous workouts
           </div>
