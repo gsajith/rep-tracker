@@ -34,7 +34,16 @@ jobs:
       # exits 0 on warnings, so this job fails only on lint errors or a broken
       # build. With no test suite, that is the whole gate.
       #
-      # No environment variables are needed: utils/db.js creates the Neon
-      # client lazily, so a missing DATABASE_URL does not break the build, and
-      # Clerk does not require its keys to compile.
+      # DATABASE_URL is still not needed: utils/db.js creates the Neon client
+      # lazily, so a missing connection string does not break the build.
+      #
+      # The Clerk key is a different matter as of v6. v5 compiled without one;
+      # v6 hard-fails while prerendering every page inside <ClerkProvider>.
+      # The value below is a placeholder, not this project's key: it is only
+      # parsed for its shape, nothing in CI authenticates against Clerk, and the
+      # bundle this job produces is thrown away. Publishable keys are public by
+      # design in any case, since they ship inside the client bundle. The secret
+      # key is not required here and is deliberately absent.
       - run: npm run build
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk
