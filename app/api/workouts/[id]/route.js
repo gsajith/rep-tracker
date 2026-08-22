@@ -1,5 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { getSql } from '@/utils/db';
+import { isUuid } from '@/utils/validate';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +17,16 @@ export async function DELETE(_request, { params }) {
   }
 
   const { id } = params;
+
+  // Without this the $1::uuid cast fails inside Postgres and comes back as a
+  // 500 carrying `invalid input syntax for type uuid`, for what is a client
+  // sending a malformed id.
+  if (!isUuid(id)) {
+    return Response.json(
+      { data: null, error: 'Invalid workout id' },
+      { status: 400 }
+    );
+  }
 
   try {
     const sql = getSql();
@@ -48,8 +59,9 @@ export async function DELETE(_request, { params }) {
     return Response.json({ data: result, error: null });
   } catch (error) {
     console.error('DELETE /api/workouts failed:', error);
+    // Fixed string, not error.message, for the same reason as the POST handler.
     return Response.json(
-      { data: null, error: error.message ?? 'Delete failed' },
+      { data: null, error: 'Could not delete the workout' },
       { status: 500 }
     );
   }
