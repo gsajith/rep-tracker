@@ -1,0 +1,51 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 320px;
+  margin: 48px auto;
+  padding: 20px;
+  border: 2px solid var(--warning);
+  border-radius: 14px;
+  text-align: left;
+}
+
+.heading {
+  margin: 0;
+  color: var(--warning);
+  font-size: 20px;
+}
+
+.body {
+  margin: 0;
+  color: var(--text);
+}
+
+.retry {
+  align-self: stretch;
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--textInverted);
+  font-weight: bold;
+  font-size: 18px;
+  padding: 12px 20px;
+  transition: background 150ms ease-in-out;
+}
+
+.retry:not(:disabled) {
+  cursor: pointer;
+}
+
+.retry:not(:disabled):hover,
+.retry:not(:disabled):focus {
+  outline: none;
+  background: var(--accentHover);
+}
+
+.hint {
+  margin: 0;
+  color: var(--textSecondary);
+  font-size: 14px;
+}
