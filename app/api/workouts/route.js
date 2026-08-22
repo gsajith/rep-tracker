@@ -93,9 +93,12 @@ export async function POST(request) {
   // The rows come from the validator already coerced. Re-deriving them here
   // would mean two independent readings of the same input, which is exactly how
   // a value that passed a range check went on to overflow bigint.
+  // Both id and user_id sit after the spread. user_id was already safe by
+  // ordering; id was safe only because the validator happens not to emit that
+  // key. Ordering makes neither depend on that.
   const rows = validExercises.map((exercise) => ({
-    id: randomUUID(),
     ...exercise,
+    id: randomUUID(),
     user_id: userId,
   }));
 
