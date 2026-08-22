@@ -39,3 +39,13 @@ export const calculateDaysAgo = (timestamp) => {
 export function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+// Returns a copy sorted newest first. A copy specifically: callers pass the
+// array straight out of WorkoutsContext, and Array.prototype.sort reorders in
+// place, so sorting the original mutates the provider's state during render and
+// every other consumer sees the new order.
+export function sortWorkoutsByEndTime(workouts) {
+  return [...workouts].sort(
+    (a, b) => b.end_time.valueOf() - a.end_time.valueOf()
+  );
+}

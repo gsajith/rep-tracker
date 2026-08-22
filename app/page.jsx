@@ -1,10 +1,10 @@
 'use client';
 import styles from './page.module.css';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { removeWorkout, saveWorkout } from '@/utils/api';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
-import { readableDate } from '@/utils/utils';
+import { readableDate, sortWorkoutsByEndTime } from '@/utils/utils';
 import { useStickyState } from '@/hooks/useStickyState';
 import Modal from '@/components/modal';
 import { LetsIconsTrash } from '@/components/SVGIcons/LetsIconsTrash';
@@ -61,6 +61,15 @@ export default function Home() {
   // bare boolean so the banner can name what actually happened instead of
   // saying "that change" and making the user guess.
   const [staleAfter, setStaleAfter] = useState(null);
+
+  // Sorted copy, never the context array itself. See the note on the helper.
+  // Memoised on `workouts` alone: this page also re-renders on saving,
+  // deleting, saveError, deleteError and staleAfter, none of which change the
+  // order.
+  const sortedWorkouts = useMemo(
+    () => sortWorkoutsByEndTime(workouts),
+    [workouts]
+  );
 
   // Drop a stale message once the workout is saved or trashed, so reopening the
   // confirm modal later does not show the error from a previous attempt.
@@ -334,9 +343,8 @@ export default function Home() {
         )}
 
         {!loading &&
-          workouts.length > 0 &&
-          workouts
-            .sort((a, b) => b.end_time.valueOf() - a.end_time.valueOf())
+          sortedWorkouts.length > 0 &&
+          sortedWorkouts
             .slice(0, allWorkoutsShown ? Number.MAX_SAFE_INTEGER : 10)
             .map((workout) => (
               <LoggedWorkout
