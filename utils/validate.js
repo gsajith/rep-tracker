@@ -195,3 +195,27 @@ export function validateWorkoutPayload({
 
   return { error: null, exercises: coerced };
 }
+
+// Shape check for the in-progress workout kept in localStorage under
+// "exercises". Distinct from validateWorkoutPayload above, which guards what a
+// client sends to the API: this guards what the app reads back out of its own
+// storage, and the two shapes differ. The stored one also carries repsDrag,
+// weightsDrag and expanded, none of which ever reach the server.
+//
+// Checks only the fields whose absence crashes a render: app/page.jsx and
+// components/workout.js read name.toLowerCase(), reps.length and
+// weights.length. Anything stricter would be guessing at a shape nobody has
+// been bitten by.
+export function isStoredExerciseList(value) {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (exercise) =>
+        exercise !== null &&
+        typeof exercise === 'object' &&
+        typeof exercise.name === 'string' &&
+        Array.isArray(exercise.reps) &&
+        Array.isArray(exercise.weights)
+    )
+  );
+}

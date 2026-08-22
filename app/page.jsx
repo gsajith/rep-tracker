@@ -5,6 +5,7 @@ import { removeWorkout, saveWorkout } from '@/utils/api';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
 import { readableDate, sortWorkoutsByEndTime } from '@/utils/utils';
+import { isStoredExerciseList } from '@/utils/validate';
 import { useStickyState } from '@/hooks/useStickyState';
 import Modal from '@/components/modal';
 import { LetsIconsTrash } from '@/components/SVGIcons/LetsIconsTrash';
@@ -36,7 +37,14 @@ export default function Home() {
   );
 
   // Tracks in storage exercises have been added to this workout
-  const [exercises, setExercises] = useStickyState([], 'exercises');
+  // The only sticky key with a validator. The other five hold primitives, where
+  // a wrong-shaped value is inert; this one holds objects that the render maps
+  // over, so a bad value crashes the page and stays in storage across reloads.
+  const [exercises, setExercises] = useStickyState(
+    [],
+    'exercises',
+    isStoredExerciseList
+  );
 
   const [storedWorkouts, setStoredWorkouts] = useStickyState(
     [],
