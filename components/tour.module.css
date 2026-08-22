@@ -159,6 +159,19 @@
   color: var(--background);
 }
 
+/* Load-bearing. globals.css carries `button:hover, button:focus { color:
+   var(--text) }` at (0,1,1), which outranks the (0,1,0) rule above and
+   paints this label --text on a --text background: black on black. Restated
+   at (0,2,0) so it survives both states.
+
+   .skip and settings' .replayButton escape this only because they already
+   set color: var(--text), so the global rule lands on the same value. Give
+   either of them a different colour and it needs this treatment too. */
+.ack:hover,
+.ack:focus {
+  color: var(--background);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ring {
     transition: none;
