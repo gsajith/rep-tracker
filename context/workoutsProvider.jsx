@@ -38,8 +38,14 @@ export const WorkoutsProvider = ({ children }) => {
         const name = exercise.name.toLowerCase();
         names.add(name);
 
-        // `end_time` is already a Date here; the loader converts timestamps once.
-        const time = workout.end_time.getTime();
+        // Keyed on when the workout started, not when it was closed. This
+        // timestamp is what the "Last time you did this" panel and the
+        // "Previously:" strip both print, so it has to agree with the date on
+        // the workout card. It also decides which session counts as the most
+        // recent, and a workout left open for days is stamped closed long after
+        // it happened, which put it ahead of sessions that really were later.
+        // Already a Date here; the loader converts timestamps once.
+        const time = workout.start_time.getTime();
         if (!(name in latest) || latest[name].time < time) {
           latest[name] = { time, exercise };
         }
