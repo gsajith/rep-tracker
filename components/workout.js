@@ -28,6 +28,7 @@ const getExerciseStyle = (isDragging, exerciseStyle, draggableStyle) => ({
 export default function Workout({
   workoutName,
   setWorkoutName,
+  nameCollides,
   exerciseNames,
   latestExercises,
   saveWorkout,
@@ -57,6 +58,10 @@ export default function Workout({
   // Modal state
   const [modalShown, setModalShown] = useState(false);
   const [trashModalShown, setTrashModalShown] = useState(false);
+
+  // True when the typed name is a routine this session did not come from, which
+  // would file this workout under a routine it was never part of.
+  const takenName = Boolean(nameCollides?.(workoutName));
 
   useEffect(() => {
     if (workoutStartTime) {
@@ -340,8 +345,15 @@ export default function Workout({
                 value={workoutName ?? ''}
                 placeholder="Leg day"
                 maxLength={200}
+                aria-invalid={takenName}
                 onChange={(event) => setWorkoutName(event.target.value || null)}
               />
+              {takenName && (
+                <div className={styles.nameTaken} role="alert">
+                  {workoutName.trim()} is already a routine. Start it from the
+                  chip on the home screen to add a workout to it.
+                </div>
+              )}
             </div>
             {saveError && (
               <div className={styles.modalError} role="alert">
@@ -350,7 +362,7 @@ export default function Workout({
             )}
             <button
               className={styles.endWorkoutConfirmButton}
-              disabled={saving}
+              disabled={saving || takenName}
               aria-busy={saving}
               onClick={() => {
                 saveWorkout();

@@ -537,3 +537,11 @@
     width: 560px;
   }
 }
+
+/* Shown under a name field when the typed name is already a routine. */
+.nameTaken {
+  color: var(--warning);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
