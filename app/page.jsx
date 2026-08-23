@@ -580,10 +580,15 @@ export default function Home() {
             <div className={styles.renameRow}>
               {/* What starting this routine would give you: the exercises from
                   its most recent session, which is what the chip copies. */}
+              {/* Guarded the way loggedWorkout.js guards the same field: a
+                  workout with no exercises would otherwise throw inside a
+                  dialog, where an error boundary is the only thing left. */}
               <ul className={styles.routineExercises}>
-                {routineBeingRenamed.workout.exercises.map((exercise) => (
-                  <li key={exercise.id}>{capitalize(exercise.name)}</li>
-                ))}
+                {(routineBeingRenamed.workout.exercises ?? []).map(
+                  (exercise) => (
+                    <li key={exercise.id}>{capitalize(exercise.name)}</li>
+                  )
+                )}
               </ul>
               {/* There is no separate list to edit: a routine is whatever its
                   newest session contained, so the way to change it is to do it
