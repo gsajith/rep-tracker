@@ -1,8 +1,71 @@
 import { auth } from '@clerk/nextjs/server';
 import { getSql } from '@/utils/db';
-import { isUuid } from '@/utils/validate';
+import { isUuid, normalizeWorkoutName, LIMITS } from '@/utils/validate';
 
 export const dynamic = 'force-dynamic';
+
+// PATCH /api/workouts/:id
+// Sets or clears a workout's name, which is what groups workouts into routines.
+// Scoped by the Clerk user id like every other query here.
+export async function PATCH(request, { params }) {
+  const { userId } = await auth();
+  if (!userId) {
+    return Response.json({ data: null, error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { id } = params;
+  if (!isUuid(id)) {
+    return Response.json(
+      { data: null, error: 'Invalid workout id' },
+      { status: 400 }
+    );
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json(
+      { data: null, error: 'Body must be JSON' },
+      { status: 400 }
+    );
+  }
+
+  const name = normalizeWorkoutName(body?.name);
+  if (name === undefined) {
+    return Response.json(
+      {
+        data: null,
+        error: `name must be a string of at most ${LIMITS.nameLength} characters`,
+      },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const sql = getSql();
+    const rows = await sql.query(
+      `update workouts set name = $1 where id = $2::uuid and user_id = $3
+       returning id, name`,
+      [name, id, userId]
+    );
+
+    if (rows.length === 0) {
+      return Response.json(
+        { data: null, error: 'Workout not found' },
+        { status: 404 }
+      );
+    }
+
+    return Response.json({ data: rows[0], error: null });
+  } catch (error) {
+    console.error('PATCH /api/workouts failed:', error);
+    return Response.json(
+      { data: null, error: 'Could not rename the workout' },
+      { status: 500 }
+    );
+  }
+}
 
 // DELETE /api/workouts/:id
 // Removes the workout and the exercises it owns. Both scoped by the Clerk user

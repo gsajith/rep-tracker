@@ -30,7 +30,7 @@ export async function GET(request) {
 
   const workouts = await sql.query(
     `select id, ${ts('start_time', 'start_time')}, ${ts('end_time', 'end_time')},
-            exercises, notes, user_id
+            exercises, notes, name, user_id
      from workouts
      where user_id = $1
      order by start_time desc
@@ -74,16 +74,21 @@ export async function POST(request) {
     return Response.json({ data: null, error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { startTime, endTime, exercises = [], notes = '' } = body;
+  const { startTime, endTime, exercises = [], notes = '', name } = body;
 
   // Everything Postgres would have rejected is rejected here instead. Without
   // this an unparseable startTime reaches the $2::timestamp cast, fails inside
   // the database, and surfaces as a 500 for what is plainly a client error.
-  const { error: invalid, exercises: validExercises } = validateWorkoutPayload({
+  const {
+    error: invalid,
+    exercises: validExercises,
+    name: validName,
+  } = validateWorkoutPayload({
     startTime,
     endTime,
     exercises,
     notes,
+    name,
   });
   if (invalid) return badRequest(invalid);
 
@@ -117,14 +122,15 @@ export async function POST(request) {
         [JSON.stringify(rows)]
       ),
       sql.query(
-        `insert into workouts (id, start_time, end_time, exercises, notes, user_id)
-         values ($1, $2::timestamp, $3::timestamp, $4::uuid[], $5, $6)`,
+        `insert into workouts (id, start_time, end_time, exercises, notes, name, user_id)
+         values ($1, $2::timestamp, $3::timestamp, $4::uuid[], $5, $6, $7)`,
         [
           workoutId,
           startTime,
           endTime,
           rows.map((r) => r.id),
           notes ?? '',
+          validName,
           userId,
         ]
       ),

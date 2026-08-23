@@ -76,3 +76,36 @@ export const formatDuration = (start, end) => {
   const rest = minutes % 60;
   return rest === 0 ? `${hours}h` : `${hours}h ${rest}m`;
 };
+
+// Routines are derived from history rather than stored separately: a routine is
+// just the set of workouts sharing a name. That keeps "when did I last do Leg
+// day" true by construction, and means a routine can never describe something
+// the user never actually did.
+//
+// Returns least-recently-done first, so the routine you are due next is the
+// one nearest to hand. Each entry carries when it was last done, so "which did
+// I do most recently" is still answerable by reading the other end.
+export function deriveRoutines(workouts) {
+  const byName = new Map();
+
+  for (const workout of workouts) {
+    const name = typeof workout.name === 'string' ? workout.name.trim() : '';
+    if (!name) continue;
+
+    const previous = byName.get(name);
+    // start_time, matching what the cards display and what decides recency
+    // everywhere else in the app.
+    if (!previous || workout.start_time > previous.lastDone) {
+      byName.set(name, {
+        name,
+        lastDone: workout.start_time,
+        workout,
+        count: (previous?.count ?? 0) + 1,
+      });
+    } else {
+      previous.count += 1;
+    }
+  }
+
+  return [...byName.values()].sort((a, b) => a.lastDone - b.lastDone);
+}

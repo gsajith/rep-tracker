@@ -26,6 +26,8 @@ const getExerciseStyle = (isDragging, exerciseStyle, draggableStyle) => ({
 
 // TODO: Add note to whole workout
 export default function Workout({
+  workoutName,
+  setWorkoutName,
   exerciseNames,
   latestExercises,
   saveWorkout,
@@ -327,6 +329,22 @@ export default function Workout({
           >
             <div style={{ textAlign: 'left' }}>
               Are you sure you want to end this workout?
+            </div>
+            {/* Naming it here is what files it under a routine, so it can be
+                started by name next time. Optional: an unnamed workout is
+                still a workout. */}
+            <div className={styles.nameField}>
+              <label className={styles.nameLabel} htmlFor="in-workout-name">
+                Name it (optional)
+              </label>
+              <input
+                id="in-workout-name"
+                className={styles.nameInput}
+                value={workoutName ?? ''}
+                placeholder="Leg day"
+                maxLength={200}
+                onChange={(event) => setWorkoutName(event.target.value || null)}
+              />
             </div>
             {saveError && (
               <div className={styles.modalError} role="alert">
@@ -783,6 +801,9 @@ export default function Workout({
             <div className={styles.timer}>
               <LetsIconsTimeAtack />
               <span>{workoutTimer}</span>
+              {workoutName && (
+                <span className={styles.activeName}>{workoutName}</span>
+              )}
             </div>
             <div
               style={{

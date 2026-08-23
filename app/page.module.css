@@ -309,3 +309,123 @@
     max-width: 592px;
   }
 }
+
+/* Routines: the distinct names in your history, least-recently-done first, so
+   the one you are due to do next is nearest to hand. */
+.routines {
+  width: 336px;
+  max-width: calc(100vw - 48px);
+  margin-top: 20px;
+}
+
+.routinesHeading {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text);
+  opacity: 0.72;
+}
+
+.routineRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.routineChip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 2px solid var(--accentText);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 150ms ease-in-out;
+}
+
+.routineChip:hover {
+  background: var(--accentHoverLight);
+}
+
+.routineChip:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.routineName {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.routineWhen {
+  font-size: 12px;
+  opacity: 0.72;
+}
+
+/* Naming a past workout, which is how a routine gets made from history logged
+   before names existed. */
+.renameRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.renameLabel {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.renameInput {
+  font-family: inherit;
+  font-size: 16px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 2px solid var(--text);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--text);
+}
+
+.renameInput:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.renameButton {
+  min-height: 44px;
+  border: 2px solid var(--text);
+  border-radius: 12px;
+  background: var(--text);
+  color: var(--background);
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.renameButton:hover,
+.renameButton:focus {
+  color: var(--background);
+}
+
+.renameButton:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.renameButton:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+@media (min-width: 768px) {
+  .routines {
+    width: 560px;
+  }
+}

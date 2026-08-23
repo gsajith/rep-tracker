@@ -92,13 +92,27 @@ function outOfRange(values, label, max, min) {
 // handler meant two independent readings of the same input, and every value
 // that got past this file did so through that gap. There is now one coercion,
 // and the range checks guard exactly the numbers that get stored.
+// Optional. A workout's name is what groups it into a routine, so it is
+// normalised once here and the normalised value is what gets stored: trimmed,
+// and empty-becomes-null so "" and "   " and absent are one state rather than
+// three that would show up as three different routines.
+export function normalizeWorkoutName(value) {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  if (trimmed.length === 0) return null;
+  if (trimmed.length > LIMITS.nameLength) return undefined;
+  return trimmed;
+}
+
 export function validateWorkoutPayload({
   startTime,
   endTime,
   exercises,
   notes,
+  name,
 }) {
-  const reject = (error) => ({ error, exercises: null });
+  const reject = (error) => ({ error, exercises: null, name: null });
 
   const startMs = timestampMs(startTime);
   if (startMs === null) return reject('startTime must be a valid timestamp');
@@ -193,7 +207,14 @@ export function validateWorkoutPayload({
     });
   }
 
-  return { error: null, exercises: coerced };
+  const workoutName = normalizeWorkoutName(name);
+  if (workoutName === undefined) {
+    return reject(
+      `name must be a string of at most ${LIMITS.nameLength} characters`
+    );
+  }
+
+  return { error: null, exercises: coerced, name: workoutName };
 }
 
 // Shape check for the in-progress workout kept in localStorage under

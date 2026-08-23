@@ -1,10 +1,11 @@
 'use client';
 import styles from './page.module.css';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { removeWorkout, saveWorkout } from '@/utils/api';
+import { removeWorkout, renameWorkout, saveWorkout } from '@/utils/api';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
 import {
+  calculateDaysAgo,
   formatDuration,
   readableDate,
   sortWorkoutsByEndTime,
@@ -27,6 +28,7 @@ export default function Home() {
     loadError,
     exerciseNames,
     latestExercises,
+    routines,
     refresh,
   } = useContext(WorkoutsContext);
 
@@ -57,6 +59,10 @@ export default function Home() {
     'storedWorkouts'
   );
 
+  // The name the in-progress workout will be saved under, which is what groups
+  // it into a routine. A plain string or null, so no validator.
+  const [workoutName, setWorkoutName] = useStickyState(null, 'workoutName');
+
   // Two-act first run. A plain string, so no validator: see components/tour.jsx
   // for the states and why the payoff cannot be shown on day one.
   const [tourStatus, setTourStatus] = useStickyState(null, 'tourStatus');
@@ -75,6 +81,14 @@ export default function Home() {
   // Finishing a workout produced no message of any kind: the card simply
   // disappeared. Every other thing this page can say is an error.
   const [saveSummary, setSaveSummary] = useState(null);
+
+  // Renaming a past workout is how a routine gets created out of history that
+  // was logged before names existed. Without it the first "Leg day" could only
+  // come from finishing a workout, and everything already logged would be
+  // ungroupable forever.
+  const [renameValue, setRenameValue] = useState('');
+  const [renaming, setRenaming] = useState(false);
+  const [renameError, setRenameError] = useState(null);
 
   // Separate flags so an in-flight delete cannot disable the save button.
   const [saving, setSaving] = useState(false);
@@ -103,8 +117,13 @@ export default function Home() {
   // Drop a stale message once the workout is saved or trashed, so reopening the
   // confirm modal later does not show the error from a previous attempt.
   useEffect(() => {
-    if (!inWorkout) setSaveError(null);
-  }, [inWorkout]);
+    if (!inWorkout) {
+      setSaveError(null);
+      // Trashing a workout drops its name with it, so the next blank session
+      // does not inherit the routine of the one that was thrown away.
+      setWorkoutName(null);
+    }
+  }, [inWorkout, setWorkoutName]);
 
   // Decide once, after the first load actually resolves. An account with
   // history never sees the tour; replaying it is a settings control rather
@@ -121,6 +140,53 @@ export default function Home() {
     const timer = setTimeout(() => setSaveSummary(null), 8000);
     return () => clearTimeout(timer);
   }, [saveSummary]);
+
+  // Shared by the copy-workout menu and the routine buttons: both start a new
+  // session from an old one's exercises, and the only difference is whether a
+  // name comes along.
+  const startFromWorkout = (workout, name) => {
+    setInWorkout(false);
+    setInWorkout(true);
+    setWorkoutStartTime(Date.now());
+    setWorkoutName(name ?? workout.name ?? null);
+    setExercises(() => {
+      const copy = structuredClone(workout);
+      return copy.exercises.map((exercise) => ({
+        ...exercise,
+        repsDrag: Array(exercise.reps.length).fill(0),
+        weightsDrag: Array(exercise.weights.length).fill(0),
+        notes: '',
+        expanded: true,
+      }));
+    });
+  };
+
+  const renameWorkoutHandler = async (workout) => {
+    if (renaming) return;
+    setRenameError(null);
+
+    if (!window.navigator.onLine) {
+      setRenameError('You are offline. Try again once you are back online.');
+      return;
+    }
+
+    setRenaming(true);
+    try {
+      const { error } = await renameWorkout(workout.id, renameValue);
+      if (error) {
+        console.error(error);
+        setRenameError('Could not save that name.');
+        return;
+      }
+      setModalShown(false);
+      setStaleAfter((await refresh()) ? 'rename' : null);
+    } catch (thrown) {
+      console.error(thrown);
+      setRenameError('Could not save that name.');
+    } finally {
+      setRenaming(false);
+    }
+  };
 
   const saveWorkoutHandler = async () => {
     if (saving) return;
@@ -143,6 +209,7 @@ export default function Home() {
       const { error } = await saveWorkout({
         startTime: new Date(workoutStartTime).toISOString(),
         endTime: new Date().toISOString(),
+        name: workoutName,
         exercises: exercises.map((exercise) => ({
           name: exercise.name,
           reps: exercise.reps.map((rep) => parseInt(rep) || 0),
@@ -164,10 +231,12 @@ export default function Home() {
       // the exercises and the start time. Nothing races that effect now the
       // reload is gone, so the cleared state is guaranteed to reach localStorage.
       setSaveSummary({
+        name: workoutName,
         exercises: exercises.length,
         duration: formatDuration(workoutStartTime, Date.now()),
       });
 
+      setWorkoutName(null);
       setInWorkout(false);
 
       // The first save graduates act 1 into act 2, which waits for the next
@@ -283,6 +352,8 @@ export default function Home() {
   } else if (staleAfter === 'delete') {
     listNotice =
       'That workout was deleted, but this list could not be refreshed.';
+  } else if (staleAfter === 'rename') {
+    listNotice = 'That name was saved, but this list could not be refreshed.';
   } else if (loadError && workouts.length > 0) {
     listNotice = 'Some of your workouts could not be loaded.';
   } else if (loadError) {
@@ -311,29 +382,39 @@ export default function Home() {
               <button
                 className={styles.workoutButton}
                 onClick={() => {
-                  setInWorkout(false);
-                  setInWorkout(true);
-                  setWorkoutStartTime(Date.now());
-                  setExercises(() => {
-                    const newWorkout = structuredClone(longPressedWorkout);
-                    newWorkout.exercises = newWorkout.exercises.map(
-                      (exercise) => ({
-                        ...exercise,
-                        repsDrag: Array(exercise.reps.length).fill(0),
-                        weightsDrag: Array(exercise.weights.length).fill(0),
-                        notes: '',
-                        expanded: true,
-                      })
-                    );
-
-                    return newWorkout.exercises;
-                  });
+                  startFromWorkout(longPressedWorkout);
                   setModalShown(false);
                 }}
               >
                 <LetsIconsCopy />
                 Copy workout
               </button>
+              <div className={styles.renameRow}>
+                <label className={styles.renameLabel} htmlFor="workout-name">
+                  Name this workout
+                </label>
+                <input
+                  id="workout-name"
+                  className={styles.renameInput}
+                  value={renameValue}
+                  placeholder="Leg day"
+                  maxLength={200}
+                  onChange={(event) => setRenameValue(event.target.value)}
+                />
+                {renameError && (
+                  <div className={styles.modalError} role="alert">
+                    {renameError}
+                  </div>
+                )}
+                <button
+                  className={styles.renameButton}
+                  disabled={renaming}
+                  aria-busy={renaming}
+                  onClick={() => renameWorkoutHandler(longPressedWorkout)}
+                >
+                  {renaming ? 'Saving...' : 'Save name'}
+                </button>
+              </div>
               {deleteError && (
                 <div className={styles.modalError} role="alert">
                   {deleteError}
@@ -370,6 +451,8 @@ export default function Home() {
           </Modal>
         )}
         <Workout
+          workoutName={workoutName}
+          setWorkoutName={setWorkoutName}
           inWorkout={inWorkout}
           setInWorkout={setInWorkout}
           exercises={exercises}
@@ -392,7 +475,10 @@ export default function Home() {
         {saveSummary && (
           <div className={styles.saveSuccess}>
             <span>
-              Workout saved. {saveSummary.exercises}{' '}
+              {saveSummary.name
+                ? `${saveSummary.name} saved. `
+                : 'Workout saved. '}
+              {saveSummary.exercises}{' '}
               {saveSummary.exercises === 1 ? 'exercise' : 'exercises'}
               {saveSummary.duration ? `, ${saveSummary.duration}` : ''}.
             </span>
@@ -403,6 +489,29 @@ export default function Home() {
               Dismiss
             </button>
           </div>
+        )}
+
+        {!inWorkout && routines.length > 0 && (
+          <section className={styles.routines} aria-label="Your routines">
+            <h2 className={styles.routinesHeading}>Start a named workout</h2>
+            <div className={styles.routineRow}>
+              {routines.map((routine) => (
+                <button
+                  key={routine.name}
+                  type="button"
+                  className={styles.routineChip}
+                  onClick={() =>
+                    startFromWorkout(routine.workout, routine.name)
+                  }
+                >
+                  <span className={styles.routineName}>{routine.name}</span>
+                  <span className={styles.routineWhen}>
+                    {calculateDaysAgo(routine.lastDone)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
         )}
 
         {/* The live region is mounted for the life of the page and only its
@@ -458,6 +567,8 @@ export default function Home() {
                 onLongPress={() => {
                   setDeleteError(null);
                   setConfirmDelete(false);
+                  setRenameError(null);
+                  setRenameValue(workout.name ?? '');
                   setLongPressedWorkout(workout);
                   setModalShown(true);
                 }}

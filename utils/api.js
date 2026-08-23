@@ -46,17 +46,34 @@ export async function loadWorkouts(limit = 100) {
       ...workout,
       start_time: parseISOString(workout.start_time),
       end_time: parseISOString(workout.end_time),
+      name: workout.name ?? null,
     })),
     error: null,
   };
 }
 
 // One request creates the workout and all of its exercises together.
-export async function saveWorkout({ startTime, endTime, exercises, notes = '' }) {
+export async function saveWorkout({
+  startTime,
+  endTime,
+  exercises,
+  notes = '',
+  name = null,
+}) {
   return request('/api/workouts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ startTime, endTime, exercises, notes }),
+    body: JSON.stringify({ startTime, endTime, exercises, notes, name }),
+  });
+}
+
+// Sets or clears a workout's name. Pass null or '' to unname it.
+export async function renameWorkout(workoutId, name) {
+  if (!workoutId) return { data: null, error: 'No workout ID' };
+  return request(`/api/workouts/${workoutId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
   });
 }
 
