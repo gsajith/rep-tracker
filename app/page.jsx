@@ -640,7 +640,7 @@ export default function Home() {
 
         {!inWorkout && routines.length > 0 && (
           <section className={styles.routines} aria-label="Your routines">
-            <h2 className={styles.routinesHeading}>Start a named workout</h2>
+            <h2 className={styles.routinesHeading}>Start a routine</h2>
             <div className={styles.routineRow}>
               {routines.map((routine) => (
                 <div key={routine.name} className={styles.routineChip}>
