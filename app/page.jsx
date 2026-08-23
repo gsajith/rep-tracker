@@ -65,6 +65,15 @@ export default function Home() {
   // it into a routine. A plain string or null, so no validator.
   const [workoutName, setWorkoutName] = useStickyState(null, 'workoutName');
 
+  // The name this session inherited from the routine it was started from, if
+  // any. A workout joins a routine by being started from its chip; typing a
+  // name that already exists is how you would join one by accident, so that is
+  // refused. Keeping the inherited name here is what tells the two apart.
+  const [inheritedRoutineName, setInheritedRoutineName] = useStickyState(
+    null,
+    'inheritedRoutineName'
+  );
+
   // Two-act first run. A plain string, so no validator: see components/tour.jsx
   // for the states and why the payoff cannot be shown on day one.
   const [tourStatus, setTourStatus] = useStickyState(null, 'tourStatus');
@@ -111,6 +120,22 @@ export default function Home() {
   // saying "that change" and making the user guess.
   const [staleAfter, setStaleAfter] = useState(null);
 
+  // Every routine name already in use, lowercased, so "leg day" cannot become a
+  // second "Leg day" the way "pushups" once became a second "Pushups".
+  const takenRoutineNames = useMemo(
+    () => new Set(routines.map((routine) => routine.name.toLowerCase())),
+    [routines]
+  );
+
+  // A typed name collides when it is already a routine and is not the name the
+  // thing being renamed already carries.
+  const nameCollides = (typed, ownName) => {
+    const trimmed = (typed ?? '').trim().toLowerCase();
+    if (!trimmed) return false;
+    if (trimmed === (ownName ?? '').trim().toLowerCase()) return false;
+    return takenRoutineNames.has(trimmed);
+  };
+
   // Sorted copy, never the context array itself. See the note on the helper.
   //
   // Memoised on `workouts` alone: this page also re-renders on saving,
@@ -130,8 +155,9 @@ export default function Home() {
       // Trashing a workout drops its name with it, so the next blank session
       // does not inherit the routine of the one that was thrown away.
       setWorkoutName(null);
+      setInheritedRoutineName(null);
     }
-  }, [inWorkout, setWorkoutName]);
+  }, [inWorkout, setWorkoutName, setInheritedRoutineName]);
 
   // Decide once, after the first load actually resolves. An account with
   // history never sees the tour; replaying it is a settings control rather
@@ -153,10 +179,12 @@ export default function Home() {
   // session from an old one's exercises, and the only difference is whether a
   // name comes along.
   const startFromWorkout = (workout, name) => {
+    const inherited = name ?? workout.name ?? null;
     setInWorkout(false);
     setInWorkout(true);
     setWorkoutStartTime(Date.now());
-    setWorkoutName(name ?? workout.name ?? null);
+    setWorkoutName(inherited);
+    setInheritedRoutineName(inherited);
     setExercises(() => {
       const copy = structuredClone(workout);
       return copy.exercises.map((exercise) => ({
@@ -275,6 +303,7 @@ export default function Home() {
       });
 
       setWorkoutName(null);
+      setInheritedRoutineName(null);
       setInWorkout(false);
 
       // The first save graduates act 1 into act 2, which waits for the next
@@ -431,8 +460,18 @@ export default function Home() {
                   value={renameValue}
                   placeholder="Leg day"
                   maxLength={200}
+                  aria-invalid={nameCollides(
+                    renameValue,
+                    longPressedWorkout.name
+                  )}
                   onChange={(event) => setRenameValue(event.target.value)}
                 />
+                {nameCollides(renameValue, longPressedWorkout.name) && (
+                  <div className={styles.nameTaken} role="alert">
+                    {renameValue.trim()} is already a routine. Start it from the
+                    chip on the home screen to add a workout to it.
+                  </div>
+                )}
                 {renameError && (
                   <div className={styles.modalError} role="alert">
                     {renameError}
@@ -440,7 +479,10 @@ export default function Home() {
                 )}
                 <button
                   className={styles.renameButton}
-                  disabled={renaming}
+                  disabled={
+                    renaming ||
+                    nameCollides(renameValue, longPressedWorkout.name)
+                  }
                   aria-busy={renaming}
                   onClick={() => renameWorkoutHandler(longPressedWorkout)}
                 >
@@ -485,6 +527,7 @@ export default function Home() {
         <Workout
           workoutName={workoutName}
           setWorkoutName={setWorkoutName}
+          nameCollides={(typed) => nameCollides(typed, inheritedRoutineName)}
           inWorkout={inWorkout}
           setInWorkout={setInWorkout}
           exercises={exercises}
@@ -545,8 +588,18 @@ export default function Home() {
                 value={routineRenameValue}
                 placeholder="Leg day"
                 maxLength={200}
+                aria-invalid={nameCollides(
+                  routineRenameValue,
+                  routineBeingRenamed.name
+                )}
                 onChange={(event) => setRoutineRenameValue(event.target.value)}
               />
+              {nameCollides(routineRenameValue, routineBeingRenamed.name) && (
+                <div className={styles.nameTaken} role="alert">
+                  {routineRenameValue.trim()} is already a routine. Renaming
+                  onto it would merge the two.
+                </div>
+              )}
               {renameError && (
                 <div className={styles.modalError} role="alert">
                   {renameError}
@@ -554,7 +607,10 @@ export default function Home() {
               )}
               <button
                 className={styles.renameButton}
-                disabled={renaming}
+                disabled={
+                  renaming ||
+                  nameCollides(routineRenameValue, routineBeingRenamed.name)
+                }
                 aria-busy={renaming}
                 onClick={renameRoutineHandler}
               >
