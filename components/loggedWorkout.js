@@ -7,6 +7,7 @@ import {
 import styles from './loggedWorkout.module.css';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
+import { useState } from 'react';
 import { useLongPress } from 'use-long-press';
 import { LetsIconsMore } from './SVGIcons/LetsIconsMore';
 
@@ -18,6 +19,13 @@ export function Exercise({
   showDate = false,
   showNote = false,
 }) {
+  // The note used to be a `title` attribute, which is a desktop hover tooltip:
+  // no keyboard path, no screen-reader announcement, and nothing at all on the
+  // phone this product is built for. Tapping the icon now reveals it.
+  const [noteRevealed, setNoteRevealed] = useState(false);
+  const hasNote = Boolean(exercise.notes && exercise.notes.length > 0);
+  const noteVisible = showNote || noteRevealed;
+
   return (
     <div
       className={styles.exercise}
@@ -28,10 +36,18 @@ export function Exercise({
         {showDate && exercise.name && ' '}
         {showDate && exercise.date}
       </div>
-      {exercise.notes && exercise.notes.length > 0 && !showNote && (
-        <div className={styles.commentIcon} title={exercise.notes}>
+      {hasNote && !showNote && (
+        <button
+          type="button"
+          className={styles.commentIcon}
+          aria-expanded={noteRevealed}
+          aria-label={`${noteRevealed ? 'Hide' : 'Show'} note for ${
+            exercise.name
+          }`}
+          onClick={() => setNoteRevealed((shown) => !shown)}
+        >
           <LetsIconsComment />
-        </div>
+        </button>
       )}
       {numSets > 0 && (
         <div className={styles.setsContainer}>
@@ -67,7 +83,7 @@ export function Exercise({
         </div>
       )}
 
-      {exercise.notes && exercise.notes.length > 0 && showNote && (
+      {hasNote && noteVisible && (
         <div className={styles.notesContainer}>
           <b>Note:</b> {exercise.notes}
         </div>
