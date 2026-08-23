@@ -26,8 +26,22 @@
   color: var(--textSecondary);
 }
 
-.title {
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   margin-right: auto;
+  min-width: 0;
+}
+
+/* The routine this workout belongs to, when it has one. */
+.routineName {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(from var(--text) r g b / 68%);
+}
+
+.title {
   font-weight: bold;
   font-size: 24px;
   color: var(--accent);

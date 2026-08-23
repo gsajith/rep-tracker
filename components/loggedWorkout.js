@@ -94,7 +94,10 @@ export default function LoggedWorkout({ data, onLongPress, id, menuLabel }) {
             session that crossed midnight claim the next day: start 11:40pm
             on the 22nd, finish at 12:20am, and the card read the 23rd above
             a time of 11:40 PM. */}
-        <span className={styles.title}>{readableDate(data.start_time)}</span>
+        <span className={styles.titleGroup}>
+          <span className={styles.title}>{readableDate(data.start_time)}</span>
+          {data.name && <span className={styles.routineName}>{data.name}</span>}
+        </span>
         <div className={styles.times}>
           <span>{calculateDaysAgo(data.start_time)}</span>
           <span>{readableTime(data.start_time)}</span>

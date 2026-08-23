@@ -1,7 +1,15 @@
 'use client';
 import { loadWorkouts } from '@/utils/api';
+import { deriveRoutines } from '@/utils/utils';
 import { useUser } from '@clerk/nextjs';
-import { createContext, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 export const WorkoutsContext = createContext();
 
@@ -25,6 +33,10 @@ export const WorkoutsProvider = ({ children }) => {
   const { user } = useUser();
 
   const latestExercises = useRef({});
+
+  // Grouped from the workouts already in state, so it stays correct after a
+  // save, a delete or a rename without a second source of truth.
+  const routines = useMemo(() => deriveRoutines(workouts), [workouts]);
 
   // Rebuilds the index from scratch on every load. Unioning into it would keep
   // the names of deleted workouts around, which only went unnoticed while every
@@ -149,6 +161,7 @@ export const WorkoutsProvider = ({ children }) => {
         loading,
         loading2,
         loadError,
+        routines,
         exerciseNames,
         latestExercises,
         refresh,

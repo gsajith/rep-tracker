@@ -257,35 +257,77 @@
 
 /* The one thing this page can say that is not a failure. Announced through the
    existing live region below, so it is not duplicated here. */
+/* The one thing this page says that is not a failure, so it gets to look like
+   an object rather than an outlined strip: the same white surface and radius as
+   the cards, lifted off the page, with the tick the app already uses for
+   completing things. */
 .saveSuccess {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   width: 336px;
   max-width: calc(100vw - 48px);
   box-sizing: border-box;
   margin-top: 16px;
-  padding: 12px 14px;
-  border: 2px solid var(--accentText);
-  border-radius: 14px;
+  padding: 14px 16px;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgb(from var(--text) r g b / 16%);
   color: var(--text);
   font-weight: 600;
   text-align: left;
+  animation: saveSuccessIn 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.saveSuccessIcon {
+  flex-shrink: 0;
+  color: var(--accentText);
+}
+
+.saveSuccessText {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+@keyframes saveSuccessIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saveSuccess {
+    animation: none;
+  }
 }
 
 .dismissButton {
   flex-shrink: 0;
-  border: 2px solid var(--text);
+  border: none;
   border-radius: 10px;
   background: transparent;
   color: var(--text);
+  opacity: 0.7;
   font-family: inherit;
   font-weight: bold;
   font-size: 14px;
   min-height: 44px;
-  padding: 6px 12px;
+  padding: 6px 10px;
   cursor: pointer;
+  transition:
+    background 150ms ease-in-out,
+    opacity 150ms ease-in-out;
+}
+
+.dismissButton:hover {
+  opacity: 1;
+  background: var(--background);
 }
 
 .dismissButton:focus-visible {
@@ -307,5 +349,191 @@
 
   .shimmer {
     max-width: 592px;
+  }
+}
+
+/* Routines: the distinct names in your history, least-recently-done first, so
+   the one you are due to do next is nearest to hand. */
+.routines {
+  width: 336px;
+  max-width: calc(100vw - 48px);
+  margin-top: 20px;
+}
+
+/* Quieter and smaller than "Your previous workouts" so the two section labels
+   do not compete. Sentence case: nothing else in this product is set in caps. */
+.routinesHeading {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.routineRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+ /* Filled, not outlined. Everything else in this product is a block of
+   material: a purple board, lime slabs, white chips. An outlined pill was the
+   only hollow object on the page, which is most of why the row read as
+   unfinished. These are small cards, and they sit on the same surface and
+   radius language as the workout cards below them. */
+.routineChip {
+  display: flex;
+  align-items: stretch;
+  background: var(--white);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgb(from var(--text) r g b / 12%);
+  transition:
+    transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.routineChip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgb(from var(--text) r g b / 18%);
+}
+
+.routineStart {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1px;
+  min-height: 52px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease-in-out;
+}
+
+/* A 1px hairline, not a 2px rule: this divides two halves of one control, it
+   is not a border around a card. */
+.routineMenuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  border: none;
+  border-left: 1px solid rgb(from var(--text) r g b / 12%);
+  background: transparent;
+  color: var(--text);
+  opacity: 0.65;
+  cursor: pointer;
+  transition:
+    background 150ms ease-in-out,
+    opacity 150ms ease-in-out;
+}
+
+.routineMenuButton:hover {
+  opacity: 1;
+}
+
+.routineStart:hover,
+.routineMenuButton:hover {
+  background: var(--accentHoverLight);
+}
+
+.routineStart:focus-visible,
+.routineMenuButton:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: -3px;
+}
+
+.renameHint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.75;
+}
+
+.routineName {
+  font-weight: bold;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.routineWhen {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accentText);
+}
+
+/* Naming a past workout, which is how a routine gets made from history logged
+   before names existed. */
+.renameRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.renameLabel {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* A 1px hairline rather than a 2px rule: the field sits inside a dialog that is
+   already a distinct surface, so a heavy border reads as a second box drawn
+   around it. Emphasis comes from the focus ring. */
+.renameInput {
+  font-family: inherit;
+  font-size: 16px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgb(from var(--text) r g b / 28%);
+  border-radius: 12px;
+  background: var(--background);
+  color: var(--text);
+  transition: border-color 150ms ease-in-out;
+}
+
+.renameInput:hover {
+  border-color: rgb(from var(--text) r g b / 45%);
+}
+
+.renameInput:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.renameButton {
+  min-height: 44px;
+  border: 2px solid var(--text);
+  border-radius: 12px;
+  background: var(--text);
+  color: var(--background);
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.renameButton:hover,
+.renameButton:focus {
+  color: var(--background);
+}
+
+.renameButton:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.renameButton:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+@media (min-width: 768px) {
+  .routines {
+    width: 560px;
   }
 }
