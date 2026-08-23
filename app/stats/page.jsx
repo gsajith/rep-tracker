@@ -54,7 +54,17 @@ export default function Stats() {
     return v;
   }, [workouts]);
   const tzoffset = new Date().getTimezoneOffset() * 60000;
-  const gh_until = new Date(Date.now() - tzoffset).toISOString().split('T')[0];
+  // Ends at the most recent workout rather than today. The calendar covers a
+  // fixed window backwards from `until`, so anyone returning after a break saw
+  // a grid of empty cells with their history off the left edge.
+  const gh_until = useMemo(() => {
+    const latest = workouts.reduce(
+      (max, w) => (w.start_time > max ? w.start_time : max),
+      new Date(0)
+    );
+    const end = latest.getTime() > 0 ? latest : new Date();
+    return new Date(end.getTime() - tzoffset).toISOString().split('T')[0];
+  }, [workouts, tzoffset]);
 
   const gh_panelColors = [
     'rgb(from var(--accentHoverLight) r g b / 50%)',
@@ -93,32 +103,37 @@ export default function Stats() {
   const calculateVolume = useCallback((reps, weights) => {
     let volume = 0;
     for (let i = 0; i < reps.length; i++) {
-      volume += reps[i] * Math.max(1, weights[i]);
+      volume += reps[i] * weights[i];
     }
     return volume;
   }, []);
 
-  const getFormatKey = useCallback((format) => {
-    switch (format) {
-      case 1:
-        return 'volume';
-      case 0:
-      case 2:
-      default:
-        return 'maxWeight';
-    }
-  }, []);
+  // True when nothing in this exercise's history carries a weight: pushups,
+  // dips, pull-ups. Charting "max weight" for those drew a flat line at a
+  // number nobody entered.
+  const isBodyweight = useMemo(() => {
+    const history = selectedExercise ? exerciseHistory[selectedExercise] : null;
+    if (!history) return false;
+    return history.every((item) => item.weights.every((w) => !Number(w)));
+  }, [exerciseHistory, selectedExercise]);
 
-  const getFormatLabel = useCallback((format) => {
-    switch (format) {
-      case 1:
-        return 'Volume';
-      case 0:
-      case 2:
-      default:
-        return 'Max weight:';
-    }
-  }, []);
+  const getFormatKey = useCallback(
+    (format) => {
+      if (isBodyweight) return format === 1 ? 'totalReps' : 'maxReps';
+      return format === 1 ? 'volume' : 'maxWeight';
+    },
+    [isBodyweight]
+  );
+
+  // No trailing colon: Recharts appends its own separator, which is where
+  // "Max weight: : 1" came from.
+  const getFormatLabel = useCallback(
+    (format) => {
+      if (isBodyweight) return format === 1 ? 'Total reps' : 'Max reps';
+      return format === 1 ? 'Volume' : 'Max weight';
+    },
+    [isBodyweight]
+  );
 
   const generateEmptyDays = useCallback((day1, day2) => {
     const date1 = day1.date;
@@ -130,13 +145,26 @@ export default function Stats() {
       dt < new Date(date2);
       dt.setDate(dt.getDate() + 1)
     ) {
-      if (dt.getTime() === new Date(date1).getTime()) {
-      } else {
-        arr.push(new Date(dt));
+      if (dt.getTime() !== new Date(date1).getTime()) {
+        arr.push({
+          date: readableDate(new Date(dt)),
+          maxWeight: 0,
+          volume: 0,
+          maxReps: 0,
+          totalReps: 0,
+          reps: [],
+          weights: [],
+        });
       }
     }
     return arr;
   }, []);
+
+  // Sessions actually logged, before empty days are padded in.
+  const sessionCount =
+    selectedExercise && exerciseHistory[selectedExercise]
+      ? exerciseHistory[selectedExercise].length
+      : 0;
 
   const selectedExerciseData = useMemo(() => {
     if (selectedExercise) {
@@ -144,7 +172,11 @@ export default function Stats() {
       const mappedHistory = history.map((historyItem) => {
         return {
           ...historyItem,
-          maxWeight: Math.max(1, Math.max(...historyItem.weights)),
+          maxWeight: historyItem.weights.length
+            ? Math.max(...historyItem.weights)
+            : 0,
+          maxReps: historyItem.reps.length ? Math.max(...historyItem.reps) : 0,
+          totalReps: historyItem.reps.reduce((a, r) => a + (Number(r) || 0), 0),
           volume: calculateVolume(historyItem.reps, historyItem.weights),
         };
       });
@@ -196,11 +228,12 @@ export default function Stats() {
           </div>
         </div>
         <div className={styles.exerciseStatsContainer}>
-          Individual exercise stats for...
+          Individual exercise stats
           {mount && (
             <>
               <Select
-                isSearchable={false}
+                // Was false, over every exercise name ever used, while the
+                // home screen's picker over the same data is searchable.
                 options={selectOptions}
                 placeholder="Select an exercise"
                 components={{
@@ -258,7 +291,11 @@ export default function Stats() {
               <GroupedButtons
                 selectedItem={selectedExerciseStatFormat}
                 setSelectedItem={setSelectedExerciseStatFormat}
-                options={['Weight', 'Volume (reps × weight)', 'Table']}
+                options={
+                  isBodyweight
+                    ? ['Reps', 'Total reps', 'Table']
+                    : ['Weight', 'Volume (reps × weight)', 'Table']
+                }
               />
               {selectedExerciseStatFormat !== 2 && (
                 <Toggle
@@ -269,64 +306,81 @@ export default function Stats() {
               )}
             </>
           )}
-          {selectedExercise !== null && selectedExerciseStatFormat !== 2 && (
-            <div
-              className={styles.exerciseStatsContainer}
-              style={{ width: '100%', height: 315 }}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={selectedExerciseData.slice(-100)}
-                  margin={{
-                    top: 12,
-                    right: 0,
-                    left: -20,
-                    bottom: 5,
-                  }}
-                >
-                  <XAxis
-                    dataKey="date"
-                    tickFormatter={(value) => {
-                      return value.split(',')[0];
-                    }}
-                  />
-                  <YAxis />
-                  <Tooltip
-                    labelFormatter={(value) => {
-                      return `Date: ${value}`;
-                    }}
-                    formatter={(value, name, ...props) => {
-                      return [
-                        value,
-                        getFormatLabel(selectedExerciseStatFormat),
-                        ...props,
-                      ];
-                    }}
-                    contentStyle={{
-                      background: 'var(--background)',
-                      borderRadius: 8,
-                    }}
-                    wrapperStyle={{
-                      borderRadius: 8,
-                      overflow: 'hidden',
-                      border: 'none',
-                    }}
-                    border={'none'}
-                  />
-                  <Bar
-                    dataKey={getFormatKey(selectedExerciseStatFormat)}
-                    fill="var(--accent)"
-                    activeBar={
-                      <Rectangle
-                        fill="var(--secondary)"
-                        stroke="var(--secondaryHover)"
-                      />
-                    }
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+          {/* One session is a measurement, not a trend, and drawing it as a
+              single bar filling the plot area said nothing. */}
+          {selectedExercise !== null &&
+            selectedExerciseStatFormat !== 2 &&
+            sessionCount === 1 && (
+              <p className={styles.singleSession}>
+                One session logged so far. Do {capitalize(selectedExercise)}{' '}
+                again and this becomes a trend.
+              </p>
+            )}
+          {selectedExercise === null && (
+            <p className={styles.pickPrompt}>
+              Pick an exercise to see what you have lifted for it over time.
+            </p>
           )}
+          {selectedExercise !== null &&
+            selectedExerciseStatFormat !== 2 &&
+            sessionCount > 1 && (
+              <div
+                className={styles.exerciseStatsContainer}
+                style={{ width: '100%', height: 315 }}
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={selectedExerciseData.slice(-100)}
+                    margin={{
+                      top: 12,
+                      right: 0,
+                      left: -20,
+                      bottom: 5,
+                    }}
+                  >
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(value) => {
+                        return value.split(',')[0];
+                      }}
+                    />
+                    <YAxis />
+                    <Tooltip
+                      labelFormatter={(value) => {
+                        return `Date: ${value}`;
+                      }}
+                      formatter={(value, name, ...props) => {
+                        return [
+                          value,
+                          getFormatLabel(selectedExerciseStatFormat),
+                          ...props,
+                        ];
+                      }}
+                      contentStyle={{
+                        background: 'var(--background)',
+                        borderRadius: 8,
+                      }}
+                      wrapperStyle={{
+                        borderRadius: 8,
+                        overflow: 'hidden',
+                        border: 'none',
+                      }}
+                      border={'none'}
+                    />
+                    <Bar
+                      dataKey={getFormatKey(selectedExerciseStatFormat)}
+                      fill="var(--accent)"
+                      activeBar={
+                        <Rectangle
+                          fill="var(--secondary)"
+                          stroke="var(--secondaryHover)"
+                        />
+                      }
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           {selectedExercise !== null && selectedExerciseStatFormat === 2 && (
             <div className={styles.exerciseHistory}>
               <div className={styles.exerciseHistoryTable}>

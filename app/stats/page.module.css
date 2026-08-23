@@ -1,5 +1,8 @@
 .container {
-  composes: container from "../page.module.css"
+  composes: container from "../page.module.css";
+  /* The home page ends with a spacer to clear the fixed nav; stats had none, so
+     the chart's x-axis ran underneath it. */
+  margin-bottom: 115px;
 }
 
 .calendarContainer {
@@ -46,4 +49,15 @@
 
 .pageTitle {
   margin-bottom: 16px;
+}
+
+/* Shown instead of a chart when there is one session: a single bar filling the
+   plot area presented one measurement as a trend. */
+.singleSession,
+.pickPrompt {
+  margin: 16px 0 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  opacity: 0.75;
 }
