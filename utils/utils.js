@@ -32,8 +32,18 @@ export const calculateMinutes = (start, end) => {
 };
 
 export const calculateDaysAgo = (timestamp) => {
-  var today = new Date();
-  return Math.floor((today - timestamp) / 1000 / 60 / 60 / 24) + ' days ago';
+  const days = Math.floor((new Date() - timestamp) / 1000 / 60 / 60 / 24);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 30) return `${days} days ago`;
+  // Past a month, a day count stops being something anyone can picture: this
+  // account had entries reading "421 days ago".
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} month${months === 1 ? '' : 's'} ago`;
+  const years = Math.floor(days / 365);
+  const remainder = Math.floor((days - years * 365) / 30);
+  if (remainder === 0) return `${years} year${years === 1 ? '' : 's'} ago`;
+  return `${years}y ${remainder}m ago`;
 };
 
 export function capitalize(string) {
@@ -49,3 +59,20 @@ export function sortWorkoutsByEndTime(workouts) {
     (a, b) => b.end_time.valueOf() - a.end_time.valueOf()
   );
 }
+
+// A workout ends when someone taps End. Sessions that were abandoned instead
+// get stamped closed whenever the next one starts, which produced durations
+// like "8839 mins" sitting next to a plausible "43 mins" with nothing marking
+// the difference. Anything past this bound is reported as unfinished rather
+// than as a number, because that is what it is.
+export const ABANDONED_AFTER_MINUTES = 6 * 60;
+
+export const formatDuration = (start, end) => {
+  const minutes = calculateMinutes(start, end);
+  if (!Number.isFinite(minutes) || minutes < 0) return null;
+  if (minutes >= ABANDONED_AFTER_MINUTES) return null;
+  if (minutes < 90) return `${minutes} min${minutes === 1 ? '' : 's'}`;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return rest === 0 ? `${hours}h` : `${hours}h ${rest}m`;
+};

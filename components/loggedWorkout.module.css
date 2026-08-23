@@ -162,3 +162,37 @@
   outline: 3px solid var(--text);
   outline-offset: 2px;
 }
+
+.exerciseCount {
+  flex-shrink: 0;
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(from var(--text) r g b / 68%);
+  white-space: nowrap;
+}
+
+/* Reads as a state rather than a measurement, because that is what it is. */
+.unfinishedLabel {
+  font-weight: bold;
+  margin-top: 4px;
+  text-align: right;
+  color: rgb(from var(--text) r g b / 68%);
+}
+
+/* A fade at the scrolling edge, so a clipped column reads as "there is more"
+   rather than as a rendering fault. The scrollbar is deliberately hidden. */
+.exercisesContainer {
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 calc(100% - 28px),
+    transparent
+  );
+}
+
+@media (min-width: 768px) {
+  .container {
+    width: 560px;
+  }
+}
