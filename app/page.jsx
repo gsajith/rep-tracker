@@ -63,6 +63,11 @@ export default function Home() {
 
   const [longPressedWorkout, setLongPressedWorkout] = useState(null);
 
+  // Deleting a saved workout used to happen on the first tap, in a modal
+  // opened by an accidental long press, with no undo and no way out but the
+  // unlabelled shim. It now needs a second, differently worded tap.
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
   // Separate flags so an in-flight delete cannot disable the save button.
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -253,7 +258,8 @@ export default function Home() {
   // while three of them are visible is its own kind of lie.
   let listNotice = null;
   if (staleAfter === 'save') {
-    listNotice = 'Your workout was saved, but this list could not be refreshed.';
+    listNotice =
+      'Your workout was saved, but this list could not be refreshed.';
   } else if (staleAfter === 'delete') {
     listNotice =
       'That workout was deleted, but this list could not be refreshed.';
@@ -267,7 +273,12 @@ export default function Home() {
     shown && (
       <main className={styles.main}>
         {modalShown && longPressedWorkout && (
-          <Modal setShown={setModalShown}>
+          <Modal
+            setShown={(shown) => {
+              setModalShown(shown);
+              if (!shown) setConfirmDelete(false);
+            }}
+          >
             <div className={styles.copyWorkoutContentWrapper}>
               <div style={{ textAlign: 'left' }}>
                 What would you like to do for your workout on{' '}
@@ -312,12 +323,28 @@ export default function Home() {
                 disabled={deleting}
                 aria-busy={deleting}
                 onClick={() => {
+                  if (!confirmDelete) {
+                    setConfirmDelete(true);
+                    return;
+                  }
                   deleteWorkoutHandler(longPressedWorkout);
                 }}
               >
                 <LetsIconsTrash />
-                {deleting ? 'Deleting...' : 'Delete workout'}
+                {deleting
+                  ? 'Deleting...'
+                  : confirmDelete
+                    ? 'Tap again to delete'
+                    : 'Delete workout'}
               </button>
+              {confirmDelete && !deleting && (
+                <button
+                  className={styles.keepButton}
+                  onClick={() => setConfirmDelete(false)}
+                >
+                  Keep it
+                </button>
+              )}
             </div>
           </Modal>
         )}
@@ -390,6 +417,7 @@ export default function Home() {
                 data={workout}
                 onLongPress={() => {
                   setDeleteError(null);
+                  setConfirmDelete(false);
                   setLongPressedWorkout(workout);
                   setModalShown(true);
                 }}

@@ -370,3 +370,69 @@
   font-weight: 600;
   text-align: left;
 }
+
+/* The exercise header is a row so removing the exercise can be its own named
+   control. It used to be reachable only by tapping the last set's small grey
+   x, which read as "remove a set" and destroyed the whole exercise. */
+.exerciseHeader {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.exerciseName {
+  flex: 1;
+  min-width: 0;
+}
+
+.removeExerciseButton {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -8px -8px -8px 0;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 150ms ease-in-out;
+}
+
+.removeExerciseButton:hover {
+  background: rgb(from var(--secondaryHover) r g b / 80%);
+}
+
+.removeExerciseButton:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: -3px;
+}
+
+/* Zero-set state. Wider than the inline "Add a set" because it stands alone
+   rather than riding on a set row, and it is the only route back. */
+.addFirstSetButton {
+  align-self: flex-start;
+  background: var(--accent);
+  color: var(--textInverted);
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 16px;
+  min-height: 44px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 150ms ease-in-out;
+}
+
+.addFirstSetButton:hover {
+  background: var(--accentHover);
+}
+
+.addFirstSetButton:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}

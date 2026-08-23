@@ -22,7 +22,18 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [themeName, setThemeName] = useStickyState('default', 'theme-name');
+  const [storedThemeName, setThemeName] = useStickyState(
+    'default',
+    'theme-name'
+  );
+
+  // "default" and "purple-green" are the same palette: globals.css defines them
+  // in one block. Only "purple-green" is in ALL_THEME_NAMES, so a stored
+  // "default" matched none of the six swatches and the settings picker showed
+  // no active selection at all until the user tapped something. Normalising on
+  // read fixes that for existing installs without touching the CSS.
+  const themeName =
+    storedThemeName === 'default' ? 'purple-green' : storedThemeName;
 
   const resetThemeColor = () => {
     const rootStyles = getComputedStyle(document.documentElement);

@@ -147,12 +147,13 @@ export default function Workout({
     }
   }, [selectedItem]);
 
-  // What the Add button would add right now. The combobox clears `query`
-  // when it closes, so a non-empty query always means the user has typed
-  // something since the last selection: trust it over a stale selection, and
-  // let a name that was never picked from the dropdown be added at all.
-  // Previously the button stayed disabled until an option was chosen, which
-  // stranded every new user, since a fresh account has no options to choose.
+  // What the Add button would add right now. The combobox clears `query` when
+  // an option is chosen rather than when the list closes, so a non-empty query
+  // always means the user has typed something since the last selection: trust
+  // it over a stale selection, and let a name that was never picked from the
+  // dropdown be added at all. Previously the button stayed disabled until an
+  // option was chosen, which stranded every new user, since a fresh account has
+  // nothing in the dropdown to choose.
   const typedName = query.trim();
   const pendingName = typedName || exerciseName.current;
   // A typed name that exactly matches an existing exercise still gets its
@@ -225,17 +226,20 @@ export default function Workout({
   const addSet = (exerciseIndex, num) => {
     setExercises((oldExercises) => {
       const newExercises = [...oldExercises];
+      // A new set copies the one above it. With no set above, `reps[-1]` is
+      // undefined and used to reach the input as NaN, which is now reachable
+      // for real: removing the last set leaves the exercise standing with none.
       const repsLength = newExercises[exerciseIndex].reps.length;
       if (repsLength < num) {
         newExercises[exerciseIndex].reps.push(
-          newExercises[exerciseIndex].reps[repsLength - 1]
+          newExercises[exerciseIndex].reps[repsLength - 1] ?? 0
         );
         newExercises[exerciseIndex].repsDrag.push(0);
       }
       const weightsLength = newExercises[exerciseIndex].weights.length;
       if (weightsLength < num) {
         newExercises[exerciseIndex].weights.push(
-          newExercises[exerciseIndex].weights[weightsLength - 1]
+          newExercises[exerciseIndex].weights[weightsLength - 1] ?? 0
         );
         newExercises[exerciseIndex].weightsDrag.push(0);
       }
@@ -243,19 +247,32 @@ export default function Workout({
     });
   };
 
-  const deleteSet = (exerciseIndex, setIndex, num) => {
+  // Removing the last set leaves the exercise in place with no sets. This used
+  // to splice the exercise out entirely, so the small grey x sitting a few
+  // pixels from "Add a set" silently destroyed the exercise and its notes, with
+  // no confirm and no undo. Removing an exercise is now its own named control.
+  //
+  // The drag arrays are spliced alongside the values they offset so the four
+  // stay index-aligned; the old version left them longer than the sets, which
+  // is the ragged shape utils/validate.js still has to tolerate on read.
+  const deleteSet = (exerciseIndex, setIndex) => {
     setExercises((oldExercises) => {
       const newExercises = [...oldExercises];
-      if (num === 1) {
-        newExercises.splice(exerciseIndex, 1);
-      } else {
-        if (newExercises[exerciseIndex].reps.length >= num)
-          newExercises[exerciseIndex].reps.splice(setIndex, 1);
-        if (newExercises[exerciseIndex].weights.length >= num)
-          newExercises[exerciseIndex].weights.splice(setIndex, 1);
+      const exercise = { ...newExercises[exerciseIndex] };
+      for (const key of ['reps', 'weights', 'repsDrag', 'weightsDrag']) {
+        if (Array.isArray(exercise[key]) && exercise[key].length > setIndex) {
+          exercise[key] = exercise[key].filter((_, i) => i !== setIndex);
+        }
       }
+      newExercises[exerciseIndex] = exercise;
       return newExercises;
     });
+  };
+
+  const removeExercise = (exerciseIndex) => {
+    setExercises((oldExercises) =>
+      oldExercises.filter((_, i) => i !== exerciseIndex)
+    );
   };
 
   const updateExerciseNotes = (exerciseIndex, note) => {
@@ -409,29 +426,40 @@ export default function Workout({
                                     : {}
                                 }
                               >
-                                <button
-                                  className={styles.exerciseName}
-                                  onClick={() => {
-                                    setExpanded(index, !exercise.expanded);
-                                  }}
-                                >
-                                  <span style={{ textAlign: 'left' }}>
-                                    {exercise.name}
-                                    {!exercise.expanded && (
-                                      <span style={{ fontWeight: '400' }}>
-                                        •{numSets}{' '}
-                                        {numSets === 1 ? 'set' : 'sets'}
-                                      </span>
-                                    )}
-                                  </span>
-                                  <LetsIconsExpandDown
-                                    style={
-                                      exercise.expanded
-                                        ? { rotate: '-180deg' }
-                                        : {}
-                                    }
-                                  />
-                                </button>
+                                <div className={styles.exerciseHeader}>
+                                  <button
+                                    className={styles.exerciseName}
+                                    onClick={() => {
+                                      setExpanded(index, !exercise.expanded);
+                                    }}
+                                    aria-expanded={!!exercise.expanded}
+                                  >
+                                    <span style={{ textAlign: 'left' }}>
+                                      {exercise.name}
+                                      {!exercise.expanded && (
+                                        <span style={{ fontWeight: '400' }}>
+                                          •{numSets}{' '}
+                                          {numSets === 1 ? 'set' : 'sets'}
+                                        </span>
+                                      )}
+                                    </span>
+                                    <LetsIconsExpandDown
+                                      style={
+                                        exercise.expanded
+                                          ? { rotate: '-180deg' }
+                                          : {}
+                                      }
+                                    />
+                                  </button>
+                                  <button
+                                    className={styles.removeExerciseButton}
+                                    onClick={() => removeExercise(index)}
+                                    aria-label={`Remove ${exercise.name}`}
+                                    title={`Remove ${exercise.name}`}
+                                  >
+                                    <LetsIconsTrash />
+                                  </button>
+                                </div>
                                 {exercise.expanded && (
                                   <>
                                     <div className={styles.setInputs}>
@@ -568,7 +596,7 @@ export default function Workout({
                                             <button
                                               className={styles.deleteSetButton}
                                               onClick={() =>
-                                                deleteSet(index, i, numSets)
+                                                deleteSet(index, i)
                                               }
                                             >
                                               <LetsIconsClose />
@@ -586,6 +614,17 @@ export default function Workout({
                                           </div>
                                         </div>
                                       ))}
+                                      {/* "Add a set" normally rides on the last
+                                          set's row, so an exercise with none
+                                          would otherwise have no way back. */}
+                                      {numSets === 0 && (
+                                        <button
+                                          className={styles.addFirstSetButton}
+                                          onClick={() => addSet(index, 1)}
+                                        >
+                                          Add a set
+                                        </button>
+                                      )}
                                     </div>
                                     <div
                                       className={styles.notesInputContainer}
@@ -593,7 +632,7 @@ export default function Workout({
                                         display: 'flex',
                                         alignItems: 'center',
                                         opacity:
-                                          exercise.notes.length > 0
+                                          (exercise.notes?.length ?? 0) > 0
                                             ? 1
                                             : 'revert-layer',
                                       }}
@@ -605,7 +644,7 @@ export default function Workout({
                                         type="text"
                                         className={styles.notesInput}
                                         placeholder={`Add notes about ${exercise.name}`}
-                                        value={exercise.notes}
+                                        value={exercise.notes ?? ''}
                                         onChange={(e) =>
                                           updateExerciseNotes(
                                             index,
@@ -692,9 +731,7 @@ export default function Workout({
               className={styles.addButton}
               onClick={() => {
                 addExercise(
-                  pendingPreview
-                    ? pendingPreview.exercise.name
-                    : pendingName,
+                  pendingPreview ? pendingPreview.exercise.name : pendingName,
                   pendingPreview
                 );
               }}
@@ -702,10 +739,9 @@ export default function Workout({
               Add
             </button>
           </div>
-          {pendingPreview &&
-            notAlreadyAdded(pendingPreview.exercise.name) && (
-              <ExerciseToPreview exerciseToPreview={pendingPreview} />
-            )}
+          {pendingPreview && notAlreadyAdded(pendingPreview.exercise.name) && (
+            <ExerciseToPreview exerciseToPreview={pendingPreview} />
+          )}
           {/* !pendingPreview covers both null (nothing chosen) and undefined
               (chosen or typed, but never done before). */}
           {!pendingPreview && pendingName && notAlreadyAdded(pendingName) && (
