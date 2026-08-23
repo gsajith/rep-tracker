@@ -332,12 +332,12 @@ export default function Workout({
               gap: 24,
             }}
           >
-            {/* Naming it here is what files it under a routine, so it can be
-                started by name next time. Optional: an unnamed workout is
-                still a workout. */}
+            {/* Naming it here is what files it under a routine, so it can
+                be started by name next time. Optional: a workout with no
+                routine is still a workout. */}
             <div className={styles.nameField}>
               <label className={styles.nameLabel} htmlFor="in-workout-name">
-                Name it (optional)
+                Name this routine (optional)
               </label>
               <input
                 id="in-workout-name"

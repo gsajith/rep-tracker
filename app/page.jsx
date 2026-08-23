@@ -1,11 +1,17 @@
 'use client';
 import styles from './page.module.css';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { removeWorkout, renameWorkout, saveWorkout } from '@/utils/api';
+import {
+  removeWorkout,
+  renameRoutine,
+  renameWorkout,
+  saveWorkout,
+} from '@/utils/api';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
 import {
   calculateDaysAgo,
+  capitalize,
   formatDuration,
   readableDate,
   sortWorkoutsByEndTime,
@@ -452,7 +458,7 @@ export default function Home() {
               </button>
               <div className={styles.renameRow}>
                 <label className={styles.renameLabel} htmlFor="workout-name">
-                  Name this workout
+                  Name this routine
                 </label>
                 <input
                   id="workout-name"
@@ -468,8 +474,7 @@ export default function Home() {
                 />
                 {nameCollides(renameValue, longPressedWorkout.name) && (
                   <div className={styles.nameTaken} role="alert">
-                    {renameValue.trim()} is already a routine. Start it from the
-                    chip on the home screen to add a workout to it.
+                    That name is taken.
                   </div>
                 )}
                 {renameError && (
@@ -570,18 +575,31 @@ export default function Home() {
         {routineBeingRenamed && (
           <Modal
             setShown={() => setRoutineBeingRenamed(null)}
-            label={`Rename ${routineBeingRenamed.name}`}
+            label="About this routine"
           >
             <div className={styles.renameRow}>
-              <label className={styles.srOnly} htmlFor="routine-name">
+              {/* What starting this routine would give you: the exercises from
+                  its most recent session, which is what the chip copies. */}
+              {/* Guarded the way loggedWorkout.js guards the same field: a
+                  workout with no exercises would otherwise throw inside a
+                  dialog, where an error boundary is the only thing left. */}
+              <ul className={styles.routineExercises}>
+                {(routineBeingRenamed.workout.exercises ?? []).map(
+                  (exercise) => (
+                    <li key={exercise.id}>{capitalize(exercise.name)}</li>
+                  )
+                )}
+              </ul>
+              {/* There is no separate list to edit: a routine is whatever its
+                  newest session contained, so the way to change it is to do it
+                  differently. */}
+              <p className={styles.routineHint}>
+                These come from the last time you did it. To change them, start
+                the routine, edit the exercises, and save.
+              </p>
+              <label className={styles.renameLabel} htmlFor="routine-name">
                 Routine name
               </label>
-              <p className={styles.renameHint}>
-                Renames all {routineBeingRenamed.count}{' '}
-                {routineBeingRenamed.count === 1 ? 'workout' : 'workouts'} under{' '}
-                {routineBeingRenamed.name}. Clear it to remove the name
-                entirely.
-              </p>
               <input
                 id="routine-name"
                 className={styles.renameInput}
@@ -596,8 +614,7 @@ export default function Home() {
               />
               {nameCollides(routineRenameValue, routineBeingRenamed.name) && (
                 <div className={styles.nameTaken} role="alert">
-                  {routineRenameValue.trim()} is already a routine. Renaming
-                  onto it would merge the two.
+                  That name is taken.
                 </div>
               )}
               {renameError && (
@@ -614,7 +631,7 @@ export default function Home() {
                 aria-busy={renaming}
                 onClick={renameRoutineHandler}
               >
-                {renaming ? 'Renaming...' : 'Rename routine'}
+                {renaming ? 'Renaming...' : 'Rename'}
               </button>
               <button
                 className={styles.keepButton}
@@ -628,7 +645,7 @@ export default function Home() {
 
         {!inWorkout && routines.length > 0 && (
           <section className={styles.routines} aria-label="Your routines">
-            <h2 className={styles.routinesHeading}>Start a named workout</h2>
+            <h2 className={styles.routinesHeading}>Start a routine</h2>
             <div className={styles.routineRow}>
               {routines.map((routine) => (
                 <div key={routine.name} className={styles.routineChip}>

@@ -448,13 +448,6 @@
   outline-offset: -3px;
 }
 
-.renameHint {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.45;
-  opacity: 0.75;
-}
-
 .routineName {
   font-weight: bold;
   font-size: 17px;
@@ -544,4 +537,33 @@
   font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
+}
+
+/* The exercises this routine would start you with. Names only: the sets change
+   every session, and the point here is which movements are in it. */
+.routineExercises {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.routineExercises li {
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--secondary);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Sits tight under the chips it explains, with the breathing room after it so
+   the routine and the controls read as two groups. */
+.routineHint {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.7;
 }
