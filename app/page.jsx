@@ -458,7 +458,7 @@ export default function Home() {
               </button>
               <div className={styles.renameRow}>
                 <label className={styles.renameLabel} htmlFor="workout-name">
-                  Name this workout
+                  Name this routine
                 </label>
                 <input
                   id="workout-name"
