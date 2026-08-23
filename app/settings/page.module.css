@@ -58,3 +58,7 @@
   outline: 3px solid var(--text);
   outline-offset: 2px;
 }
+
+.pageTitle {
+  margin-bottom: 16px;
+}

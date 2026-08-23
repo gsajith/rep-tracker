@@ -34,6 +34,10 @@ export default function GroupedButtons({
             className={classNames(styles.button, {
               [`${styles.active}`]: index === selectedItem,
             })}
+            // Selection was conveyed by colour alone, and the inactive colour
+            // fails contrast, so there was nothing left to convey it.
+            aria-pressed={index === selectedItem}
+            type="button"
             key={option}
           >
             {option}

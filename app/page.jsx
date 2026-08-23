@@ -272,6 +272,7 @@ export default function Home() {
   return (
     shown && (
       <main className={styles.main}>
+        <h1 className={styles.srOnly}>Your workouts</h1>
         {modalShown && longPressedWorkout && (
           <Modal
             setShown={(shown) => {
@@ -414,6 +415,9 @@ export default function Home() {
               <LoggedWorkout
                 key={workout.id}
                 id={index === 0 ? 'tour-workout' : undefined}
+                menuLabel={`Options for the workout on ${readableDate(
+                  workout.end_time
+                )}`}
                 data={workout}
                 onLongPress={() => {
                   setDeleteError(null);
