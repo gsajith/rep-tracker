@@ -89,16 +89,16 @@ export default function LoggedWorkout({ data, onLongPress, id, menuLabel }) {
   return (
     <div className={styles.container} id={id} {...bind()}>
       <div className={styles.header}>
-        <span className={styles.title}>{readableDate(data.end_time)}</span>
+        {/* Dated by when the workout started, matching the clock time and
+            the "days ago" beside it. Dating the title by end_time made a
+            session that crossed midnight claim the next day: start 11:40pm
+            on the 22nd, finish at 12:20am, and the card read the 23rd above
+            a time of 11:40 PM. */}
+        <span className={styles.title}>{readableDate(data.start_time)}</span>
         <div className={styles.times}>
           <span>{calculateDaysAgo(data.start_time)}</span>
           <span>{readableTime(data.start_time)}</span>
         </div>
-        {/* The card gave no hint that exercises continue past the right edge:
-            no scrollbar, no fade, no count. */}
-        <span className={styles.exerciseCount}>
-          {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'}
-        </span>
         {/* Copy and delete were reachable only by long-pressing the card, which
             exposes no keyboard or screen-reader path and is not announced
             anywhere. This opens the same menu. */}
@@ -143,8 +143,13 @@ export default function LoggedWorkout({ data, onLongPress, id, menuLabel }) {
       </div>
       <br />
       <div className={styles.metadata}>
-        <span style={{ width: 220 }}>
-          {data.notes ? 'Note: ' + data.notes : ''}
+        <span className={styles.metaLeft}>
+          {/* The card gives no other hint that exercises continue past the
+              right edge: the scrollbar is hidden and only the fade marks it. */}
+          <span className={styles.exerciseCount}>
+            {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'}
+          </span>
+          {data.notes ? <span>Note: {data.notes}</span> : null}
         </span>
         <span
           style={{

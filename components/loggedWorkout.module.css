@@ -114,6 +114,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: flex-end;
   color: var(--textSecondary);
   gap: 16px;
 }
@@ -163,10 +164,15 @@
   outline-offset: 2px;
 }
 
+.metaLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+
 .exerciseCount {
-  flex-shrink: 0;
-  margin-left: 8px;
-  font-size: 12px;
   font-weight: 600;
   color: rgb(from var(--text) r g b / 68%);
   white-space: nowrap;

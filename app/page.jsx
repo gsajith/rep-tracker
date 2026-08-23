@@ -304,7 +304,7 @@ export default function Home() {
               <div style={{ textAlign: 'left' }}>
                 What would you like to do for your workout on{' '}
                 <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>
-                  {readableDate(longPressedWorkout.end_time)}
+                  {readableDate(longPressedWorkout.start_time)}
                 </span>
                 ?
               </div>
@@ -452,7 +452,7 @@ export default function Home() {
                 key={workout.id}
                 id={index === 0 ? 'tour-workout' : undefined}
                 menuLabel={`Options for the workout on ${readableDate(
-                  workout.end_time
+                  workout.start_time
                 )}`}
                 data={workout}
                 onLongPress={() => {
