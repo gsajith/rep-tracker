@@ -1,11 +1,17 @@
 'use client';
 import styles from './page.module.css';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { removeWorkout, renameWorkout, saveWorkout } from '@/utils/api';
+import {
+  removeWorkout,
+  renameRoutine,
+  renameWorkout,
+  saveWorkout,
+} from '@/utils/api';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
 import {
   calculateDaysAgo,
+  capitalize,
   formatDuration,
   readableDate,
   sortWorkoutsByEndTime,
@@ -468,8 +474,7 @@ export default function Home() {
                 />
                 {nameCollides(renameValue, longPressedWorkout.name) && (
                   <div className={styles.nameTaken} role="alert">
-                    {renameValue.trim()} is already a routine. Start it from the
-                    chip on the home screen to add a workout to it.
+                    That name is taken.
                   </div>
                 )}
                 {renameError && (
@@ -570,18 +575,19 @@ export default function Home() {
         {routineBeingRenamed && (
           <Modal
             setShown={() => setRoutineBeingRenamed(null)}
-            label={`Rename ${routineBeingRenamed.name}`}
+            label={routineBeingRenamed.name}
           >
             <div className={styles.renameRow}>
+              {/* What starting this routine would give you: the exercises from
+                  its most recent session, which is what the chip copies. */}
+              <ul className={styles.routineExercises}>
+                {routineBeingRenamed.workout.exercises.map((exercise) => (
+                  <li key={exercise.id}>{capitalize(exercise.name)}</li>
+                ))}
+              </ul>
               <label className={styles.srOnly} htmlFor="routine-name">
                 Routine name
               </label>
-              <p className={styles.renameHint}>
-                Renames all {routineBeingRenamed.count}{' '}
-                {routineBeingRenamed.count === 1 ? 'workout' : 'workouts'} under{' '}
-                {routineBeingRenamed.name}. Clear it to remove the name
-                entirely.
-              </p>
               <input
                 id="routine-name"
                 className={styles.renameInput}
@@ -596,8 +602,7 @@ export default function Home() {
               />
               {nameCollides(routineRenameValue, routineBeingRenamed.name) && (
                 <div className={styles.nameTaken} role="alert">
-                  {routineRenameValue.trim()} is already a routine. Renaming
-                  onto it would merge the two.
+                  That name is taken.
                 </div>
               )}
               {renameError && (
@@ -614,7 +619,7 @@ export default function Home() {
                 aria-busy={renaming}
                 onClick={renameRoutineHandler}
               >
-                {renaming ? 'Renaming...' : 'Rename routine'}
+                {renaming ? 'Renaming...' : 'Rename'}
               </button>
               <button
                 className={styles.keepButton}
