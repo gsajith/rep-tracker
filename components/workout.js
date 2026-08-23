@@ -147,13 +147,11 @@ export default function Workout({
     }
   }, [selectedItem]);
 
-  // What the Add button would add right now. The combobox clears `query` when
-  // an option is chosen rather than when the list closes, so a non-empty query
-  // always means the user has typed something since the last selection: trust
-  // it over a stale selection, and let a name that was never picked from the
-  // dropdown be added at all. Previously the button stayed disabled until an
-  // option was chosen, which stranded every new user, since a fresh account has
-  // nothing in the dropdown to choose.
+  // What the Add button would add right now. `query` is non-empty only while
+  // the list is open with text in it, which is exactly when Add is reachable,
+  // so a typed name that was never picked from the dropdown can be committed.
+  // The button used to stay disabled until an option was chosen, which
+  // stranded every new user: a fresh account has nothing to choose from.
   const typedName = query.trim();
   const pendingName = typedName || exerciseName.current;
   // A typed name that exactly matches an existing exercise still gets its
@@ -719,25 +717,30 @@ export default function Workout({
             </DragDropContext>
           )}
           <div style={{ display: 'flex' }} id="tour-add">
+            {/* Add sits inside <ComboBox> on purpose: pressing a button that
+                lives outside the combobox counts as an outside click, which
+                closes the list and clears the query before the handler can
+                read it. */}
             <ComboBox
               options={exerciseNames}
               selectedItem={selectedItem}
               setSelectedItem={setSelectedItem}
               query={query}
               setQuery={setQuery}
-            />
-            <button
-              disabled={!typedName && exerciseToPreview === null}
-              className={styles.addButton}
-              onClick={() => {
-                addExercise(
-                  pendingPreview ? pendingPreview.exercise.name : pendingName,
-                  pendingPreview
-                );
-              }}
             >
-              Add
-            </button>
+              <button
+                disabled={!typedName && exerciseToPreview === null}
+                className={styles.addButton}
+                onClick={() => {
+                  addExercise(
+                    pendingPreview ? pendingPreview.exercise.name : pendingName,
+                    pendingPreview
+                  );
+                }}
+              >
+                Add
+              </button>
+            </ComboBox>
           </div>
           {pendingPreview && notAlreadyAdded(pendingPreview.exercise.name) && (
             <ExerciseToPreview exerciseToPreview={pendingPreview} />

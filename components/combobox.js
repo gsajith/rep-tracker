@@ -4,16 +4,30 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from '@headlessui/react';
+import { useEffect, useRef } from 'react';
 import styles from './combobox.module.css';
 import { capitalize } from '@/utils/utils';
 
 export default function ComboBox({
+  children,
   options,
   selectedItem,
   setSelectedItem,
   query,
   setQuery,
 }) {
+  const inputRef = useRef(null);
+
+  // Headless UI owns the input's text while the list is open, so clearing
+  // `query` after an exercise is added does not empty the field on its own and
+  // the name people just added stays sitting there. Guarded on `selectedItem`
+  // so this never wipes the label of an option they actually chose.
+  useEffect(() => {
+    if (query === '' && !selectedItem && inputRef.current?.value) {
+      inputRef.current.value = '';
+    }
+  }, [query, selectedItem]);
+
   const trimmed = query.trim();
   const filteredOptions =
     trimmed === ''
@@ -34,17 +48,18 @@ export default function ComboBox({
   return (
     <Combobox
       value={selectedItem}
-      onChange={(option) => {
-        setSelectedItem(option);
-        // Cleared when an option is actually chosen, not when the list closes.
-        // Clearing on close wiped whatever the user had typed the moment they
-        // reached for the Add button, so a free-typed name could never be
-        // committed: the only state where Add looked usable was the one where
-        // the text had already been thrown away.
-        setQuery('');
-      }}
+      // Closing clears the query so the field and the Add button can never
+      // disagree: Headless UI blanks the input on close no matter what this
+      // component does, and a surviving query left Add enabled over an empty
+      // box. The Add button lives inside this Combobox (see `children` below)
+      // so pressing it is not an outside click and does not close anything,
+      // which is what let a free-typed name reach the button in the first
+      // place. Both halves are load-bearing; dropping either brings back a bug.
+      onClose={() => setQuery('')}
+      onChange={setSelectedItem}
     >
       <ComboboxInput
+        ref={inputRef}
         className={styles.comboBoxInput}
         aria-label="Autocomplete input"
         displayValue={(option) => (option ? capitalize(option.name) : '')}
@@ -65,6 +80,7 @@ export default function ComboBox({
           </ComboboxOption>
         )}
       </ComboboxOptions>
+      {children}
     </Combobox>
   );
 }
