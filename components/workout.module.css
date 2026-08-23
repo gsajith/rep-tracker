@@ -88,8 +88,11 @@
   margin-bottom: 0px;
 }
 
+/* Was `opacity: 0.7`, which multiplied with the 50% on .setAdornment inside it
+   and took the app's highest-value content down to 2.24:1, the worst ratio in
+   the app. The panel is tinted through its own colours now so nothing
+   compounds. */
 .pastExercise {
-  opacity: 0.7;
   border-radius: 0px 0px 14px 14px;
   background: var(--secondary);
   color: var(--text);
@@ -139,8 +142,8 @@
   margin-top: 8px;
 }
 
+/* Was `opacity: 0.5`, which dropped the note placeholder to 3.33:1 at rest. */
 .notesInputContainer {
-  opacity: 0.5;
 }
 
 .notesInputContainer:hover, .notesInputContainer:focus-within{
@@ -188,7 +191,7 @@
 
 .addSetButton {
   min-height: 44px;
-  background: var(--accent);
+  background: var(--accentText);
   color: var(--textInverted);
   border-radius: 8px;
   border: none;
@@ -345,8 +348,10 @@
   border: 2px solid var(--text);
 }
 
+/* 68% rather than 50%: this is the "x" and "lbs" sitting between the numbers,
+   and at 50% it failed on every surface it appears on. */
 .setAdornment {
-  color: rgb(from var(--text) r g b / 50%);
+  color: rgb(from var(--text) r g b / 68%);
 }
 
 .deleteWorkout {

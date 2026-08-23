@@ -118,12 +118,13 @@
   gap: 16px;
 }
 
+/* 68%: at 50% the "x" and "lbs" measured 3.97:1 on the white card. */
 .setAdornment {
-  color: rgb(from var(--text) r g b / 50%);
+  color: rgb(from var(--text) r g b / 68%);
 }
 
 .minutesLabel {
-  color: var(--accent);
+  color: var(--accentText);
   font-weight: bold;
   margin-top: 4px;
   text-align: right;

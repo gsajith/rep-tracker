@@ -15,12 +15,12 @@
 
 .button:hover {
   background-color: var(--accentHoverLight);
-  color: var(--accent);
+  color: var(--accentText);
 
 }
 
 .active {
-  color: var(--accent);
+  color: var(--accentText);
 }
 
 

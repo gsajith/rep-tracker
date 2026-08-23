@@ -224,8 +224,18 @@ export default function Stats() {
                   }),
                   singleValue: (baseStyles, state) => ({
                     ...baseStyles,
-                    color: 'var(--accent)',
+                    color: 'var(--accentText)',
                     fontWeight: '600',
+                  }),
+                  // react-select's default placeholder is #808080, 3.95:1 on
+                  // white.
+                  placeholder: (baseStyles) => ({
+                    ...baseStyles,
+                    color: 'var(--textSecondary)',
+                  }),
+                  input: (baseStyles) => ({
+                    ...baseStyles,
+                    color: 'var(--text)',
                   }),
                   menu: (baseStyles, state) => ({
                     ...baseStyles,
