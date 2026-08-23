@@ -19,6 +19,7 @@ import {
 import Toggle from '@/components/toggle';
 import { useStickyState } from '@/hooks/useStickyState';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
+import { useWeightUnit } from '@/context/unitProvider';
 import { Exercise } from '@/components/loggedWorkout';
 
 export default function Stats() {
@@ -100,6 +101,8 @@ export default function Stats() {
     return options;
   }, [exerciseHistory]);
 
+  const { toDisplay, unitLabel } = useWeightUnit();
+
   const calculateVolume = useCallback((reps, weights) => {
     let volume = 0;
     for (let i = 0; i < reps.length; i++) {
@@ -130,9 +133,13 @@ export default function Stats() {
   const getFormatLabel = useCallback(
     (format) => {
       if (isBodyweight) return format === 1 ? 'Total reps' : 'Max reps';
-      return format === 1 ? 'Volume' : 'Max weight';
+      // Named here because the bars carry no unit anywhere else, and volume in
+      // kg is a different number from volume in lbs.
+      return format === 1
+        ? `Volume (${unitLabel})`
+        : `Max weight (${unitLabel})`;
     },
-    [isBodyweight]
+    [isBodyweight, unitLabel]
   );
 
   const generateEmptyDays = useCallback((day1, day2) => {
@@ -173,11 +180,15 @@ export default function Stats() {
         return {
           ...historyItem,
           maxWeight: historyItem.weights.length
-            ? Math.max(...historyItem.weights)
+            ? toDisplay(Math.max(...historyItem.weights))
             : 0,
           maxReps: historyItem.reps.length ? Math.max(...historyItem.reps) : 0,
           totalReps: historyItem.reps.reduce((a, r) => a + (Number(r) || 0), 0),
-          volume: calculateVolume(historyItem.reps, historyItem.weights),
+          // Reps are dimensionless, so converting the summed volume is the
+          // same as converting every weight that went into it.
+          volume: toDisplay(
+            calculateVolume(historyItem.reps, historyItem.weights)
+          ),
         };
       });
       if (selectedExerciseStatFormat !== 2) {
@@ -205,6 +216,7 @@ export default function Stats() {
     selectedExercise,
     showEmptyDays,
     selectedExerciseStatFormat,
+    toDisplay,
   ]);
 
   return (

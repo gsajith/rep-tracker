@@ -13,7 +13,8 @@
   composes: container from "../page.module.css"
 }
 
-.tour {
+.tour,
+.unitSelector {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -21,18 +22,52 @@
   margin-top: 32px;
 }
 
-.tourTitle {
+.settingTitle {
   font-weight: bold;
   font-size: 18px;
 }
 
 /* Same reasoning as .emptyBody in page.module.css: faded --text clears 4.5:1
    on every theme, --textSecondary does not. */
-.tourBody {
+.settingBody {
   margin: 4px 0 0;
   font-size: 15px;
   line-height: 1.45;
   opacity: 0.72;
+}
+
+.unitChoices {
+  display: flex;
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 2px solid var(--text);
+  overflow: hidden;
+}
+
+.unitButton {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: bold;
+  min-height: 44px;
+  min-width: 56px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* --secondary behind --text, the same pair the exercise cards use, which is
+   the one green-dark's --secondary was darkened for and so is the pair known
+   to clear 4.5:1 on all six palettes. aria-pressed carries the selection for
+   anything not reading colour. */
+.unitButtonActive {
+  background: var(--secondary);
+}
+
+.unitButton:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: -3px;
 }
 
 .replayButton {

@@ -17,6 +17,7 @@ import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
+import { useWeightUnit } from '@/context/unitProvider';
 
 const getExerciseStyle = (isDragging, exerciseStyle, draggableStyle) => ({
   userSelect: 'none',
@@ -42,6 +43,11 @@ export default function Workout({
   workoutStartTime,
   setWorkoutStartTime,
 }) {
+  // Weights live in state and in the database as pounds whatever this says;
+  // the conversion happens at the input's edge, so nothing downstream of here
+  // has to know which unit is on screen.
+  const { toDisplay, toStored, unitLabel } = useWeightUnit();
+
   // State for the exercise selector combobox
   const [selectedItem, setSelectedItem] = useState();
   // State for the exercise selector combobox
@@ -595,15 +601,23 @@ export default function Workout({
                                                 );
                                               }}
                                               onTouchEnd={() => {
+                                                // A drag step is one unit of
+                                                // whatever is on screen: 1 kg
+                                                // in kg, 1 lb in lbs. So it is
+                                                // added to the shown number,
+                                                // and the sum is what converts
+                                                // back to storage.
                                                 updateExerciseWeights(
                                                   index,
                                                   i,
-                                                  parseInt(
-                                                    exercise.weights[i]
-                                                  ) +
-                                                    parseInt(
-                                                      exercise.weightsDrag[i]
-                                                    )
+                                                  toStored(
+                                                    toDisplay(
+                                                      exercise.weights[i]
+                                                    ) +
+                                                      parseFloat(
+                                                        exercise.weightsDrag[i]
+                                                      )
+                                                  )
                                                 );
                                                 updateExerciseWeightsDrag(
                                                   index,
@@ -615,8 +629,8 @@ export default function Workout({
                                               className={styles.setInputNumber}
                                               value={Math.max(
                                                 0,
-                                                parseInt(exercise.weights[i]) +
-                                                  parseInt(
+                                                toDisplay(exercise.weights[i]) +
+                                                  parseFloat(
                                                     exercise.weightsDrag[i]
                                                   )
                                               )}
@@ -624,7 +638,7 @@ export default function Workout({
                                                 updateExerciseWeights(
                                                   index,
                                                   i,
-                                                  e.target.value
+                                                  toStored(e.target.value)
                                                 );
                                               }}
                                             />
@@ -635,7 +649,7 @@ export default function Workout({
                                                 marginTop: 5,
                                               }}
                                             >
-                                              lbs
+                                              {unitLabel}
                                             </span>
                                           </div>
 
@@ -737,7 +751,7 @@ export default function Workout({
                                           ×
                                         </span>
                                         <span style={{ fontSize: 18 }}>
-                                          {exercise.oldWeights[i]}
+                                          {toDisplay(exercise.oldWeights[i])}
                                         </span>
                                         <span
                                           className={styles.setAdornment}
@@ -746,7 +760,7 @@ export default function Workout({
                                             marginTop: 5,
                                           }}
                                         >
-                                          lbs
+                                          {unitLabel}
                                         </span>
                                       </div>
                                     ))}

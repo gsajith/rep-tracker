@@ -1,8 +1,11 @@
 import { calculateDaysAgo, readableDate } from '@/utils/utils';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import styles from './exerciseToPreview.module.css';
+import { useWeightUnit } from '@/context/unitProvider';
 
 export default function ExerciseToPreview({ exerciseToPreview }) {
+  const { toDisplay, unitLabel } = useWeightUnit();
+
   return (
     // id is the tour's anchor for the payoff step; harmless otherwise.
     <div className={styles.exercisePreview} id="tour-preview">
@@ -35,7 +38,7 @@ export default function ExerciseToPreview({ exerciseToPreview }) {
                   ×
                 </span>
                 <span style={{ fontSize: 18 }}>
-                  {exerciseToPreview.exercise.weights[i]}
+                  {toDisplay(exerciseToPreview.exercise.weights[i])}
                 </span>
                 <span
                   className={styles.setAdornment}
@@ -44,7 +47,7 @@ export default function ExerciseToPreview({ exerciseToPreview }) {
                     marginTop: 5,
                   }}
                 >
-                  lbs
+                  {unitLabel}
                 </span>
               </div>
             ))}
