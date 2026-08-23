@@ -1,6 +1,6 @@
 import {
   calculateDaysAgo,
-  calculateMinutes,
+  formatDuration,
   readableDate,
   readableTime,
 } from '@/utils/utils';
@@ -81,6 +81,11 @@ export default function LoggedWorkout({ data, onLongPress, id, menuLabel }) {
     onLongPress();
   });
 
+  const numExercises = data.exercises?.length ?? 0;
+  // null when the span is implausible, which means the session was abandoned
+  // rather than ended. See formatDuration.
+  const duration = formatDuration(data.start_time, data.end_time);
+
   return (
     <div className={styles.container} id={id} {...bind()}>
       <div className={styles.header}>
@@ -89,6 +94,11 @@ export default function LoggedWorkout({ data, onLongPress, id, menuLabel }) {
           <span>{calculateDaysAgo(data.start_time)}</span>
           <span>{readableTime(data.start_time)}</span>
         </div>
+        {/* The card gave no hint that exercises continue past the right edge:
+            no scrollbar, no fade, no count. */}
+        <span className={styles.exerciseCount}>
+          {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'}
+        </span>
         {/* Copy and delete were reachable only by long-pressing the card, which
             exposes no keyboard or screen-reader path and is not announced
             anywhere. This opens the same menu. */}
@@ -144,8 +154,15 @@ export default function LoggedWorkout({ data, onLongPress, id, menuLabel }) {
             justifyContent: 'flex-end',
           }}
         >
-          <span className={styles.minutesLabel}>
-            {calculateMinutes(data.start_time, data.end_time)} mins
+          <span
+            className={duration ? styles.minutesLabel : styles.unfinishedLabel}
+            title={
+              duration
+                ? undefined
+                : 'This workout was never ended, so its length is the gap until the next one started.'
+            }
+          >
+            {duration ?? 'Not ended'}
           </span>
           <LetsIconsTimeAtack />
         </span>

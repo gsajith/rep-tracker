@@ -4,7 +4,11 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import { removeWorkout, saveWorkout } from '@/utils/api';
 import LoggedWorkout from '@/components/loggedWorkout';
 import Workout from '@/components/workout';
-import { readableDate, sortWorkoutsByEndTime } from '@/utils/utils';
+import {
+  formatDuration,
+  readableDate,
+  sortWorkoutsByEndTime,
+} from '@/utils/utils';
 import { isStoredExerciseList } from '@/utils/validate';
 import { useStickyState } from '@/hooks/useStickyState';
 import Modal from '@/components/modal';
@@ -68,6 +72,10 @@ export default function Home() {
   // unlabelled shim. It now needs a second, differently worded tap.
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  // Finishing a workout produced no message of any kind: the card simply
+  // disappeared. Every other thing this page can say is an error.
+  const [saveSummary, setSaveSummary] = useState(null);
+
   // Separate flags so an in-flight delete cannot disable the save button.
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -106,6 +114,13 @@ export default function Home() {
     if (loading || loadError || tourStatus !== null) return;
     setTourStatus(workouts.length === 0 ? 'act1' : 'done');
   }, [loading, loadError, tourStatus, workouts.length, setTourStatus]);
+
+  // Clears itself rather than sitting there for the rest of the session.
+  useEffect(() => {
+    if (!saveSummary) return undefined;
+    const timer = setTimeout(() => setSaveSummary(null), 8000);
+    return () => clearTimeout(timer);
+  }, [saveSummary]);
 
   const saveWorkoutHandler = async () => {
     if (saving) return;
@@ -148,6 +163,11 @@ export default function Home() {
       // Clearing `inWorkout` runs the reset effect in <Workout />, which empties
       // the exercises and the start time. Nothing races that effect now the
       // reload is gone, so the cleared state is guaranteed to reach localStorage.
+      setSaveSummary({
+        exercises: exercises.length,
+        duration: formatDuration(workoutStartTime, Date.now()),
+      });
+
       setInWorkout(false);
 
       // The first save graduates act 1 into act 2, which waits for the next
@@ -368,6 +388,22 @@ export default function Home() {
           saveError={saveError}
           onOpenSaveConfirm={() => setSaveError(null)}
         />
+
+        {saveSummary && (
+          <div className={styles.saveSuccess}>
+            <span>
+              Workout saved. {saveSummary.exercises}{' '}
+              {saveSummary.exercises === 1 ? 'exercise' : 'exercises'}
+              {saveSummary.duration ? `, ${saveSummary.duration}` : ''}.
+            </span>
+            <button
+              className={styles.dismissButton}
+              onClick={() => setSaveSummary(null)}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* The live region is mounted for the life of the page and only its
             text changes. Mounting the region together with its message is the

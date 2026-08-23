@@ -254,3 +254,58 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* The one thing this page can say that is not a failure. Announced through the
+   existing live region below, so it is not duplicated here. */
+.saveSuccess {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 336px;
+  max-width: calc(100vw - 48px);
+  box-sizing: border-box;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 2px solid var(--accentText);
+  border-radius: 14px;
+  color: var(--text);
+  font-weight: 600;
+  text-align: left;
+}
+
+.dismissButton {
+  flex-shrink: 0;
+  border: 2px solid var(--text);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 14px;
+  min-height: 44px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.dismissButton:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* The card was a hard 336px at every viewport, so a 1280px screen showed a
+   phone-width column with 71% of the window empty while 1400px of exercise
+   data sat clipped inside a scroller on the same screen. One breakpoint gives
+   that content somewhere to go without changing the phone layout at all. */
+@media (min-width: 768px) {
+  .container,
+  .emptyState,
+  .saveSuccess,
+  .listNotice {
+    width: 560px;
+  }
+
+  .shimmer {
+    max-width: 592px;
+  }
+}

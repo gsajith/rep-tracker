@@ -519,3 +519,10 @@
   opacity: 0.55;
   cursor: default;
 }
+
+/* 4px narrower than the cards below it, matching the phone proportions. */
+@media (min-width: 768px) {
+  .container {
+    width: 556px;
+  }
+}
