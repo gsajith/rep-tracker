@@ -8,6 +8,7 @@ import styles from './loggedWorkout.module.css';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
 import { useLongPress } from 'use-long-press';
+import { LetsIconsMore } from './SVGIcons/LetsIconsMore';
 
 export function Exercise({
   exercise,
@@ -75,7 +76,7 @@ export function Exercise({
   );
 }
 
-export default function LoggedWorkout({ data, onLongPress, id }) {
+export default function LoggedWorkout({ data, onLongPress, id, menuLabel }) {
   const bind = useLongPress(() => {
     onLongPress();
   });
@@ -88,6 +89,17 @@ export default function LoggedWorkout({ data, onLongPress, id }) {
           <span>{calculateDaysAgo(data.start_time)}</span>
           <span>{readableTime(data.start_time)}</span>
         </div>
+        {/* Copy and delete were reachable only by long-pressing the card, which
+            exposes no keyboard or screen-reader path and is not announced
+            anywhere. This opens the same menu. */}
+        <button
+          type="button"
+          className={styles.menuButton}
+          aria-label={menuLabel}
+          onClick={onLongPress}
+        >
+          <LetsIconsMore />
+        </button>
       </div>
       <div className={styles.exercisesContainer}>
         <div className={styles.exercises}>

@@ -293,20 +293,30 @@ export default function Workout({
     setExercises(newExercises);
   };
 
+  // A real <button> when it is the start card, a plain container once a
+  // workout is running and it holds inputs and buttons of its own. It was a
+  // div with onClick in both states, so the primary action of the app could
+  // not be focused, activated by keyboard, or announced as anything but text.
+  const Shell = inWorkout ? 'div' : 'button';
+
   return (
-    <div
-      className={`${styles.container} ${!inWorkout && styles.startup}`}
+    <Shell
+      className={
+        inWorkout ? styles.container : `${styles.container} ${styles.startup}`
+      }
       id={inWorkout ? undefined : 'tour-start'}
-      onClick={() => {
-        if (!inWorkout) {
-          setInWorkout(!inWorkout);
-          setWorkoutStartTime(Date.now());
-        } else {
-        }
-      }}
+      type={inWorkout ? undefined : 'button'}
+      onClick={
+        inWorkout
+          ? undefined
+          : () => {
+              setInWorkout(true);
+              setWorkoutStartTime(Date.now());
+            }
+      }
     >
       {modalShown && (
-        <Modal setShown={setModalShown}>
+        <Modal setShown={setModalShown} label="End this workout?">
           <div
             style={{
               display: 'flex',
@@ -333,11 +343,18 @@ export default function Workout({
             >
               <LetsIconsDoneRound /> {saving ? 'Saving...' : 'Save & end!'}
             </button>
+            <button
+              className={styles.cancelButton}
+              onClick={() => setModalShown(false)}
+              disabled={saving}
+            >
+              Keep going
+            </button>
           </div>
         </Modal>
       )}
       {trashModalShown && (
-        <Modal setShown={setTrashModalShown}>
+        <Modal setShown={setTrashModalShown} label="Trash this workout?">
           <div
             style={{
               display: 'flex',
@@ -356,6 +373,12 @@ export default function Workout({
               }}
             >
               <LetsIconsTrash /> Trash it!
+            </button>
+            <button
+              className={styles.cancelButton}
+              onClick={() => setTrashModalShown(false)}
+            >
+              Keep it
             </button>
           </div>
         </Modal>
@@ -403,8 +426,12 @@ export default function Workout({
                                 snapshot.isDragging,
                                 exercise.expanded
                                   ? {
+                                      // Per-set estimate raised from 50 with the set
+                                      // rows: the inputs are now 44px tall for
+                                      // thumbs, and this number is what stops
+                                      // the accordion clipping its own content.
                                       maxHeight:
-                                        50 * numOldSets + 50 * numSets + 300,
+                                        64 * numOldSets + 64 * numSets + 300,
                                     }
                                   : {},
                                 provided.draggableProps.style
@@ -798,6 +825,6 @@ export default function Workout({
           <div className={styles.plusContainer}>+</div>
         </div>
       )}
-    </div>
+    </Shell>
   );
 }

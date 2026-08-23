@@ -178,7 +178,7 @@ export default function Stats() {
   return (
     shown && (
       <div className={styles.container}>
-        <h2>Stats</h2>
+        <h1 className={styles.pageTitle}>Stats</h1>
         <div
           className={classNames(
             loading || loading2 ? 'shimmerBG' : '',

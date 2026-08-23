@@ -13,8 +13,8 @@
   height: 100%;
   flex-grow: 1;
   padding: 8px;
+  min-height: 44px;
   border: none;
-  outline: none;
   font-weight: 600;
   color: rgb(from var(--text) r g b / 50%);
   z-index: 2;
@@ -30,4 +30,12 @@
   position: absolute;
   transition: all 300ms ease-in-out, opacity 300ms 300ms ease-in-out;
   border-radius: 4px;
+}
+
+
+/* Standard focus ring for this app: --text keeps it visible on every palette,
+   where --accent drops to 2.4:1 on green-dark. */
+.button:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: -3px;
 }

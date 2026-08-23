@@ -1,24 +1,52 @@
+/* The button is the touch target; .swatch is the visible pill. Splitting them
+   lets the target reach 44px without inflating the swatch, and moves the
+   overflow clip off the element that has to show the active check. */
 .themeButtonContainer {
-  background: var(--white);
-  outline: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 44px;
+  padding: 0;
+  margin-inline-end: 12px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+}
+
+.swatch {
+  display: flex;
   width: 60px;
   height: 24px;
   border-radius: 24px;
-  display: flex;
   overflow: hidden;
-  margin-block: 6px;
-  margin-inline-end: 12px;
-  cursor: pointer;
+  background: var(--white);
   border: 1px solid var(--accent);
   position: relative;
 }
 
-.active {
-  outline: 2px solid var(--accentHoverLight);
+.active .swatch {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
 }
 
-.themeButtonContainer:hover, .themeButtonContainer:focus {
-  outline: 2px solid var(--text)
+.themeButtonContainer:hover .swatch {
+  outline: 2px solid var(--textSecondary);
+  outline-offset: 1px;
+}
+
+.themeButtonContainer:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.activeCheck {
+  position: absolute;
+  z-index: 2;
+  color: var(--text);
+  pointer-events: none;
 }
 
 .themeButtonAccent {
@@ -30,7 +58,6 @@
   background: var(--accent);
   transform: rotate(25deg);
 }
-
 
 .themeButtonSecondary {
   position: relative;

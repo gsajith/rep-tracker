@@ -43,3 +43,7 @@
   scroll-snap-align: end;
   margin-inline-end: 50px;
 }
+
+.pageTitle {
+  margin-bottom: 16px;
+}

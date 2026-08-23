@@ -34,7 +34,6 @@
   border-radius: 0px 14px 14px 0px;
   font-weight: bold;
   width: 68px;
-  outline: none;
   transition: background 150ms ease-in-out;
 }
 
@@ -98,6 +97,7 @@
   flex-direction: column;
 }
 .exerciseName {
+  min-height: 44px;
   font-weight: bold;
   display: flex;
   justify-content: space-between;
@@ -111,7 +111,6 @@
 }
 .exerciseName:hover {
   background: rgb(from var(--secondaryHover) r g b / 80%);
-  outline: none;
 }
 .exerciseName > svg {
   transition: rotate 150ms ease-in-out;
@@ -147,6 +146,7 @@
 }
 
 .notesInput {
+  min-height: 44px;
   border: none;
   padding: 8px;
   border-radius: 8px;
@@ -185,6 +185,7 @@
 
 
 .addSetButton {
+  min-height: 44px;
   background: var(--accent);
   color: var(--textInverted);
   border-radius: 8px;
@@ -208,7 +209,15 @@
   font-weight: bold;
 }
 
+/* 44px minimum: these are the controls a thumb hits between sets, and they
+   measured 34x34 before. min-width matters as much as min-height, because
+   VariableInput sizes the field to `value.length + 'ch'`, so a single-digit
+   rep count rendered 24px wide. */
 .setInputNumber {
+  min-height: 44px;
+  min-width: 44px;
+  text-align: center;
+  box-sizing: border-box;
   padding: 8px 12px;
   border: none;
   border-radius: 8px;
@@ -223,10 +232,16 @@
 
 .deleteSetButton {
   opacity: 0.8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
   background: none;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 2px;
 }
 
 .deleteSetButton:hover, .deleteSetButton:focus {
@@ -269,7 +284,6 @@
 
 .endWorkoutButton:hover, .endWorkoutButton:focus {
   color: var(--accent);
-  outline: none;
   background: var(--accentHoverLight);
   border: 2px solid var(--text);
 }
@@ -289,7 +303,6 @@
 }
 
 .trashWorkoutButton:hover, .trashWorkoutButton:focus {
-  outline: none;
   border: 2px solid var(--text);
   color: var(--white);
 }
@@ -326,7 +339,6 @@
 .endWorkoutConfirmButton:not(:disabled):hover,
 .endWorkoutConfirmButton:not(:disabled):focus {
   color: var(--textInverted);
-  outline: none;
   background: var(--accentHover);
   border: 2px solid var(--text);
 }
@@ -360,7 +372,6 @@
 .deleteWorkout:focus {
   background: var(--warning);
   color: var(--textInverted);
-  outline: none;
   border: 2px solid var(--text);
 }
 
@@ -435,4 +446,58 @@
 .addFirstSetButton:focus-visible {
   outline: 3px solid var(--text);
   outline-offset: 2px;
+}
+
+
+/* Standard focus ring for this app: --text keeps it visible on every palette,
+   where --accent drops to 2.4:1 on green-dark. */
+.addButton:not(:disabled):focus-visible,
+.exerciseName:focus-visible,
+.deleteSetButton:focus-visible,
+.addSetButton:focus-visible,
+.endWorkoutButton:focus-visible,
+.trashWorkoutButton:focus-visible,
+.endWorkoutConfirmButton:not(:disabled):focus-visible,
+.deleteWorkout:focus-visible,
+.startup:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* The start card is the primary action and is now a real button. */
+.startup {
+  width: 100%;
+  font-family: inherit;
+  text-align: left;
+  border: none;
+}
+
+/* Both confirm dialogs previously offered only the action that commits or
+   destroys, so the only way to back out was tapping the unlabelled shim. */
+.cancelButton {
+  border: 2px solid var(--text);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 18px;
+  min-height: 44px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: box-shadow 150ms ease-in-out;
+}
+
+.cancelButton:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.cancelButton:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.cancelButton:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
