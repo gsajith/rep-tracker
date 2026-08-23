@@ -6,7 +6,7 @@
   --backgroundShim: #ECEFF3AA;
   --white: #FFFFFF;
   --text: #1D1226;
-  --textSecondary: #908E96;
+  --textSecondary: #6B6873;
   --accent: #A462D8;
   --accentHover: #8553ae;
   --accentHoverLight: #e2caf5;
@@ -14,6 +14,7 @@
   --secondaryHover: #b7d755;
   --textInverted: #FFFFFF;
   --warning: #ac2746;
+  --accentText: #7A4AA8;
 }
 
 [data-theme="blue-orange"] {
@@ -21,7 +22,7 @@
   --backgroundShim: #ECEFF3AA;
   --white: #FFFFFF;
   --text: #1D1226;
-  --textSecondary: #908E96;
+  --textSecondary: #6B6873;
   --accent: #4586ee;
   --accentHover: #225dbc;
   --accentHoverLight: #c5d7f4;
@@ -29,6 +30,7 @@
   --secondaryHover: #d3884f;
   --textInverted: #FFFFFF;
   --warning: #ac2746;
+  --accentText: #225DBC;
 }
 
 [data-theme="blue-dark"] {
@@ -44,6 +46,7 @@
   --secondaryHover: #0f0f73;
   --textInverted: #000000;
   --warning: #f488a1;
+  --accentText: #4586ee;
 }
 
 [data-theme="red-dark"] {
@@ -59,6 +62,7 @@
   --secondaryHover: #730f2a;
   --textInverted: #000000;
   --warning: #f488a1;
+  --accentText: #ee455c;
 }
 
 [data-theme="cosmo-wanda"] {
@@ -66,14 +70,18 @@
   --backgroundShim: #ECEFF3AA;
   --white: #FFFFFF;
   --text: #1D1226;
-  --textSecondary: #908E96;
+  --textSecondary: #6B6873;
   --accent: #57f7a7;
   --accentHover: #22bc60;
   --accentHoverLight: #c5f4d5;
   --secondary: #f49fcb;
   --secondaryHover: #d34fc8;
-  --textInverted: #FFFFFF;
+  /* Dark, not white: this palette's accent and secondary are both pale, so
+     white text on them measured about 1.4:1 and the start card was
+     effectively unreadable. */
+  --textInverted: #1D1226;
   --warning: #ac2746;
+  --accentText: #157A42;
 }
 
 [data-theme="green-dark"] {
@@ -85,10 +93,13 @@
   --accent: #394493;
   --accentHover: #535da2;
   --accentHoverLight: #1d2550;
-  --secondary: #41af4f;
-  --secondaryHover: #217822;
+  /* Darkened from #41af4f: the exercise cards use --secondary behind --text,
+     and the old pair measured 2.36:1, so every set on this theme failed. */
+  --secondary: #1E5C28;
+  --secondaryHover: #164420;
   --textInverted: #000000;
   --warning: #d4395d;
+  --accentText: #8B95D9;
 }
 
 * {
