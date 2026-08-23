@@ -67,7 +67,18 @@ export async function saveWorkout({
   });
 }
 
-// Sets or clears a workout's name. Pass null or '' to unname it.
+// Renames a whole routine: every workout under `from` becomes `to`. A routine
+// is derived from the names on history, so renaming one workout at a time would
+// split the group rather than rename it.
+export async function renameRoutine(from, to) {
+  return request('/api/workouts', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from, to }),
+  });
+}
+
+// Sets or clears a single workout's name. Pass null or '' to unname it.
 export async function renameWorkout(workoutId, name) {
   if (!workoutId) return { data: null, error: 'No workout ID' };
   return request(`/api/workouts/${workoutId}`, {

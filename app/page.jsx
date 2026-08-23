@@ -15,6 +15,8 @@ import { useStickyState } from '@/hooks/useStickyState';
 import Modal from '@/components/modal';
 import { LetsIconsTrash } from '@/components/SVGIcons/LetsIconsTrash';
 import { LetsIconsCopy } from '@/components/SVGIcons/LetsIconsCopy';
+import { LetsIconsMore } from '@/components/SVGIcons/LetsIconsMore';
+import { LetsIconsDoneRound } from '@/components/SVGIcons/LetsIconsDoneRound';
 import classNames from 'classnames';
 import { WorkoutsContext } from '@/context/workoutsProvider';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
@@ -89,6 +91,12 @@ export default function Home() {
   const [renameValue, setRenameValue] = useState('');
   const [renaming, setRenaming] = useState(false);
   const [renameError, setRenameError] = useState(null);
+
+  // Renaming a routine has to move every workout under that name at once.
+  // Doing them one at a time would leave the older ones behind as a second
+  // routine, which is the opposite of what renaming means here.
+  const [routineBeingRenamed, setRoutineBeingRenamed] = useState(null);
+  const [routineRenameValue, setRoutineRenameValue] = useState('');
 
   // Separate flags so an in-flight delete cannot disable the save button.
   const [saving, setSaving] = useState(false);
@@ -183,6 +191,36 @@ export default function Home() {
     } catch (thrown) {
       console.error(thrown);
       setRenameError('Could not save that name.');
+    } finally {
+      setRenaming(false);
+    }
+  };
+
+  const renameRoutineHandler = async () => {
+    if (renaming || !routineBeingRenamed) return;
+    setRenameError(null);
+
+    if (!window.navigator.onLine) {
+      setRenameError('You are offline. Try again once you are back online.');
+      return;
+    }
+
+    setRenaming(true);
+    try {
+      const { error } = await renameRoutine(
+        routineBeingRenamed.name,
+        routineRenameValue
+      );
+      if (error) {
+        console.error(error);
+        setRenameError('Could not rename that routine.');
+        return;
+      }
+      setRoutineBeingRenamed(null);
+      setStaleAfter((await refresh()) ? 'rename' : null);
+    } catch (thrown) {
+      console.error(thrown);
+      setRenameError('Could not rename that routine.');
     } finally {
       setRenaming(false);
     }
@@ -366,19 +404,13 @@ export default function Home() {
         <h1 className={styles.srOnly}>Your workouts</h1>
         {modalShown && longPressedWorkout && (
           <Modal
+            label={readableDate(longPressedWorkout.start_time)}
             setShown={(shown) => {
               setModalShown(shown);
               if (!shown) setConfirmDelete(false);
             }}
           >
             <div className={styles.copyWorkoutContentWrapper}>
-              <div style={{ textAlign: 'left' }}>
-                What would you like to do for your workout on{' '}
-                <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>
-                  {readableDate(longPressedWorkout.start_time)}
-                </span>
-                ?
-              </div>
               <button
                 className={styles.workoutButton}
                 onClick={() => {
@@ -474,7 +506,8 @@ export default function Home() {
 
         {saveSummary && (
           <div className={styles.saveSuccess}>
-            <span>
+            <LetsIconsDoneRound className={styles.saveSuccessIcon} />
+            <span className={styles.saveSuccessText}>
               {saveSummary.name
                 ? `${saveSummary.name} saved. `
                 : 'Workout saved. '}
@@ -491,24 +524,83 @@ export default function Home() {
           </div>
         )}
 
+        {routineBeingRenamed && (
+          <Modal
+            setShown={() => setRoutineBeingRenamed(null)}
+            label={`Rename ${routineBeingRenamed.name}`}
+          >
+            <div className={styles.renameRow}>
+              <label className={styles.srOnly} htmlFor="routine-name">
+                Routine name
+              </label>
+              <p className={styles.renameHint}>
+                Renames all {routineBeingRenamed.count}{' '}
+                {routineBeingRenamed.count === 1 ? 'workout' : 'workouts'} under{' '}
+                {routineBeingRenamed.name}. Clear it to remove the name
+                entirely.
+              </p>
+              <input
+                id="routine-name"
+                className={styles.renameInput}
+                value={routineRenameValue}
+                placeholder="Leg day"
+                maxLength={200}
+                onChange={(event) => setRoutineRenameValue(event.target.value)}
+              />
+              {renameError && (
+                <div className={styles.modalError} role="alert">
+                  {renameError}
+                </div>
+              )}
+              <button
+                className={styles.renameButton}
+                disabled={renaming}
+                aria-busy={renaming}
+                onClick={renameRoutineHandler}
+              >
+                {renaming ? 'Renaming...' : 'Rename routine'}
+              </button>
+              <button
+                className={styles.keepButton}
+                onClick={() => setRoutineBeingRenamed(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </Modal>
+        )}
+
         {!inWorkout && routines.length > 0 && (
           <section className={styles.routines} aria-label="Your routines">
             <h2 className={styles.routinesHeading}>Start a named workout</h2>
             <div className={styles.routineRow}>
               {routines.map((routine) => (
-                <button
-                  key={routine.name}
-                  type="button"
-                  className={styles.routineChip}
-                  onClick={() =>
-                    startFromWorkout(routine.workout, routine.name)
-                  }
-                >
-                  <span className={styles.routineName}>{routine.name}</span>
-                  <span className={styles.routineWhen}>
-                    {calculateDaysAgo(routine.lastDone)}
-                  </span>
-                </button>
+                <div key={routine.name} className={styles.routineChip}>
+                  <button
+                    type="button"
+                    className={styles.routineStart}
+                    onClick={() =>
+                      startFromWorkout(routine.workout, routine.name)
+                    }
+                  >
+                    <span className={styles.routineName}>{routine.name}</span>
+                    <span className={styles.routineWhen}>
+                      {calculateDaysAgo(routine.lastDone)}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.routineMenuButton}
+                    aria-label={`Rename ${routine.name}`}
+                    onClick={() => {
+                      setRenameError(null);
+                      setRoutineRenameValue(routine.name);
+                      setRoutineBeingRenamed(routine);
+                    }}
+                  >
+                    <LetsIconsMore />
+                  </button>
+                </div>
               ))}
             </div>
           </section>

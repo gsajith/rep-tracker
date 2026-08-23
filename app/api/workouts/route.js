@@ -1,7 +1,11 @@
 import { auth } from '@clerk/nextjs/server';
 import { randomUUID } from 'node:crypto';
 import { getSql, ts } from '@/utils/db';
-import { validateWorkoutPayload } from '@/utils/validate';
+import {
+  LIMITS,
+  normalizeWorkoutName,
+  validateWorkoutPayload,
+} from '@/utils/validate';
 
 export const dynamic = 'force-dynamic';
 
@@ -149,4 +153,50 @@ export async function POST(request) {
     { data: { id: workoutId, exercises: rows.map((r) => r.id) }, error: null },
     { status: 201 }
   );
+}
+
+// PATCH /api/workouts
+// Renames a routine: every workout the user has under `from` becomes `to`.
+// A routine is derived from the names on history, so renaming one workout at a
+// time would split it in two rather than rename it. Pass an empty `to` to strip
+// the name off the whole group.
+export async function PATCH(request) {
+  const userId = await requireUser();
+  if (!userId) return unauthorized();
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return badRequest('Body must be JSON');
+  }
+
+  const from = normalizeWorkoutName(body?.from);
+  if (from === undefined || from === null) {
+    return badRequest('from must be the routine name to rename');
+  }
+
+  const to = normalizeWorkoutName(body?.to);
+  if (to === undefined) {
+    return badRequest(
+      `to must be a string of at most ${LIMITS.nameLength} characters`
+    );
+  }
+
+  try {
+    const sql = getSql();
+    const rows = await sql.query(
+      `update workouts set name = $1 where user_id = $2 and name = $3
+       returning id`,
+      [to, userId, from]
+    );
+
+    return Response.json({ data: { renamed: rows.length }, error: null });
+  } catch (error) {
+    console.error('PATCH /api/workouts failed:', error);
+    return Response.json(
+      { data: null, error: 'Could not rename the routine' },
+      { status: 500 }
+    );
+  }
 }

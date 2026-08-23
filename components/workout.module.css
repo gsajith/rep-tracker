@@ -540,15 +540,23 @@
   font-weight: 600;
 }
 
+/* A 1px hairline rather than a 2px rule: the field sits inside a dialog that is
+   already a distinct surface, so a heavy border reads as a second box drawn
+   around it. Emphasis comes from the focus ring. */
 .nameInput {
   font-family: inherit;
   font-size: 16px;
   min-height: 44px;
-  padding: 8px 12px;
-  border: 2px solid var(--text);
-  border-radius: 10px;
-  background: var(--white);
+  padding: 10px 12px;
+  border: 1px solid rgb(from var(--text) r g b / 28%);
+  border-radius: 12px;
+  background: var(--background);
   color: var(--text);
+  transition: border-color 150ms ease-in-out;
+}
+
+.nameInput:hover {
+  border-color: rgb(from var(--text) r g b / 45%);
 }
 
 .nameInput:focus-visible {
@@ -564,4 +572,11 @@
   font-weight: bold;
   color: var(--textInverted);
   opacity: 0.85;
+}
+
+.modalBody {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.8;
 }

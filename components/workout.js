@@ -327,9 +327,6 @@ export default function Workout({
               gap: 24,
             }}
           >
-            <div style={{ textAlign: 'left' }}>
-              Are you sure you want to end this workout?
-            </div>
             {/* Naming it here is what files it under a routine, so it can be
                 started by name next time. Optional: an unnamed workout is
                 still a workout. */}
@@ -381,9 +378,9 @@ export default function Workout({
               gap: 24,
             }}
           >
-            <div style={{ textAlign: 'left' }}>
-              Are you sure you want to trash this workout?
-            </div>
+            <p className={styles.modalBody}>
+              The sets you have logged will be discarded. Nothing is saved.
+            </p>
             <button
               className={styles.deleteWorkout}
               onClick={() => {
