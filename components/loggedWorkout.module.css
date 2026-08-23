@@ -7,11 +7,15 @@
   border-radius: 16px;
 }
 
+/* Not space-between: with three children that spread the date, the time and
+   the options button evenly across the card, leaving the time floating in the
+   middle. The title takes the slack instead, so the time and the button read
+   as one group on the right. */
 .header {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px;
 }
 
 .times {
@@ -23,6 +27,7 @@
 }
 
 .title {
+  margin-right: auto;
   font-weight: bold;
   font-size: 24px;
   color: var(--accent);
