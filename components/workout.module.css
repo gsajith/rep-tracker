@@ -11,7 +11,6 @@
 .startup {
   font-size: 32px;
   font-weight: bold;
-  height: 80px;
 }
 
 .startup:hover, .startup:focus {
@@ -21,6 +20,9 @@
 }
 
 .plusContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--accent);
   background: var(--white);
   border-radius: 999px;
@@ -464,9 +466,20 @@
   outline-offset: 2px;
 }
 
-/* The start card is the primary action and is now a real button. */
+/* The start card is the primary action and is now a real button. Buttons are
+   border-box in the UA stylesheet where the old div was content-box, so the
+   original `height: 80px` started clipping the two-line label the moment the
+   element changed; this keeps the same painted height (80 + 36 padding) and
+   lets it grow rather than cut. No width here: .container already sets it, and
+   overriding it stretched the card past every other card on the page. */
 .startup {
-  width: 100%;
+  /* content-box, matching the div this used to be and the .container it shares
+     with the in-workout state. Buttons are border-box in the UA stylesheet, so
+     without this the 18px padding came out of the 80px height and clipped the
+     two-line label, and the painted width stopped matching every other card on
+     the page. */
+  box-sizing: content-box;
+  height: 80px;
   font-family: inherit;
   text-align: left;
   border: none;

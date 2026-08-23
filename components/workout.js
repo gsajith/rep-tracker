@@ -813,7 +813,7 @@ export default function Workout({
           </div>
         </div>
       ) : (
-        <div
+        <span
           style={{
             display: 'flex',
             flexDirection: 'row',
@@ -821,9 +821,11 @@ export default function Workout({
             justifyContent: 'space-between',
           }}
         >
-          <div style={{ width: 150 }}>Start a workout</div>
-          <div className={styles.plusContainer}>+</div>
-        </div>
+          {/* Spans rather than divs: this subtree is inside a <button> now,
+              which may only contain phrasing content. */}
+          <span style={{ width: 150 }}>Start a workout</span>
+          <span className={styles.plusContainer}>+</span>
+        </span>
       )}
     </Shell>
   );
