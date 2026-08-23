@@ -558,3 +558,12 @@
   font-size: 14px;
   font-weight: 600;
 }
+
+/* Sits tight under the chips it explains, with the breathing room after it so
+   the routine and the controls read as two groups. */
+.routineHint {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.7;
+}

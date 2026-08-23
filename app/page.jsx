@@ -575,7 +575,7 @@ export default function Home() {
         {routineBeingRenamed && (
           <Modal
             setShown={() => setRoutineBeingRenamed(null)}
-            label={routineBeingRenamed.name}
+            label="About this routine"
           >
             <div className={styles.renameRow}>
               {/* What starting this routine would give you: the exercises from
@@ -585,7 +585,14 @@ export default function Home() {
                   <li key={exercise.id}>{capitalize(exercise.name)}</li>
                 ))}
               </ul>
-              <label className={styles.srOnly} htmlFor="routine-name">
+              {/* There is no separate list to edit: a routine is whatever its
+                  newest session contained, so the way to change it is to do it
+                  differently. */}
+              <p className={styles.routineHint}>
+                These come from the last time you did it. To change them, start
+                the routine, edit the exercises, and save.
+              </p>
+              <label className={styles.renameLabel} htmlFor="routine-name">
                 Routine name
               </label>
               <input
