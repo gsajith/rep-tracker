@@ -1,11 +1,9 @@
 import { calculateDaysAgo, readableDate } from '@/utils/utils';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import styles from './exerciseToPreview.module.css';
-import { useWeightUnit } from '@/context/unitProvider';
+import Weight from './weight';
 
 export default function ExerciseToPreview({ exerciseToPreview }) {
-  const { toDisplay, unitLabel } = useWeightUnit();
-
   return (
     // id is the tour's anchor for the payoff step; harmless otherwise.
     <div className={styles.exercisePreview} id="tour-preview">
@@ -37,18 +35,10 @@ export default function ExerciseToPreview({ exerciseToPreview }) {
                 >
                   ×
                 </span>
-                <span style={{ fontSize: 18 }}>
-                  {toDisplay(exerciseToPreview.exercise.weights[i])}
-                </span>
-                <span
-                  className={styles.setAdornment}
-                  style={{
-                    marginLeft: -3,
-                    marginTop: 5,
-                  }}
-                >
-                  {unitLabel}
-                </span>
+                <Weight
+                  lb={exerciseToPreview.exercise.weights[i]}
+                  adornmentClassName={styles.setAdornment}
+                />
               </div>
             ))}
           </div>

@@ -1,0 +1,17 @@
+- generic [ref=f3e3]:
+  - generic [ref=f3e4]:
+    - text: "main (lb):"
+    - spinbutton [ref=f3e5]: "135"
+    - text: stored=135
+  - generic [ref=f3e6]:
+    - text: "pr-kg (kg):"
+    - spinbutton [ref=f3e7]: "61.2"
+    - text: stored=135
+  - generic [ref=f3e8]:
+    - text: "fixed-kg (kg):"
+    - spinbutton [ref=f3e9]: "61.2"
+    - text: stored=135
+  - generic [ref=f3e10]:
+    - text: "fixed-lb (lb):"
+    - spinbutton [ref=f3e11]: "135"
+    - text: stored=135

@@ -8,17 +8,18 @@ import {
   weightUnitLabel,
 } from '@/utils/units';
 
-// Falling back to pounds keeps <Exercise /> renderable outside the provider,
-// which is what the whole app did until this context was added.
-const DEFAULT_VALUE = {
-  unit: 'lb',
-  setUnit: () => {},
-  unitLabel: weightUnitLabel('lb'),
-  toDisplay: (stored) => toDisplayWeight(stored, 'lb'),
-  toStored: (shown) => toStoredWeight(shown, 'lb'),
-};
+const unitValue = (unit, setUnit) => ({
+  unit,
+  setUnit,
+  unitLabel: weightUnitLabel(unit),
+  toDisplay: (stored) => toDisplayWeight(stored, unit),
+  toStored: (shown) => toStoredWeight(shown, unit),
+});
 
-const WeightUnitContext = createContext(DEFAULT_VALUE);
+// The provider wraps <html>, so nothing in the app renders without it. The
+// default is here so a component can still be rendered on its own, in pounds,
+// which is what it would have done before this context existed.
+const WeightUnitContext = createContext(unitValue('lb', () => {}));
 
 export const useWeightUnit = () => useContext(WeightUnitContext);
 
@@ -27,16 +28,7 @@ export const WeightUnitProvider = ({ children }) => {
   // quietly label every number on screen with the wrong unit, which is worse.
   const [unit, setUnit] = useStickyState('lb', 'weight-unit', isWeightUnit);
 
-  const value = useMemo(
-    () => ({
-      unit,
-      setUnit,
-      unitLabel: weightUnitLabel(unit),
-      toDisplay: (stored) => toDisplayWeight(stored, unit),
-      toStored: (shown) => toStoredWeight(shown, unit),
-    }),
-    [unit, setUnit]
-  );
+  const value = useMemo(() => unitValue(unit, setUnit), [unit, setUnit]);
 
   return (
     <WeightUnitContext.Provider value={value}>

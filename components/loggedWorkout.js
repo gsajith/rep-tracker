@@ -10,7 +10,7 @@ import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
 import { useState } from 'react';
 import { useLongPress } from 'use-long-press';
 import { LetsIconsMore } from './SVGIcons/LetsIconsMore';
-import { useWeightUnit } from '@/context/unitProvider';
+import Weight from './weight';
 
 export function Exercise({
   exercise,
@@ -24,7 +24,6 @@ export function Exercise({
   // no keyboard path, no screen-reader announcement, and nothing at all on the
   // phone this product is built for. Tapping the icon now reveals it.
   const [noteRevealed, setNoteRevealed] = useState(false);
-  const { toDisplay, unitLabel } = useWeightUnit();
   const hasNote = Boolean(exercise.notes && exercise.notes.length > 0);
   const noteVisible = showNote || noteRevealed;
 
@@ -65,18 +64,10 @@ export function Exercise({
               >
                 ×
               </span>
-              <span style={{ fontSize: 18 }}>
-                {toDisplay(exercise.weights[i])}
-              </span>
-              <span
-                className={styles.setAdornment}
-                style={{
-                  marginLeft: -3,
-                  marginTop: 5,
-                }}
-              >
-                {unitLabel}
-              </span>
+              <Weight
+                lb={exercise.weights[i]}
+                adornmentClassName={styles.setAdornment}
+              />
             </div>
           ))}
           {truncateSets && (

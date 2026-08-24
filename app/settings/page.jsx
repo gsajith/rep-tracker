@@ -56,30 +56,28 @@ export default function Settings() {
               you lifted.
             </p>
           </div>
-          {/* Same mount gate as the theme swatches: the stored choice is not
-              known until localStorage can be read, and pressed state that
-              flips after hydration is worse than a beat of nothing. */}
-          {mount && (
-            <div
-              className={styles.unitChoices}
-              role="group"
-              aria-label="Weight unit"
-            >
-              {WEIGHT_UNITS.map((name) => (
-                <button
-                  key={name}
-                  type="button"
-                  aria-pressed={unit === name}
-                  onClick={() => setUnit(name)}
-                  className={classNames(styles.unitButton, {
-                    [`${styles.unitButtonActive}`]: unit === name,
-                  })}
-                >
-                  {weightUnitLabel(name)}
-                </button>
-              ))}
-            </div>
-          )}
+          {/* No mount gate, unlike the swatches above: useLoadDelay already
+              holds the whole page back to a later tick than the mount effect,
+              so this never renders before the stored choice is readable. */}
+          <div
+            className={styles.unitChoices}
+            role="group"
+            aria-label="Weight unit"
+          >
+            {WEIGHT_UNITS.map((name) => (
+              <button
+                key={name}
+                type="button"
+                aria-pressed={unit === name}
+                onClick={() => setUnit(name)}
+                className={classNames(styles.unitButton, {
+                  [`${styles.unitButtonActive}`]: unit === name,
+                })}
+              >
+                {weightUnitLabel(name)}
+              </button>
+            ))}
+          </div>
         </div>
         <div className={styles.tour}>
           <div>

@@ -303,10 +303,16 @@ export default function Stats() {
               <GroupedButtons
                 selectedItem={selectedExerciseStatFormat}
                 setSelectedItem={setSelectedExerciseStatFormat}
+                // The unit is named here because the Y axis carries no label:
+                // without it a peak of 61 on the chart could be either unit.
                 options={
                   isBodyweight
                     ? ['Reps', 'Total reps', 'Table']
-                    : ['Weight', 'Volume (reps × weight)', 'Table']
+                    : [
+                        `Weight (${unitLabel})`,
+                        `Volume (reps × ${unitLabel})`,
+                        'Table',
+                      ]
                 }
               />
               {selectedExerciseStatFormat !== 2 && (
@@ -403,7 +409,10 @@ export default function Stats() {
                       exercise={e}
                       truncateSets={false}
                       extraSets={0}
-                      numSets={e.reps.length}
+                      // Min, matching <LoggedWorkout />: stored reps and
+                      // weights can be ragged, and a set with no weight was
+                      // asking for an element that is not there.
+                      numSets={Math.min(e.reps.length, e.weights.length)}
                       name={selectedExercise}
                       showDate={true}
                       showNote={true}
