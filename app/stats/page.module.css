@@ -51,9 +51,8 @@
   margin-bottom: 16px;
 }
 
-/* Shown instead of a chart when there is one session: a single bar filling the
-   plot area presented one measurement as a trend. */
-.singleSession,
+/* Stands in for the chart before an exercise is picked, so the space below the
+   selector says what goes there rather than sitting empty. */
 .pickPrompt {
   margin: 16px 0 0;
   font-size: 16px;
