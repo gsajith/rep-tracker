@@ -17,6 +17,17 @@ import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
+import { useWeightUnit } from '@/context/unitProvider';
+import Weight from './weight';
+
+// An emptied set field holds "", which has no number in it and so no display
+// value either. React rejects NaN as a controlled value and <VariableInput />
+// would size the field to the three characters of "NaN", so the empty field is
+// passed through as empty.
+const weightInputValue = (storedLb, drag, toDisplay) => {
+  const shown = toDisplay(storedLb) + parseFloat(drag);
+  return Number.isFinite(shown) ? Math.max(0, shown) : '';
+};
 
 const getExerciseStyle = (isDragging, exerciseStyle, draggableStyle) => ({
   userSelect: 'none',
@@ -42,6 +53,11 @@ export default function Workout({
   workoutStartTime,
   setWorkoutStartTime,
 }) {
+  // Weights live in state and in the database as pounds whatever this says;
+  // the conversion happens at the input's edge, so nothing downstream of here
+  // has to know which unit is on screen.
+  const { unit, toDisplay, toStored, unitLabel } = useWeightUnit();
+
   // State for the exercise selector combobox
   const [selectedItem, setSelectedItem] = useState();
   // State for the exercise selector combobox
@@ -199,11 +215,17 @@ export default function Workout({
     });
   };
 
+  // A drag notch is one unit of whatever is on screen, so past the fine region
+  // the step has to be the smallest plate pair that unit is actually stocked
+  // in: 5 lb, or 2.5 kg. Left at 5 it would have jumped a kg user 11 lb a
+  // notch, with nothing landing on the 2.5 kg increments they lift in.
+  const coarseWeightsDragStep = unit === 'kg' ? 2.5 : 5;
+
   const normalizeWeightsDrag = (value) => {
     if (value <= 200) {
       return Math.floor(value / 40);
     } else {
-      return Math.ceil((value - 200) / 40) * 5;
+      return Math.ceil((value - 200) / 40) * coarseWeightsDragStep;
     }
   };
 
@@ -595,16 +617,38 @@ export default function Workout({
                                                 );
                                               }}
                                               onTouchEnd={() => {
-                                                updateExerciseWeights(
-                                                  index,
-                                                  i,
-                                                  parseInt(
-                                                    exercise.weights[i]
-                                                  ) +
-                                                    parseInt(
-                                                      exercise.weightsDrag[i]
-                                                    )
+                                                const drag = parseFloat(
+                                                  exercise.weightsDrag[i]
                                                 );
+                                                // touchAction is none on this
+                                                // input, so every tap of it
+                                                // ends here, drag or not. With
+                                                // no drag there is nothing to
+                                                // commit: converting the value
+                                                // out and back would re-round
+                                                // a number the user never
+                                                // edited, and in kg that quietly
+                                                // turns a stored 135 lb into
+                                                // 134.92.
+                                                if (drag) {
+                                                  // The commit clamps the same
+                                                  // way the shown value does.
+                                                  // Without it, dragging below
+                                                  // zero displayed 0 and saved
+                                                  // a negative weight.
+                                                  updateExerciseWeights(
+                                                    index,
+                                                    i,
+                                                    toStored(
+                                                      Math.max(
+                                                        0,
+                                                        toDisplay(
+                                                          exercise.weights[i]
+                                                        ) + drag
+                                                      )
+                                                    )
+                                                  );
+                                                }
                                                 updateExerciseWeightsDrag(
                                                   index,
                                                   i,
@@ -613,18 +657,16 @@ export default function Workout({
                                               }}
                                               type="number"
                                               className={styles.setInputNumber}
-                                              value={Math.max(
-                                                0,
-                                                parseInt(exercise.weights[i]) +
-                                                  parseInt(
-                                                    exercise.weightsDrag[i]
-                                                  )
+                                              value={weightInputValue(
+                                                exercise.weights[i],
+                                                exercise.weightsDrag[i],
+                                                toDisplay
                                               )}
                                               onChange={(e) => {
                                                 updateExerciseWeights(
                                                   index,
                                                   i,
-                                                  e.target.value
+                                                  toStored(e.target.value)
                                                 );
                                               }}
                                             />
@@ -635,7 +677,7 @@ export default function Workout({
                                                 marginTop: 5,
                                               }}
                                             >
-                                              lbs
+                                              {unitLabel}
                                             </span>
                                           </div>
 
@@ -736,18 +778,12 @@ export default function Workout({
                                         >
                                           ×
                                         </span>
-                                        <span style={{ fontSize: 18 }}>
-                                          {exercise.oldWeights[i]}
-                                        </span>
-                                        <span
-                                          className={styles.setAdornment}
-                                          style={{
-                                            marginLeft: -3,
-                                            marginTop: 5,
-                                          }}
-                                        >
-                                          lbs
-                                        </span>
+                                        <Weight
+                                          lb={exercise.oldWeights[i]}
+                                          adornmentClassName={
+                                            styles.setAdornment
+                                          }
+                                        />
                                       </div>
                                     ))}
                                   </div>

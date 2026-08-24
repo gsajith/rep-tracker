@@ -6,6 +6,9 @@ import { useEffect, useState } from 'react';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
 import { browserStorage, writeStickyValue } from '@/hooks/useStickyState';
 import { useRouter } from 'next/navigation';
+import { useWeightUnit } from '@/context/unitProvider';
+import { WEIGHT_UNITS, weightUnitLabel } from '@/utils/units';
+import classNames from 'classnames';
 
 // "blue-orange" reads as "Blue orange" rather than being announced as the
 // slug, or as nothing at all, which is what six unnamed buttons did before.
@@ -16,6 +19,7 @@ const themeLabel = (name) => {
 
 export default function Settings() {
   const { themeName, setThemeName, allThemeNames } = useTheme();
+  const { unit, setUnit } = useWeightUnit();
   const router = useRouter();
 
   const [mount, setMount] = useState(false);
@@ -43,10 +47,42 @@ export default function Settings() {
               ))}
           </div>
         </div>
+        <div className={styles.unitSelector}>
+          <div>
+            <div className={styles.settingTitle}>Weight unit</div>
+            <p className={styles.settingBody}>
+              Everything already logged was recorded in pounds and gets
+              converted for display. Switching changes what you see, not what
+              you lifted.
+            </p>
+          </div>
+          {/* No mount gate, unlike the swatches above: useLoadDelay already
+              holds the whole page back to a later tick than the mount effect,
+              so this never renders before the stored choice is readable. */}
+          <div
+            className={styles.unitChoices}
+            role="group"
+            aria-label="Weight unit"
+          >
+            {WEIGHT_UNITS.map((name) => (
+              <button
+                key={name}
+                type="button"
+                aria-pressed={unit === name}
+                onClick={() => setUnit(name)}
+                className={classNames(styles.unitButton, {
+                  [`${styles.unitButtonActive}`]: unit === name,
+                })}
+              >
+                {weightUnitLabel(name)}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className={styles.tour}>
           <div>
-            <div className={styles.tourTitle}>Guided tour</div>
-            <p className={styles.tourBody}>
+            <div className={styles.settingTitle}>Guided tour</div>
+            <p className={styles.settingBody}>
               Walks through starting a workout, adding an exercise, and where
               last time&apos;s numbers turn up.
             </p>

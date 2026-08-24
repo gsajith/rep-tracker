@@ -75,12 +75,16 @@ Confirmed functionality:
 - Long-press a past workout to copy it into a new session or delete it.
 - Stats: a contribution-calendar view of workout days, and per-exercise Weight,
   Volume (reps x weight), and Table views with a show-empty-days toggle.
-- Settings holds one control: the color-style picker.
+- Settings holds the color-style picker, a lbs/kg weight-unit choice, and
+  a replay of the guided tour.
 
 Confirmed constraints:
 
-- **Weights are in lbs**, hard-coded in `components/workout.js`,
-  `components/loggedWorkout.js`, and `components/exerciseToPreview.js`.
+- **Weights are stored in lbs.** Every number in the database and in
+  localStorage is pounds; no row records the unit it was typed in, so pounds is
+  the only thing a stored number can be read as. The settings choice converts at
+  the edges (`utils/units.js`, `context/unitProvider.jsx`) and never rewrites
+  what is stored.
 - **The database has no row-level security.** Every query in a route handler is
   scoped by the Clerk user id resolved server-side. That scoping is the only
   thing separating one user's data from another's.
@@ -91,8 +95,9 @@ Confirmed constraints:
 
 Explicitly undecided, and not to be treated as settled:
 
-- **Units.** `lbs` was not made binding. With a public audience, kg support is
-  an open product decision.
+- **Per-workout units.** The unit is one global display choice. Whether a
+  single account needs to log some lifts in kg and others in lbs, which would
+  need a unit recorded per set, is unresolved.
 - **Discoverability of the two signature gestures.** Neither swipe-to-scrub nor
   long-press-to-copy is announced anywhere in the UI. How a new user learns them
   is unresolved.
@@ -143,8 +148,8 @@ marketing surface, no screenshots, and no published privacy policy or terms.
 4. **One user's data is never another's.** Every query scopes by Clerk user id.
    No client component touches the database.
 5. **Public sign-up raises the floor.** Assumptions that held for one expert
-   user (lbs only, touch only, no first run) are open decisions now, not
-   defaults to build on.
+   user (touch only, no first run) are open decisions now, not defaults to
+   build on.
 
 ## Accessibility & Inclusion
 

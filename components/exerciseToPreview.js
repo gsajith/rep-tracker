@@ -1,6 +1,7 @@
 import { calculateDaysAgo, readableDate } from '@/utils/utils';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import styles from './exerciseToPreview.module.css';
+import Weight from './weight';
 
 export default function ExerciseToPreview({ exerciseToPreview }) {
   return (
@@ -34,18 +35,10 @@ export default function ExerciseToPreview({ exerciseToPreview }) {
                 >
                   ×
                 </span>
-                <span style={{ fontSize: 18 }}>
-                  {exerciseToPreview.exercise.weights[i]}
-                </span>
-                <span
-                  className={styles.setAdornment}
-                  style={{
-                    marginLeft: -3,
-                    marginTop: 5,
-                  }}
-                >
-                  lbs
-                </span>
+                <Weight
+                  lb={exerciseToPreview.exercise.weights[i]}
+                  adornmentClassName={styles.setAdornment}
+                />
               </div>
             ))}
           </div>

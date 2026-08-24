@@ -19,6 +19,7 @@ import {
 import Toggle from '@/components/toggle';
 import { useStickyState } from '@/hooks/useStickyState';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
+import { useWeightUnit } from '@/context/unitProvider';
 import { Exercise } from '@/components/loggedWorkout';
 
 export default function Stats() {
@@ -100,6 +101,8 @@ export default function Stats() {
     return options;
   }, [exerciseHistory]);
 
+  const { toDisplay, unitLabel } = useWeightUnit();
+
   const calculateVolume = useCallback((reps, weights) => {
     let volume = 0;
     for (let i = 0; i < reps.length; i++) {
@@ -130,9 +133,13 @@ export default function Stats() {
   const getFormatLabel = useCallback(
     (format) => {
       if (isBodyweight) return format === 1 ? 'Total reps' : 'Max reps';
-      return format === 1 ? 'Volume' : 'Max weight';
+      // Named here because the bars carry no unit anywhere else, and volume in
+      // kg is a different number from volume in lbs.
+      return format === 1
+        ? `Volume (${unitLabel})`
+        : `Max weight (${unitLabel})`;
     },
-    [isBodyweight]
+    [isBodyweight, unitLabel]
   );
 
   const generateEmptyDays = useCallback((day1, day2) => {
@@ -173,11 +180,15 @@ export default function Stats() {
         return {
           ...historyItem,
           maxWeight: historyItem.weights.length
-            ? Math.max(...historyItem.weights)
+            ? toDisplay(Math.max(...historyItem.weights))
             : 0,
           maxReps: historyItem.reps.length ? Math.max(...historyItem.reps) : 0,
           totalReps: historyItem.reps.reduce((a, r) => a + (Number(r) || 0), 0),
-          volume: calculateVolume(historyItem.reps, historyItem.weights),
+          // Reps are dimensionless, so converting the summed volume is the
+          // same as converting every weight that went into it.
+          volume: toDisplay(
+            calculateVolume(historyItem.reps, historyItem.weights)
+          ),
         };
       });
       if (selectedExerciseStatFormat !== 2) {
@@ -205,6 +216,7 @@ export default function Stats() {
     selectedExercise,
     showEmptyDays,
     selectedExerciseStatFormat,
+    toDisplay,
   ]);
 
   return (
@@ -291,10 +303,16 @@ export default function Stats() {
               <GroupedButtons
                 selectedItem={selectedExerciseStatFormat}
                 setSelectedItem={setSelectedExerciseStatFormat}
+                // The unit is named here because the Y axis carries no label:
+                // without it a peak of 61 on the chart could be either unit.
                 options={
                   isBodyweight
                     ? ['Reps', 'Total reps', 'Table']
-                    : ['Weight', 'Volume (reps × weight)', 'Table']
+                    : [
+                        `Weight (${unitLabel})`,
+                        `Volume (reps × ${unitLabel})`,
+                        'Table',
+                      ]
                 }
               />
               {selectedExerciseStatFormat !== 2 && (
@@ -391,7 +409,10 @@ export default function Stats() {
                       exercise={e}
                       truncateSets={false}
                       extraSets={0}
-                      numSets={e.reps.length}
+                      // Min, matching <LoggedWorkout />: stored reps and
+                      // weights can be ragged, and a set with no weight was
+                      // asking for an element that is not there.
+                      numSets={Math.min(e.reps.length, e.weights.length)}
                       name={selectedExercise}
                       showDate={true}
                       showNote={true}

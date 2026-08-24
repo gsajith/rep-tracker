@@ -13,7 +13,8 @@
   composes: container from "../page.module.css"
 }
 
-.tour {
+.tour,
+.unitSelector {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -21,14 +22,14 @@
   margin-top: 32px;
 }
 
-.tourTitle {
+.settingTitle {
   font-weight: bold;
   font-size: 18px;
 }
 
 /* Same reasoning as .emptyBody in page.module.css: faded --text clears 4.5:1
    on every theme, --textSecondary does not. */
-.tourBody {
+.settingBody {
   margin: 4px 0 0;
   font-size: 15px;
   line-height: 1.45;
@@ -57,6 +58,28 @@
 .replayButton:focus-visible {
   outline: 3px solid var(--text);
   outline-offset: 2px;
+}
+
+.unitChoices {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+/* The same pill as Replay, down to the focus ring. Only the width floor is
+   new, so that "kg" and "lbs" come out the same size. */
+.unitButton {
+  composes: replayButton;
+  min-width: 64px;
+}
+
+/* --secondary behind --text, the pair the exercise cards use and the one
+   green-dark's --secondary was darkened to make work, so it clears 4.5:1 on
+   all six palettes. Declared after .replayButton so it wins the background on
+   source order. aria-pressed carries the selection for anything not reading
+   colour. */
+.unitButtonActive {
+  background: var(--secondary);
 }
 
 .pageTitle {

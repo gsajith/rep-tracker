@@ -10,6 +10,7 @@ import { LetsIconsTimeAtack } from './SVGIcons/LetsIconsTimeAtack';
 import { useState } from 'react';
 import { useLongPress } from 'use-long-press';
 import { LetsIconsMore } from './SVGIcons/LetsIconsMore';
+import Weight from './weight';
 
 export function Exercise({
   exercise,
@@ -63,16 +64,10 @@ export function Exercise({
               >
                 ×
               </span>
-              <span style={{ fontSize: 18 }}>{exercise.weights[i]}</span>
-              <span
-                className={styles.setAdornment}
-                style={{
-                  marginLeft: -3,
-                  marginTop: 5,
-                }}
-              >
-                lbs
-              </span>
+              <Weight
+                lb={exercise.weights[i]}
+                adornmentClassName={styles.setAdornment}
+              />
             </div>
           ))}
           {truncateSets && (
