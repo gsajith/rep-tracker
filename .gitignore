@@ -63,3 +63,6 @@ public/workbox-*.js.map
 # Local design-tooling state (impeccable). config.json is five regenerable
 # lines and the rest is per-session journals, so none of it is worth tracking.
 .impeccable/
+
+# Playwright MCP writes page snapshots and console logs here.
+.playwright-mcp/
