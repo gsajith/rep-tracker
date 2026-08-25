@@ -1,62 +1,88 @@
 .container {
-  composes: container from "../page.module.css";
-  /* The home page ends with a spacer to clear the fixed nav; stats had none, so
-     the chart's x-axis ran underneath it. */
-  margin-bottom: 115px;
+  composes: container from '../page.module.css';
+  margin-top: 8px;
+  /* The home page ends with a spacer to clear the dock; stats had none, so the
+     chart's x-axis ran underneath it. */
+  margin-bottom: 24px;
+}
+
+.pageTitle {
+  margin-bottom: 16px;
+  font-size: 30px;
 }
 
 .calendarContainer {
-  border-radius: 8px;
-  padding-block: 8px;
+  border-radius: var(--r-inner);
+  background: var(--surface-2);
+  padding: 14px 12px;
+  min-height: 120px;
+  overflow-x: auto;
+}
+
+.calendarStatus {
+  text-align: center;
+  padding-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-mute);
 }
 
 .exerciseStatsContainer {
-  margin-top: 8px;
+  margin-top: 22px;
 }
+
+.sectionHeading {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* Stands in for the chart before an exercise is picked, so the space below the
+   selector says what goes there rather than sitting empty. */
+.pickPrompt {
+  margin: 18px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-mute);
+}
+
+/** ------------------------------------------------------------ table view */
 
 .exerciseHistory {
   display: flex;
   flex: 1;
   overflow-x: scroll;
   -ms-overflow-style: none;
-  /* Internet Explorer 10+ */
   scrollbar-width: none;
-  /* Firefox */
   position: relative;
-  margin-top: 12px;
+  margin-top: 16px;
   overscroll-behavior-inline: contain;
   scroll-snap-type: x mandatory;
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 calc(100% - 28px),
+    transparent
+  );
+}
+
+.exerciseHistory::-webkit-scrollbar {
+  display: none;
 }
 
 .exerciseHistoryTable {
   display: flex;
-  gap: 12px;
-  align-items: baseline;
+  gap: 8px;
+  align-items: flex-start;
 }
 
-.exerciseHistory>.exerciseHistoryTable > * {
+.exerciseHistory > .exerciseHistoryTable > * {
   scroll-snap-align: start;
 }
 
-.exerciseHistory > .exerciseHistoryTable > *:first-child {
-  margin-inline-start: 50px;
-}
-
-.exerciseHistory>.exerciseHistoryTable>*:last-child {
+.exerciseHistory > .exerciseHistoryTable > *:last-child {
   scroll-snap-align: end;
-  margin-inline-end: 50px;
-}
-
-.pageTitle {
-  margin-bottom: 16px;
-}
-
-/* Stands in for the chart before an exercise is picked, so the space below the
-   selector says what goes there rather than sitting empty. */
-.pickPrompt {
-  margin: 16px 0 0;
-  font-size: 16px;
-  line-height: 1.5;
-  color: var(--text);
-  opacity: 0.75;
+  margin-inline-end: 28px;
 }

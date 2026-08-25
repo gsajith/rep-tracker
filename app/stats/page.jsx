@@ -67,12 +67,15 @@ export default function Stats() {
     return new Date(end.getTime() - tzoffset).toISOString().split('T')[0];
   }, [workouts, tzoffset]);
 
+  // A day with nothing logged is --line. The panel this grid sits in is already
+  // --surface-2, so an empty cell painted in that disappeared into it and the
+  // calendar read as a blank field with a few marks floating on it.
   const gh_panelColors = [
-    'rgb(from var(--accentHoverLight) r g b / 50%)',
-    'rgb(from var(--accent) r g b / 70%)',
-    'rgb(from var(--accent) r g b / 100%)',
+    'var(--line)',
+    'rgb(from var(--brand) r g b / 55%)',
+    'var(--brand)',
   ];
-  const gh_panelAttributes = { rx: 1, ry: 1 };
+  const gh_panelAttributes = { rx: 3, ry: 3 };
 
   const exerciseHistory = useMemo(() => {
     const history = {};
@@ -229,12 +232,12 @@ export default function Stats() {
             panelColors={gh_panelColors}
             panelAttributes={gh_panelAttributes}
           />
-          <div style={{ textAlign: 'center' }}>
-            {loading || loading2 ? 'Loading...' : ''}
-          </div>
+          {(loading || loading2) && (
+            <div className={styles.calendarStatus}>Loading</div>
+          )}
         </div>
         <div className={styles.exerciseStatsContainer}>
-          Individual exercise stats
+          <h2 className={styles.sectionHeading}>Individual exercise stats</h2>
           {mount && (
             <>
               <Select
@@ -246,51 +249,57 @@ export default function Stats() {
                   IndicatorSeparator: () => null,
                 }}
                 onChange={(option) => setSelectedExercise(option.value)}
+                // Rebuilt on the app's own parts: a tinted field, a 12px
+                // radius, and the brand focus ring the rest of the app uses.
                 styles={{
                   control: (baseStyles, state) => ({
                     ...baseStyles,
-                    marginTop: 8,
-                    background: 'var(--white)',
+                    marginTop: 12,
+                    minHeight: 52,
+                    background: 'var(--surface-2)',
+                    borderRadius: 'var(--r-chip)',
                     boxShadow: state.isFocused
-                      ? '0 0 0 2px var(--accent)'
+                      ? '0 0 0 3px var(--brand)'
                       : 'none',
-                    border: '1px solid var(--textSecondary)',
-                    '&:hover': {
-                      border: state.isFocused
-                        ? '1px solid var(--accent)'
-                        : '1px solid #aaa',
-                    },
+                    border: 'none',
+                    '&:hover': { border: 'none' },
                   }),
-                  singleValue: (baseStyles, state) => ({
+                  singleValue: (baseStyles) => ({
                     ...baseStyles,
-                    color: 'var(--accentText)',
-                    fontWeight: '600',
+                    color: 'var(--ink)',
+                    fontWeight: 700,
                   }),
-                  // react-select's default placeholder is #808080, 3.95:1 on
-                  // white.
+                  // react-select's default placeholder is #808080, which is
+                  // 3.95:1 on white.
                   placeholder: (baseStyles) => ({
                     ...baseStyles,
-                    color: 'var(--textSecondary)',
+                    color: 'var(--ink-mute)',
                   }),
                   input: (baseStyles) => ({
                     ...baseStyles,
-                    color: 'var(--text)',
+                    color: 'var(--ink)',
                   }),
-                  menu: (baseStyles, state) => ({
+                  dropdownIndicator: (baseStyles) => ({
                     ...baseStyles,
-                    background: 'var(--white)',
+                    color: 'var(--ink-mute)',
+                  }),
+                  menu: (baseStyles) => ({
+                    ...baseStyles,
+                    background: 'var(--surface)',
+                    borderRadius: 'var(--r-inner)',
+                    overflow: 'hidden',
+                    boxShadow: 'var(--lift)',
                     zIndex: 3,
                   }),
                   option: (baseStyles, state) => ({
                     ...baseStyles,
+                    color: state.isSelected ? 'var(--on-brand)' : 'var(--ink)',
+                    fontWeight: state.isSelected ? 700 : 500,
                     backgroundColor: state.isSelected
-                      ? 'var(--accent)'
-                      : 'var(--white)',
-                    '&:hover': {
-                      backgroundColor: state.isSelected
-                        ? 'var(--accent)'
-                        : 'var(--accentHoverLight)',
-                    },
+                      ? 'var(--brand)'
+                      : state.isFocused
+                        ? 'var(--surface-2)'
+                        : 'var(--surface)',
                   }),
                 }}
               />
@@ -343,8 +352,13 @@ export default function Stats() {
                     tickFormatter={(value) => {
                       return value.split(',')[0];
                     }}
+                    stroke="var(--line)"
+                    tick={{ fontSize: 12, fill: 'var(--ink-mute)' }}
                   />
-                  <YAxis />
+                  <YAxis
+                    stroke="var(--line)"
+                    tick={{ fontSize: 12, fill: 'var(--ink-mute)' }}
+                  />
                   <Tooltip
                     labelFormatter={(value) => {
                       return `Date: ${value}`;
@@ -356,26 +370,23 @@ export default function Stats() {
                         ...props,
                       ];
                     }}
+                    cursor={{ fill: 'var(--surface-2)' }}
                     contentStyle={{
-                      background: 'var(--background)',
-                      borderRadius: 8,
-                    }}
-                    wrapperStyle={{
-                      borderRadius: 8,
-                      overflow: 'hidden',
+                      background: 'var(--surface)',
                       border: 'none',
+                      borderRadius: 'var(--r-chip)',
+                      boxShadow: 'var(--lift)',
+                      color: 'var(--ink)',
+                      fontSize: 14,
                     }}
-                    border={'none'}
+                    labelStyle={{ color: 'var(--ink-mute)' }}
+                    wrapperStyle={{ outline: 'none' }}
                   />
                   <Bar
                     dataKey={getFormatKey(selectedExerciseStatFormat)}
-                    fill="var(--accent)"
-                    activeBar={
-                      <Rectangle
-                        fill="var(--secondary)"
-                        stroke="var(--secondaryHover)"
-                      />
-                    }
+                    fill="var(--brand)"
+                    radius={[6, 6, 0, 0]}
+                    activeBar={<Rectangle fill="var(--brand-from)" radius={[6, 6, 0, 0]} />}
                   />
                 </BarChart>
               </ResponsiveContainer>

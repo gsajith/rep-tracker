@@ -1,248 +1,14 @@
-.previousWorkoutsHeader {
-  margin-top: 32px;
-  margin-bottom: 16px;
-  font-size: 18px;
-  font-weight: bold;
-  color: var(--textSecondary);
-}
-
-.workoutButton {
-  border: none;
-  background: var(--accent);
-  color: var(--textInverted);
-  padding: 16px;
-  font-weight: bold;
-  font-size: 18px;
-  border-radius: 14px;
-  transition: background 150ms ease-in-out, border 150ms ease-in-out;
-  border: 2px solid var(--accent);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-
-  padding-left: 8px;
-}
-
-.workoutButton:not(:disabled) {
-  cursor: pointer;
-}
-
-/* Without the :not(:disabled) guards a disabled button keeps the pointer
-   cursor and still lights up on hover, so it reads as clickable.
-
-   Dim only. Do not copy .addButton's disabled background: that rule works
-   because .addButton already has --secondary in its base rule and sets no
-   colour, so it dims in place. These buttons set color: --textInverted, and
-   swapping the background to --secondary underneath it puts white on light
-   lime in the default theme, around 1.2:1.
-
-   Opacity fades the element as a group, so the label's contrast against the
-   button drops as well rather than holding: roughly 3.9:1 to 2.0:1 on the
-   default theme. That is the ordinary disabled band, and WCAG exempts
-   inactive controls, so it is the trade being made here knowingly. */
-.workoutButton:disabled {
-  opacity: 0.55;
-}
-
-.workoutButton:not(:disabled):hover,
-.workoutButton:not(:disabled):focus {
-  color: var(--textInverted);
-  background: var(--accentHover);
-  border: 2px solid var(--text);
-}
-
-.delete {
-  background: var(--warning);
-  border: 2px solid var(--textSecondary);
-}
-
-.delete:not(:disabled):hover, .delete:not(:disabled):focus {
-  background: var(--warning)
-}
+/* Home. One gradient card at the top carrying the primary action, a row of
+   routine pills under it, then the history as white cards. */
 
 .main {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.copyWorkoutContentWrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 24px;
-}
-
-.loadingContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
   width: 100%;
+  padding-top: 8px;
 }
 
-.shimmer {
-  max-width: 368px;
-  width: 100%;
-  height: 150px;
-  border-radius: 16px;
-}
-
-.showAllWorkoutsButton {
-  background: var(--secondary);
-  border: none;
-  cursor: pointer;
-  padding: 16px;
-  margin: 12px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 24px;
-}
-
-.showAllWorkoutsButton:hover {
-  background: var(--secondaryHover);
-}
-
-.container {
-  background: var(--white);
-  margin-bottom: 16px;
-  padding: 16px;
-  max-width: calc(100vw - 48px);
-  width: 336px;
-  border-radius: 16px;
-}
-
-/* Error text inside the long-press modal. --warning is defined per theme in
-   globals.css, so this reads correctly on the dark themes too. */
-.modalError {
-  color: var(--warning);
-  font-weight: 600;
-  text-align: left;
-}
-
-/* Banner above the previous-workouts list, for when the list on screen is
-   known to be out of date or never arrived at all. */
-.listNotice {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 16px;
-  padding: 12px 14px;
-  border: 2px solid var(--warning);
-  border-radius: 14px;
-  color: var(--warning);
-  font-weight: 600;
-  text-align: left;
-}
-
-.retryButton {
-  flex-shrink: 0;
-  border: 2px solid var(--warning);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--warning);
-  font-weight: bold;
-  font-size: 16px;
-  padding: 6px 12px;
-}
-
-.retryButton:not(:disabled) {
-  cursor: pointer;
-}
-
-/* Dim only, no colour swap, for the reason spelled out on .workoutButton. */
-.retryButton:disabled {
-  opacity: 0.55;
-}
-
-/* The empty previous-workouts list. Sized and aligned to the workout cards it
-   stands in for, so the column keeps its shape once the first one lands. The
-   purple start card directly above is already the call to action, so this
-   explains what the list is for rather than growing a second button. */
-.emptyState {
-  width: 336px;
-  max-width: calc(100vw - 48px);
-  margin-top: 24px;
-  text-align: left;
-}
-
-.emptyTitle {
-  margin: 0 0 8px;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-/* --text faded rather than --textSecondary, which lands at 3.2:1 against the
-   page and fails as body text. Fading --text instead computes to 6.7:1 on the
-   light themes and 8.0:1 on the dark ones. */
-.emptyBody {
-  margin: 0;
-  font-size: 16px;
-  line-height: 1.5;
-  opacity: 0.72;
-}
-
-/* Shown only while the delete button is primed, so there is a labelled way out
-   of the confirm rather than only the unlabelled shim behind the modal. */
-.keepButton {
-  border: 2px solid var(--text);
-  border-radius: 14px;
-  background: transparent;
-  color: var(--text);
-  font-family: inherit;
-  font-weight: bold;
-  font-size: 18px;
-  min-height: 44px;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: box-shadow 150ms ease-in-out;
-}
-
-.keepButton:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.keepButton:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
-}
-
-
-/* Standard focus ring for this app: --text keeps it visible on every palette,
-   where --accent drops to 2.4:1 on green-dark. */
-.workoutButton:not(:disabled):focus-visible,
-.showAllWorkoutsButton:focus-visible,
-.workoutMenuButton:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
-}
-
-/* Keyboard and screen-reader route to the copy/delete menu, which was reachable
-   only by long-pressing the card. Sits in the card header beside the times. */
-.workoutMenuButton {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  margin: -8px -4px -8px 4px;
-  padding: 0;
-  border: none;
-  border-radius: 8px;
-  background: none;
-  color: var(--text);
-  cursor: pointer;
-  transition: background 150ms ease-in-out;
-}
-
-.workoutMenuButton:hover {
-  background: var(--accentHoverLight);
-}
-
-/* The home screen had no heading at all. This names the page for assistive
-   tech without adding a redundant title above a list that is already obvious. */
 .srOnly {
   position: absolute;
   width: 1px;
@@ -255,33 +21,222 @@
   border: 0;
 }
 
-/* The one thing this page can say that is not a failure. Announced through the
-   existing live region below, so it is not duplicated here. */
-/* The one thing this page says that is not a failure, so it gets to look like
-   an object rather than an outlined strip: the same white surface and radius as
-   the cards, lifted off the page, with the tick the app already uses for
-   completing things. */
+/** ---------------------------------------------------------------- routines */
+
+.routines {
+  width: var(--card);
+  margin-top: 22px;
+}
+
+.routinesHeading {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.routineRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* A pill, matching the dock and the reference's category chips. The name is
+   the control; the menu is a second cell sharing the same pill. */
+.routineChip {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  box-shadow: var(--lift);
+  transition: transform 200ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.routineChip:hover {
+  transform: translateY(-2px);
+}
+
+.routineStart {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1px;
+  min-height: 52px;
+  padding: 8px 8px 8px 18px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.routineName {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.routineWhen {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-text);
+}
+
+.routineMenuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  border: none;
+  background: transparent;
+  color: var(--ink-mute);
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.routineMenuButton:hover {
+  color: var(--ink);
+}
+
+.routineStart:focus-visible,
+.routineMenuButton:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: -3px;
+}
+
+/** ------------------------------------------------------- previous workouts */
+
+.previousWorkoutsHeader {
+  width: var(--card);
+  margin-top: 30px;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: var(--card);
+}
+
+.shimmer {
+  width: 100%;
+  height: 132px;
+}
+
+.showAllWorkoutsButton {
+  width: var(--card);
+  min-height: 52px;
+  margin: 6px 0 12px;
+  padding: 14px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--brand-text);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--lift);
+  transition: background 150ms ease;
+}
+
+.showAllWorkoutsButton:hover {
+  background: var(--surface-2);
+}
+
+/** ------------------------------------------------------------ empty state */
+
+.emptyState {
+  width: var(--card);
+  margin-top: 20px;
+  padding: 22px;
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--lift);
+  text-align: left;
+}
+
+.emptyTitle {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.emptyBody {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-mute);
+}
+
+/** ------------------------------------------------------------------ notices */
+
+.listNotice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: var(--card);
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: var(--r-inner);
+  background: rgb(from var(--warn) r g b / 12%);
+  color: var(--warn);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.retryButton {
+  flex-shrink: 0;
+  min-height: 38px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--warn);
+  color: var(--on-warn);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 14px;
+}
+
+.retryButton:not(:disabled) {
+  cursor: pointer;
+}
+
+.retryButton:disabled {
+  opacity: 0.55;
+}
+
 .saveSuccess {
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 336px;
-  max-width: calc(100vw - 48px);
-  box-sizing: border-box;
-  margin-top: 16px;
+  width: var(--card);
+  margin-top: 14px;
   padding: 14px 16px;
-  background: var(--white);
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgb(from var(--text) r g b / 16%);
-  color: var(--text);
+  background: var(--lime);
+  border-radius: var(--r-inner);
+  color: var(--on-lime);
+  font-size: 15px;
   font-weight: 600;
   text-align: left;
-  animation: saveSuccessIn 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: saveIn 280ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
 }
 
 .saveSuccessIcon {
   flex-shrink: 0;
-  color: var(--accentText);
+  color: var(--on-lime);
 }
 
 .saveSuccessText {
@@ -290,7 +245,7 @@
   line-height: 1.4;
 }
 
-@keyframes saveSuccessIn {
+@keyframes saveIn {
   from {
     opacity: 0;
     transform: translateY(-8px);
@@ -309,159 +264,104 @@
 
 .dismissButton {
   flex-shrink: 0;
+  min-height: 38px;
   border: none;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text);
-  opacity: 0.7;
+  border-radius: var(--r-pill);
+  background: rgb(0 0 0 / 12%);
+  color: var(--on-lime);
   font-family: inherit;
-  font-weight: bold;
+  font-weight: 700;
   font-size: 14px;
-  min-height: 44px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   cursor: pointer;
-  transition:
-    background 150ms ease-in-out,
-    opacity 150ms ease-in-out;
 }
 
 .dismissButton:hover {
-  opacity: 1;
-  background: var(--background);
+  background: rgb(0 0 0 / 20%);
 }
 
-.dismissButton:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
+/** ------------------------------------------------------- the shared card */
+
+/* Used by /stats and /settings through `composes`. */
+.container {
+  width: var(--card);
+  margin-bottom: 14px;
+  padding: 20px;
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--lift);
 }
 
-/* The card was a hard 336px at every viewport, so a 1280px screen showed a
-   phone-width column with 71% of the window empty while 1400px of exercise
-   data sat clipped inside a scroller on the same screen. One breakpoint gives
-   that content somewhere to go without changing the phone layout at all. */
-@media (min-width: 768px) {
-  .container,
-  .emptyState,
-  .saveSuccess,
-  .listNotice {
-    width: 560px;
-  }
+/** --------------------------------------------------------- dialog innards */
 
-  .shimmer {
-    max-width: 592px;
-  }
-}
-
-/* Routines: the distinct names in your history, least-recently-done first, so
-   the one you are due to do next is nearest to hand. */
-.routines {
-  width: 336px;
-  max-width: calc(100vw - 48px);
-  margin-top: 20px;
-}
-
-/* Quieter and smaller than "Your previous workouts" so the two section labels
-   do not compete. Sentence case: nothing else in this product is set in caps. */
-.routinesHeading {
-  margin: 0 0 10px;
-  font-size: 14px;
-  font-weight: bold;
-  color: var(--text);
-  opacity: 0.6;
-}
-
-.routineRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
- /* Filled, not outlined. Everything else in this product is a block of
-   material: a purple board, lime slabs, white chips. An outlined pill was the
-   only hollow object on the page, which is most of why the row read as
-   unfinished. These are small cards, and they sit on the same surface and
-   radius language as the workout cards below them. */
-.routineChip {
-  display: flex;
-  align-items: stretch;
-  background: var(--white);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgb(from var(--text) r g b / 12%);
-  transition:
-    transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.routineChip:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgb(from var(--text) r g b / 18%);
-}
-
-.routineStart {
+.copyWorkoutContentWrapper {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 1px;
-  min-height: 52px;
-  padding: 8px 16px;
-  border: none;
-  background: transparent;
-  color: var(--text);
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background 150ms ease-in-out;
+  gap: 18px;
 }
 
-/* A 1px hairline, not a 2px rule: this divides two halves of one control, it
-   is not a border around a card. */
-.routineMenuButton {
+.workoutButton {
   display: flex;
-  align-items: center;
   justify-content: center;
-  width: 44px;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 18px;
   border: none;
-  border-left: 1px solid rgb(from var(--text) r g b / 12%);
-  background: transparent;
-  color: var(--text);
-  opacity: 0.65;
-  cursor: pointer;
-  transition:
-    background 150ms ease-in-out,
-    opacity 150ms ease-in-out;
-}
-
-.routineMenuButton:hover {
-  opacity: 1;
-}
-
-.routineStart:hover,
-.routineMenuButton:hover {
-  background: var(--accentHoverLight);
-}
-
-.routineStart:focus-visible,
-.routineMenuButton:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: -3px;
-}
-
-.routineName {
-  font-weight: bold;
+  border-radius: var(--r-pill);
+  background: var(--lime);
+  color: var(--on-lime);
+  font-family: inherit;
+  font-weight: 700;
   font-size: 17px;
-  letter-spacing: -0.01em;
+  transition: background 150ms ease;
 }
 
-.routineWhen {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accentText);
+.workoutButton:not(:disabled) {
+  cursor: pointer;
 }
 
-/* Naming a past workout, which is how a routine gets made from history logged
-   before names existed. */
+.workoutButton:disabled {
+  opacity: 0.5;
+}
+
+.workoutButton:not(:disabled):hover,
+.workoutButton:not(:disabled):focus {
+  color: var(--on-lime);
+  background: var(--lime-deep);
+}
+
+.delete {
+  background: var(--surface-2);
+  color: var(--warn);
+}
+
+/* :hover only: the dialog autofocuses its first control, so a fill on :focus
+   opens it with the destructive action as its loudest object. */
+.delete:not(:disabled):hover {
+  background: var(--warn);
+  color: var(--on-warn);
+}
+
+.keepButton {
+  min-height: 48px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink-mute);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.keepButton:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
 .renameRow {
   display: flex;
   flex-direction: column;
@@ -471,76 +371,56 @@
 
 .renameLabel {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--ink-mute);
 }
 
-/* A 1px hairline rather than a 2px rule: the field sits inside a dialog that is
-   already a distinct surface, so a heavy border reads as a second box drawn
-   around it. Emphasis comes from the focus ring. */
 .renameInput {
   font-family: inherit;
   font-size: 16px;
-  min-height: 44px;
-  padding: 10px 12px;
-  border: 1px solid rgb(from var(--text) r g b / 28%);
-  border-radius: 12px;
-  background: var(--background);
-  color: var(--text);
-  transition: border-color 150ms ease-in-out;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: var(--r-chip);
+  background: var(--surface-2);
+  color: var(--ink);
 }
 
-.renameInput:hover {
-  border-color: rgb(from var(--text) r g b / 45%);
-}
-
-.renameInput:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
+.renameInput::placeholder {
+  color: var(--ink-mute);
 }
 
 .renameButton {
-  min-height: 44px;
-  border: 2px solid var(--text);
-  border-radius: 12px;
-  background: var(--text);
-  color: var(--background);
+  min-height: 48px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--brand);
+  color: var(--on-brand);
   font-family: inherit;
-  font-weight: bold;
+  font-weight: 700;
   font-size: 16px;
   cursor: pointer;
 }
 
 .renameButton:hover,
 .renameButton:focus {
-  color: var(--background);
-}
-
-.renameButton:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
+  color: var(--on-brand);
 }
 
 .renameButton:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: default;
 }
 
-@media (min-width: 768px) {
-  .routines {
-    width: 560px;
-  }
-}
-
-/* Shown under a name field when the typed name is already a routine. */
-.nameTaken {
-  color: var(--warning);
-  font-size: 13px;
+.nameTaken,
+.modalError {
+  color: var(--warn);
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
+  text-align: left;
 }
 
-/* The exercises this routine would start you with. Names only: the sets change
-   every session, and the point here is which movements are in it. */
 .routineExercises {
   margin: 0;
   padding: 0;
@@ -551,19 +431,28 @@
 }
 
 .routineExercises li {
-  padding: 5px 10px;
-  border-radius: 8px;
-  background: var(--secondary);
-  color: var(--text);
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--ink);
   font-size: 14px;
   font-weight: 600;
 }
 
-/* Sits tight under the chips it explains, with the breathing room after it so
-   the routine and the controls read as two groups. */
 .routineHint {
-  margin: 0 0 8px;
-  font-size: 13px;
+  margin: 0 0 6px;
+  font-size: 14px;
   line-height: 1.45;
-  opacity: 0.7;
+  color: var(--ink-mute);
+}
+
+.workoutButton:not(:disabled):focus-visible,
+.showAllWorkoutsButton:focus-visible,
+.keepButton:focus-visible,
+.renameButton:focus-visible,
+.renameInput:focus-visible,
+.retryButton:not(:disabled):focus-visible,
+.dismissButton:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
 }

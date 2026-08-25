@@ -1,102 +1,53 @@
-/* The tour paints its own layer. The scrim is black and the hairline around
-   the cutout is light, both chosen by construction rather than per theme,
-   because the scrim is the thing all seven themes are seen through and an
-   accent-coloured ring disappears against it on at least two of them. The card
-   below uses the app's own tokens, so it still reads as part of Rep Tracker.
-
-   z-index sits well under the modal's 998, so an open confirm modal covers the
-   tour instead of fighting it. */
+/* The guided tour. A brand ring around the part being pointed at, and a card
+   that comments on it. No shim: the app stays usable, which is the point of a
+   tour whose steps clear when you do the real thing. */
 
 .ring {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 40;
-  border: 3px solid var(--accent);
-  /* Fallback only. tour.jsx overrides this per step with the anchor's own
-     corner radii plus the padding, so the cutout stays concentric. */
-  border-radius: 20px;
-  /* Never intercepts a tap: the whole point is that the user works the real
-     controls underneath. The huge spread is the scrim; the middle shadow is
-     the depth that separates the lit area from it. */
+  z-index: 900;
   pointer-events: none;
-  box-shadow:
-    0 0 0 2px rgba(255, 255, 255, 0.85),
-    0 14px 34px rgba(0, 0, 0, 0.45),
-    0 0 0 100vmax rgba(0, 0, 0, 0.55);
-  transition:
-    transform 460ms cubic-bezier(0.16, 1, 0.3, 1),
-    width 460ms cubic-bezier(0.16, 1, 0.3, 1),
-    height 460ms cubic-bezier(0.16, 1, 0.3, 1);
+  border: 3px solid var(--brand);
+  box-shadow: 0 0 0 6px rgb(from var(--brand) r g b / 20%);
+  transition: transform 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
+    width 240ms cubic-bezier(0.2, 0.9, 0.3, 1),
+    height 240ms cubic-bezier(0.2, 0.9, 0.3, 1);
 }
-
-/* The travelling cutout is the one authored motion here. It is a fixed,
-   childless, out-of-flow element, so animating its box costs a repaint of
-   itself and never reflows the document. */
 
 .card {
   position: fixed;
-  z-index: 41;
   left: 50%;
-  transform: translate(-50%, 0);
-  width: 336px;
-  max-width: calc(100vw - 48px);
-  box-sizing: border-box;
-  background: var(--white);
-  color: var(--text);
-  border-radius: 16px;
-  /* The dark themes set --white to #000000, so without this the card is a
-     black panel on a black scrim and loses its edge entirely. Derived from
-     --text so it is a faint grey hairline on the light themes and a visible
-     one on the dark. */
-  border: 1px solid rgb(from var(--text) r g b / 18%);
+  transform: translateX(-50%);
+  z-index: 901;
+  width: var(--card);
   padding: 18px;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.4);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  animation: tourCardIn 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  background: var(--field);
+  color: var(--on-brand);
+  border-radius: var(--r-card);
+  box-shadow: var(--lift-brand);
+  animation: cardIn 260ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
 }
 
-.cardBottom {
-  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
-}
-
-.cardTop {
-  top: 64px;
-}
-
-@keyframes tourCardIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 10px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
+.cardBottom { bottom: calc(var(--rail-bottom) + 16px); }
+.cardTop { top: calc(var(--rail-top) + 16px); }
 
 .body {
   display: flex;
-  gap: 12px;
   align-items: flex-start;
+  gap: 12px;
 }
 
-/* --text rather than --accent: the accent drops to 2.4:1 against the card on
-   green-dark, which fails the 3:1 a non-text graphic needs. The accent gets
-   exactly one job in this layer, the ring. */
 .icon {
   flex-shrink: 0;
-  margin-top: 1px;
-  color: var(--text);
+  color: var(--lime);
 }
 
 .text {
   margin: 0;
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.45;
-  font-weight: 600;
+  color: var(--on-brand);
 }
 
 .controls {
@@ -104,16 +55,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  margin-top: 16px;
 }
 
-/* Opacity, not --textSecondary, which is 3.2:1 on the card and fails as body
-   text. Fading --text instead computes to 7.2:1 on the light themes and 8.9:1
-   on the dark ones. This is static text rather than a control being dimmed
-   out of the readable band, which is the case page.module.css argues about. */
 .counter {
-  font-size: 14px;
-  font-weight: 700;
-  opacity: 0.72;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-brand-mute);
 }
 
 .buttons {
@@ -121,65 +69,50 @@
   gap: 8px;
 }
 
-.skip,
-.ack {
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 12px;
-  padding: 10px 16px;
+.skip, .ack {
   min-height: 44px;
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  transition: box-shadow 150ms ease-in-out;
-}
-
-/* Both buttons keep their colours on hover and signal with elevation instead.
-   Every hover tint that read well on the light themes fell under 4.5:1 on
-   green-dark, and this is a phone-first app where hover is the rarer state. */
-.skip:hover,
-.ack:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.skip:focus-visible,
-.ack:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
+  border: none;
 }
 
 .skip {
-  background: transparent;
-  border: 2px solid var(--text);
-  color: var(--text);
+  background: rgb(255 255 255 / 14%);
+  color: var(--on-brand);
+  transition: background 150ms ease;
 }
 
-/* --text on --background inverts cleanly per theme and never drops below
-   14:1, unlike --accent (3.9:1) or --secondary (2.4:1 on green-dark). */
+.skip:hover {
+  color: var(--on-brand);
+  background: rgb(255 255 255 / 24%);
+}
+
 .ack {
-  background: var(--text);
-  border: 2px solid var(--text);
-  color: var(--background);
+  background: var(--lime);
+  color: var(--on-lime);
+  transition: background 150ms ease;
 }
 
-/* Load-bearing. globals.css carries `button:hover, button:focus { color:
-   var(--text) }` at (0,1,1), which outranks the (0,1,0) rule above and
-   paints this label --text on a --text background: black on black. Restated
-   at (0,2,0) so it survives both states.
+.ack:hover, .ack:focus {
+  color: var(--on-lime);
+  background: var(--lime-deep);
+}
 
-   .skip and settings' .replayButton escape this only because they already
-   set color: var(--text), so the global rule lands on the same value. Give
-   either of them a different colour and it needs this treatment too. */
-.ack:hover,
-.ack:focus {
-  color: var(--background);
+.skip:focus-visible, .ack:focus-visible {
+  outline: 3px solid var(--on-brand);
+  outline-offset: 2px;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ring {
-    transition: none;
-  }
-
-  .card {
-    animation: none;
-  }
+  .ring { transition: none; }
+  .card { animation: none; }
 }

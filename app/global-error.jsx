@@ -7,9 +7,9 @@ import { useEffect } from 'react';
 // failure this issue describes.
 //
 // It replaces the entire document, so it renders its own <html> and <body>, and
-// it cannot rely on globals.css or the theme variables: the layout that loads
-// them is the thing that failed. Hence literal colours, taken from the default
-// theme in app/globals.css.
+// it cannot rely on globals.css or the brand variables: the layout that loads
+// them is the thing that failed. Hence literal colours, taken from the light
+// rendition in app/globals.css.
 export default function GlobalError({ error, reset }) {
   useEffect(() => {
     console.error('Global error boundary caught:', error);
@@ -22,12 +22,12 @@ export default function GlobalError({ error, reset }) {
           margin: 0,
           padding: 24,
           fontFamily: 'system-ui, sans-serif',
-          background: '#ECEFF3',
-          color: '#1D1226',
+          background: '#f4f3fa',
+          color: '#191233',
         }}
       >
         <div style={{ maxWidth: 320, margin: '48px auto' }} role="alert">
-          <h2 style={{ margin: '0 0 12px', fontSize: 20, color: '#ac2746' }}>
+          <h2 style={{ margin: '0 0 12px', fontSize: 20, color: '#c62b4e' }}>
             Rep Tracker failed to load
           </h2>
           <p style={{ margin: '0 0 16px' }}>
@@ -39,9 +39,9 @@ export default function GlobalError({ error, reset }) {
               width: '100%',
               padding: '12px 20px',
               border: 'none',
-              borderRadius: 14,
-              background: '#A462D8',
-              color: '#FFFFFF',
+              borderRadius: 999,
+              background: '#4b45c6',
+              color: '#ffffff',
               fontWeight: 'bold',
               fontSize: 18,
               cursor: 'pointer',
@@ -49,10 +49,9 @@ export default function GlobalError({ error, reset }) {
           >
             Try again
           </button>
-          {/* Body colour rather than the muted grey: #908E96 on this
-              background is about 2.8:1, and this is the sentence explaining
-              how to recover. */}
-          <p style={{ margin: '16px 0 0', fontSize: 14, color: '#1D1226' }}>
+          {/* Body colour rather than the muted cut: this is the sentence
+              explaining how to recover. */}
+          <p style={{ margin: '16px 0 0', fontSize: 14, color: '#191233' }}>
             If this keeps happening, clearing this site&apos;s data in your
             browser settings will reset the app.
           </p>

@@ -17,13 +17,8 @@ export default function Weight({ lb, adornmentClassName }) {
 
   return (
     <>
-      <span style={{ fontSize: 18 }}>{shown}</span>
-      <span
-        className={adornmentClassName}
-        style={{ marginLeft: -3, marginTop: 5 }}
-      >
-        {unitLabel}
-      </span>
+      <span>{shown}</span>
+      <span className={adornmentClassName}>{unitLabel}</span>
     </>
   );
 }

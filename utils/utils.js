@@ -125,21 +125,54 @@ export function withLatestNumbers(workout, latestExercises) {
   return (workout.exercises ?? []).map((exercise) => {
     // The index is keyed on the lowercased name, and stored names are not.
     const latest = latestExercises?.[exercise.name.toLowerCase()];
-    if (!latest || latest.time <= startedAt) return exercise;
+    // Nothing newer than the workout being copied, so its own numbers are the
+    // most recent ones and it is its own "last time".
+    if (!latest || latest.time <= startedAt) {
+      return {
+        ...exercise,
+        oldReps: [...exercise.reps],
+        oldWeights: [...exercise.weights],
+        oldNotes: exercise.notes,
+        time: startedAt,
+        prefilled: true,
+      };
+    }
 
     const sets = Math.min(
       latest.exercise.reps.length,
       latest.exercise.weights.length
     );
-    if (sets === 0) return exercise;
+    // The newer session exists but has no usable sets, so it cannot fill
+    // anything and this workout is again its own "last time".
+    if (sets === 0) {
+      return {
+        ...exercise,
+        oldReps: [...exercise.reps],
+        oldWeights: [...exercise.weights],
+        oldNotes: exercise.notes,
+        time: startedAt,
+        prefilled: true,
+      };
+    }
 
     const fill = (values, count) =>
       Array.from({ length: count }, (_, i) => values[Math.min(i, sets - 1)]);
 
+    // The numbers to start from, and a record of where they came from. Without
+    // the old* fields an exercise copied out of a routine carries no memory of
+    // the session it was filled from, so <Workout /> renders no "Previously"
+    // panel for it and nothing can tell whether today beat last time. Adding an
+    // exercise by hand has always had them, which is why the two routes into
+    // the same card behaved differently.
     return {
       ...exercise,
       reps: fill(latest.exercise.reps, exercise.reps.length),
       weights: fill(latest.exercise.weights, exercise.weights.length),
+      oldReps: [...latest.exercise.reps],
+      oldWeights: [...latest.exercise.weights],
+      oldNotes: latest.exercise.notes,
+      time: latest.time,
+      prefilled: true,
     };
   });
 }

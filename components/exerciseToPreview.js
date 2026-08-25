@@ -23,18 +23,8 @@ export default function ExerciseToPreview({ exerciseToPreview }) {
           <div className={styles.setsContainer}>
             {[...Array(numSets)].map((_e, i) => (
               <div className={styles.setContainer} key={i}>
-                <span style={{ fontSize: 18 }}>
-                  {exerciseToPreview.exercise.reps[i]}
-                </span>
-                <span
-                  className={styles.setAdornment}
-                  style={{
-                    marginTop: 2,
-                    fontSize: 16,
-                  }}
-                >
-                  ×
-                </span>
+                <span>{exerciseToPreview.exercise.reps[i]}</span>
+                <span className={styles.setAdornment}>reps</span>
                 <Weight
                   lb={exerciseToPreview.exercise.weights[i]}
                   adornmentClassName={styles.setAdornment}
@@ -47,18 +37,10 @@ export default function ExerciseToPreview({ exerciseToPreview }) {
       {exerciseToPreview.exercise.notes &&
         exerciseToPreview.exercise.notes.length > 0 && (
           <div className={styles.previewNotes}>
-            <span
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginRight: 4,
-              }}
-            >
-              <LetsIconsComment /> Notes:{' '}
+            <span className={styles.previewNotesLabel}>
+              <LetsIconsComment /> Notes
             </span>
-            <div style={{ marginTop: 2 }}>
-              {exerciseToPreview.exercise.notes}
-            </div>
+            <div>{exerciseToPreview.exercise.notes}</div>
           </div>
         )}
     </div>

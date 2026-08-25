@@ -1,29 +1,24 @@
+/* A logged session: a white card, the date as its headline in the brand colour,
+   and the exercises running across it as lime tiles. Same three materials as
+   the live workout card, one step quieter because none of it is editable. */
+
 .container {
-  background: var(--white);
-  margin-bottom: 16px;
-  padding: 16px;
-  max-width: calc(100vw - 48px);
-  width: 336px;
-  border-radius: 16px;
+  width: var(--card);
+  margin-bottom: 12px;
+  padding: 18px 18px 16px;
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--lift);
 }
 
 /* Not space-between: with three children that spread the date, the time and
    the options button evenly across the card, leaving the time floating in the
-   middle. The title takes the slack instead, so the time and the button read
-   as one group on the right. */
+   middle. The title takes the slack instead. */
 .header {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-}
-
-.times {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  font-size: 12px;
-  color: var(--textSecondary);
 }
 
 .titleGroup {
@@ -32,86 +27,135 @@
   align-items: flex-start;
   margin-right: auto;
   min-width: 0;
-}
-
-/* The routine this workout belongs to, when it has one. */
-.routineName {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgb(from var(--text) r g b / 68%);
+  gap: 2px;
 }
 
 .title {
-  font-weight: bold;
-  font-size: 24px;
-  color: var(--accent);
+  font-weight: 700;
+  font-size: 21px;
+  letter-spacing: -0.02em;
+  color: var(--brand-text);
 }
 
+.routineName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-mute);
+}
+
+.times {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-mute);
+  white-space: nowrap;
+}
+
+.menuButton {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -10px -10px -10px 2px;
+  padding: 0;
+  border: none;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--ink-mute);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.menuButton:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.menuButton:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: -3px;
+}
+
+/** --------------------------------------------------------- exercise strip */
+
 .exercisesContainer {
-  margin-top: 16px;
+  margin-top: 14px;
   display: flex;
   flex: 1;
   overflow-x: scroll;
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   position: relative;
   overscroll-behavior-inline: contain;
   scroll-snap-type: x mandatory;
+  /* A fade at the scrolling edge, so a clipped column reads as "there is more"
+     rather than as a rendering fault. The scrollbar is deliberately hidden. */
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 calc(100% - 28px),
+    transparent
+  );
 }
 
-.exercisesContainer::state(webkit-scrollbar) {
-  display: none; /* Safari and Chrome */
+.exercisesContainer::-webkit-scrollbar {
+  display: none;
 }
 
 .exercises {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   /* flex-start, not baseline: revealing a note makes one tile taller, and
      baseline alignment pushed every neighbour's sets down to match it. */
   align-items: flex-start;
 }
 
 .exercise {
-  background: var(--secondary);
-  border-radius: 8px;
-  padding: 8px;
-  max-width: 100px;
-  width: 100px;
+  background: var(--lime);
+  color: var(--on-lime);
+  border-radius: var(--r-inner);
+  padding: 12px 10px;
+  max-width: 132px;
+  width: 132px;
   position: relative;
 }
 
-.exercisesContainer>.exercises>.exercise {
+.exercisesContainer > .exercises > .exercise {
   scroll-snap-align: start;
 }
 
-.exercisesContainer>.exercises>.exercise:first-child {
-  margin-inline-start: 50px;
-}
-
-.exercisesContainer>.exercises>.exercise:last-child {
+.exercisesContainer > .exercises > .exercise:last-child {
   scroll-snap-align: end;
-  margin-inline-end: 50px;
+  margin-inline-end: 28px;
 }
 
 .exerciseName {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  display: -webkit-box;
   line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   overflow: hidden;
-  padding-left: 2px;
+  color: var(--on-lime);
 }
 
-/* A real button, not a div with a title attribute. 44px of hit area in a 100px
+/* A real button, not a div with a title attribute. 44px of hit area in a 116px
    tile is deliberate: nothing else in the tile is interactive, and the card's
-   long-press still has the rest of its surface plus the explicit options button
-   in the header. The icon itself stays small and tucked into the corner. */
+   long-press still has the rest of its surface plus the options button in the
+   header. */
 .commentIcon {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: 0;
+  right: 0;
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
@@ -121,88 +165,68 @@
   box-sizing: border-box;
   border: none;
   background: none;
-  color: var(--text);
+  color: rgb(from var(--on-lime) r g b / 60%);
   cursor: pointer;
 }
 
-.commentIcon:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: -3px;
-  border-radius: 8px;
+.commentIcon:hover {
+  color: var(--on-lime);
 }
 
-.setContainer {
-  background: var(--white);
-  border-radius: 8px;
-  padding: 2px 8px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  font-weight: bold;
-  font-size: 12px;
+.commentIcon:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: -3px;
+  border-radius: var(--r-chip);
 }
 
 .setsContainer {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
+
+.setContainer {
+  background: var(--surface);
+  border-radius: var(--r-chip);
+  padding: 5px 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.setAdornment {
+  color: var(--ink-mute);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.notesContainer {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgb(0 0 0 / 12%);
+  font-size: 12px;
+  line-height: 1.35;
+  color: rgb(from var(--on-lime) r g b / 72%);
+}
+
+/** ---------------------------------------------------------------- footer */
 
 .metadata {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: flex-end;
-  color: var(--textSecondary);
-  gap: 16px;
-}
-
-/* 68%: at 50% the "x" and "lbs" measured 3.97:1 on the white card. */
-.setAdornment {
-  color: rgb(from var(--text) r g b / 68%);
-}
-
-.minutesLabel {
-  color: var(--accentText);
-  font-weight: bold;
-  margin-top: 4px;
-  text-align: right;
-}
-
-.notesContainer {
-  margin-top: 8px;
-  border-top: 1px solid rgb(from var(--text) r g b / 50%);
-  padding-top: 4px;
-}
-
-/* Same 44px target and quiet treatment as the in-workout remove control. */
-.menuButton {
-  flex-shrink: 0;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  margin: -8px -8px -8px 4px;
-  padding: 0;
-  border: none;
-  border-radius: 8px;
-  background: none;
-  color: var(--text);
-  cursor: pointer;
-  transition: background 150ms ease-in-out;
-}
-
-.menuButton:hover {
-  background: var(--accentHoverLight);
-}
-
-.menuButton:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
+  gap: 14px;
+  margin-top: 14px;
+  color: var(--ink-mute);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .metaLeft {
@@ -214,32 +238,27 @@
 }
 
 .exerciseCount {
-  font-weight: 600;
-  color: rgb(from var(--text) r g b / 68%);
   white-space: nowrap;
+}
+
+.metaRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+}
+
+.minutesLabel {
+  color: var(--ink);
+  text-align: right;
 }
 
 /* Reads as a state rather than a measurement, because that is what it is. */
 .unfinishedLabel {
-  font-weight: bold;
-  margin-top: 4px;
+  color: var(--ink-mute);
   text-align: right;
-  color: rgb(from var(--text) r g b / 68%);
-}
-
-/* A fade at the scrolling edge, so a clipped column reads as "there is more"
-   rather than as a rendering fault. The scrollbar is deliberately hidden. */
-.exercisesContainer {
-  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
-  -webkit-mask-image: linear-gradient(
-    to right,
-    #000 calc(100% - 28px),
-    transparent
-  );
-}
-
-@media (min-width: 768px) {
-  .container {
-    width: 560px;
-  }
 }

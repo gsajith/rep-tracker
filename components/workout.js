@@ -17,6 +17,7 @@ import { LetsIconsDoneRound } from './SVGIcons/LetsIconsDoneRound';
 import { LetsIconsComment } from './SVGIcons/LetsIconsComment';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { LetsIconsTrash } from './SVGIcons/LetsIconsTrash';
+import { Sparkle } from './SVGIcons/Sparkle';
 import { useWeightUnit } from '@/context/unitProvider';
 import Weight from './weight';
 
@@ -27,6 +28,20 @@ import Weight from './weight';
 const weightInputValue = (storedLb, drag, toDisplay) => {
   const shown = toDisplay(storedLb) + parseFloat(drag);
   return Number.isFinite(shown) ? Math.max(0, shown) : '';
+};
+
+// True when this set is heavier than the same set last time, or the same
+// weight for more reps. Both sides have to be real numbers: oldReps and
+// oldWeights are null for an exercise with no history, and stored arrays can be
+// ragged, so a set can ask for a previous value that is not there.
+const beatsLastTime = (exercise, i) => {
+  const oldReps = Number(exercise.oldReps?.[i]);
+  const oldWeight = Number(exercise.oldWeights?.[i]);
+  const reps = Number(exercise.reps?.[i]);
+  const weight = Number(exercise.weights?.[i]);
+  if (![oldReps, oldWeight, reps, weight].every(Number.isFinite)) return false;
+  if (weight > oldWeight) return true;
+  return weight === oldWeight && reps > oldReps;
 };
 
 const getExerciseStyle = (isDragging, exerciseStyle, draggableStyle) => ({
@@ -412,9 +427,6 @@ export default function Workout({
               gap: 24,
             }}
           >
-            <p className={styles.modalBody}>
-              The sets you have logged will be discarded. Nothing is saved.
-            </p>
             <button
               className={styles.deleteWorkout}
               onClick={() => {
@@ -462,6 +474,27 @@ export default function Workout({
                         exercise.reps.length,
                         exercise.weights.length
                       );
+
+                      // Last session's sets are worth showing only when they
+                      // are not already sitting in the fields above them.
+                      // Copying a workout fills every set from that session, so
+                      // the panel would repeat what you are looking at; adding
+                      // an exercise by hand fills one set from a session that
+                      // may have had three, so it still carries something.
+                      const showPastSets =
+                        exercise.expanded &&
+                        exercise.time &&
+                        !exercise.prefilled &&
+                        numOldSets > 0;
+
+                      // The note always earns its place: it is the one thing
+                      // from last time that is not re-entered for you, and it
+                      // comes from the most recent session of this exercise
+                      // rather than from whatever the routine last stored.
+                      const showPastNote =
+                        exercise.expanded &&
+                        exercise.time &&
+                        (exercise.oldNotes?.length ?? 0) > 0;
 
                       return (
                         <Draggable
@@ -585,6 +618,11 @@ export default function Workout({
                                               }}
                                               type="number"
                                               className={styles.setInputNumber}
+                                              data-dragging={
+                                                parseInt(
+                                                  exercise.repsDrag[i]
+                                                ) || undefined
+                                              }
                                               value={Math.max(
                                                 0,
                                                 parseInt(exercise.reps[i]) +
@@ -600,12 +638,8 @@ export default function Workout({
                                             />
                                             <span
                                               className={styles.setAdornment}
-                                              style={{
-                                                marginTop: 2,
-                                                fontSize: 16,
-                                              }}
                                             >
-                                              ×
+                                              reps
                                             </span>
 
                                             <VariableInput
@@ -662,6 +696,11 @@ export default function Workout({
                                               }}
                                               type="number"
                                               className={styles.setInputNumber}
+                                              data-dragging={
+                                                parseFloat(
+                                                  exercise.weightsDrag[i]
+                                                ) || undefined
+                                              }
                                               value={weightInputValue(
                                                 exercise.weights[i],
                                                 exercise.weightsDrag[i],
@@ -677,13 +716,19 @@ export default function Workout({
                                             />
                                             <span
                                               className={styles.setAdornment}
-                                              style={{
-                                                marginLeft: -3,
-                                                marginTop: 5,
-                                              }}
                                             >
                                               {unitLabel}
                                             </span>
+                                            {beatsLastTime(exercise, i) && (
+                                              <span
+                                                className={styles.beat}
+                                                role="img"
+                                                aria-label="Better than last time"
+                                                title="Better than last time"
+                                              >
+                                                <Sparkle size={16} />
+                                              </span>
+                                            )}
                                           </div>
 
                                           <div
@@ -700,41 +745,47 @@ export default function Workout({
                                             >
                                               <LetsIconsClose />
                                             </button>
-                                            {i + 1 === numSets && (
-                                              <button
-                                                className={styles.addSetButton}
-                                                onClick={() =>
-                                                  addSet(index, numSets + 1)
-                                                }
-                                              >
-                                                Add a set
-                                              </button>
-                                            )}
                                           </div>
                                         </div>
                                       ))}
-                                      {/* "Add a set" normally rides on the last
-                                          set's row, so an exercise with none
-                                          would otherwise have no way back. */}
-                                      {numSets === 0 && (
-                                        <button
-                                          className={styles.addFirstSetButton}
-                                          onClick={() => addSet(index, 1)}
-                                        >
-                                          Add a set
-                                        </button>
-                                      )}
+                                      {/* Its own row rather than riding on the
+                                          last set, which crowded that row and
+                                          left an exercise with no sets at all
+                                          with no way back. */}
+                                      <button
+                                        className={styles.addSetButton}
+                                        onClick={() => addSet(index, numSets + 1)}
+                                      >
+                                        Add a set
+                                      </button>
                                     </div>
+                                    {showPastNote && (
+                                      <div
+                                        className={styles.pastNote}
+                                        id={
+                                          index === 0 && !showPastSets
+                                            ? 'tour-past'
+                                            : undefined
+                                        }
+                                      >
+                                        <LetsIconsComment
+                                          className={styles.pastNoteIcon}
+                                        />
+                                        <span className={styles.pastNoteBody}>
+                                          <span className={styles.pastNoteWhen}>
+                                            Your note on{' '}
+                                            {readableDate(
+                                              new Date(exercise.time)
+                                            )}
+                                          </span>
+                                          <span className={styles.pastNoteText}>
+                                            {exercise.oldNotes}
+                                          </span>
+                                        </span>
+                                      </div>
+                                    )}
                                     <div
                                       className={styles.notesInputContainer}
-                                      style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        opacity:
-                                          (exercise.notes?.length ?? 0) > 0
-                                            ? 1
-                                            : 'revert-layer',
-                                      }}
                                     >
                                       <LetsIconsComment
                                         className={styles.notesInputIcon}
@@ -755,49 +806,45 @@ export default function Workout({
                                   </>
                                 )}
                               </div>
-                              {exercise.time && exercise.expanded && (
+                              {showPastSets && (
                                 <div
                                   className={styles.pastExercise}
                                   id={index === 0 ? 'tour-past' : undefined}
                                 >
-                                  <span>
-                                    Previously:{' '}
-                                    {readableDate(new Date(exercise.time))} (
-                                    {calculateDaysAgo(new Date(exercise.time))})
-                                  </span>
-                                  <div className={styles.setsContainer}>
-                                    {[...Array(numOldSets)].map((_e, i) => (
-                                      <div
-                                        className={styles.setContainer}
-                                        key={i}
-                                      >
-                                        <span style={{ fontSize: 18 }}>
-                                          {exercise.oldReps[i]}
-                                        </span>
-                                        <span
-                                          className={styles.setAdornment}
-                                          style={{
-                                            marginTop: 2,
-                                            fontSize: 16,
-                                          }}
-                                        >
-                                          ×
-                                        </span>
-                                        <Weight
-                                          lb={exercise.oldWeights[i]}
-                                          adornmentClassName={
-                                            styles.setAdornment
-                                          }
-                                        />
+                                  {showPastSets && (
+                                    <>
+                                      <span className={styles.pastHeading}>
+                                        Previously:{' '}
+                                        {readableDate(new Date(exercise.time))}{' '}
+                                        (
+                                        {calculateDaysAgo(
+                                          new Date(exercise.time)
+                                        )}
+                                        )
+                                      </span>
+                                      <div className={styles.setsContainer}>
+                                        {[...Array(numOldSets)].map((_e, i) => (
+                                          <div
+                                            className={styles.setContainer}
+                                            key={i}
+                                          >
+                                            <span>{exercise.oldReps[i]}</span>
+                                            <span
+                                              className={styles.setAdornment}
+                                            >
+                                              reps
+                                            </span>
+                                            <Weight
+                                              lb={exercise.oldWeights[i]}
+                                              adornmentClassName={
+                                                styles.setAdornment
+                                              }
+                                            />
+                                          </div>
+                                        ))}
                                       </div>
-                                    ))}
-                                  </div>
-                                  {exercise.oldNotes &&
-                                    exercise.oldNotes.length > 0 && (
-                                      <div style={{ marginTop: 8 }}>
-                                        Note: {exercise.oldNotes}
-                                      </div>
-                                    )}
+                                    </>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -849,6 +896,7 @@ export default function Workout({
           )}
           <div className={styles.endWorkoutContainer}>
             <div className={styles.timer}>
+              <span className={styles.live} aria-hidden="true" />
               <LetsIconsTimeAtack />
               <span>{workoutTimer}</span>
             </div>
@@ -875,19 +923,19 @@ export default function Workout({
           </div>
         </div>
       ) : (
-        <span
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* Spans rather than divs: this subtree is inside a <button> now,
-              which may only contain phrasing content. */}
-          <span style={{ width: 150 }}>Start a workout</span>
-          <span className={styles.plusContainer}>+</span>
-        </span>
+        /* Spans rather than divs: this subtree is inside a <button>, which may
+           only contain phrasing content. The layout lives in .startup. */
+        <>
+          <span className={styles.sparkles} aria-hidden="true">
+            <Sparkle size={18} className={styles.sparkleA} />
+            <Sparkle size={30} className={styles.sparkleB} />
+            <Sparkle size={22} className={styles.sparkleC} />
+          </span>
+          <span className={styles.startLabel}>Start a workout</span>
+          <span className={styles.plusContainer} aria-hidden="true">
+            +
+          </span>
+        </>
       )}
     </Shell>
   );

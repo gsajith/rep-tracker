@@ -1,46 +1,67 @@
+/* What you did last time, under the exercise picker before you add it. Lime,
+   because it is the same material as the exercise block it is previewing. */
 .exercisePreview {
-  opacity: 0.6;
   margin-top: 12px;
-  background: var(--secondary);
-  border-radius: 14px;
-  padding: 8px 16px;
-  color: var(--text);
+  background: var(--lime);
+  border-radius: var(--r-inner);
+  padding: 14px;
+  color: var(--on-lime);
 }
 
 .exercisePreviewTitle {
-  font-size: 12px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-}
-
-.setContainer {
-  background: var(--white);
-  border-radius: 8px;
-  padding: 2px 8px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  font-weight: bold;
-  font-size: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(from var(--on-lime) r g b / 72%);
 }
 
 .setsContainer {
   display: flex;
   flex-direction: row;
-  gap: 4px;
-  margin-top: 12px;
+  gap: 6px;
+  margin-top: 10px;
   flex-wrap: wrap;
+}
+
+.setContainer {
+  background: var(--surface);
+  border-radius: var(--r-chip);
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.setAdornment {
+  color: rgb(from var(--on-lime) r g b / 62%);
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .previewNotes {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
   margin-top: 12px;
-  align-items: flex-start;
+  padding-top: 10px;
+  border-top: 1px solid rgb(0 0 0 / 12%);
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-.setAdornment {
-  color: rgb(from var(--text) r g b / 50%);
+.previewNotesLabel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(from var(--on-lime) r g b / 72%);
 }

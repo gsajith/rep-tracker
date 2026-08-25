@@ -2,102 +2,68 @@
 import { useStickyState } from '@/hooks/useStickyState';
 import { createContext, useContext, useEffect } from 'react';
 
-const ALL_THEME_NAMES = [
-  'purple-green',
-  'blue-orange',
-  'blue-dark',
-  'red-dark',
-  'cosmo-wanda',
-  'green-dark',
-];
+// Light, dark, or whatever the phone is set to. Replaces seven named colour
+// palettes with one brand in two renditions.
+export const APPEARANCES = ['system', 'light', 'dark'];
 
-export const ThemeContext = createContext({
-  themeName: 'default',
-  setThemeName: () => {},
-  allThemeNames: ALL_THEME_NAMES,
-});
-
-export const useTheme = () => {
-  return useContext(ThemeContext);
+export const APPEARANCE_LABELS = {
+  system: 'Auto',
+  light: 'Light',
+  dark: 'Dark',
 };
 
+export const ThemeContext = createContext({
+  appearance: 'system',
+  setAppearance: () => {},
+  appearances: APPEARANCES,
+});
+
+export const useTheme = () => useContext(ThemeContext);
+
+// The address bar and the PWA splash take a literal colour rather than a
+// variable. Kept in step with --bg in globals.css by hand.
+const GROUND = { light: '#f4f3fa', dark: '#14102a' };
+
 export const ThemeProvider = ({ children }) => {
-  const [storedThemeName, setThemeName] = useStickyState(
-    'default',
-    'theme-name'
-  );
-
-  // "default" and "purple-green" are the same palette: globals.css defines them
-  // in one block. Only "purple-green" is in ALL_THEME_NAMES, so a stored
-  // "default" matched none of the six swatches and the settings picker showed
-  // no active selection at all until the user tapped something. Normalising on
-  // read fixes that for existing installs without touching the CSS.
-  const themeName =
-    storedThemeName === 'default' ? 'purple-green' : storedThemeName;
-
-  const resetThemeColor = () => {
-    const rootStyles = getComputedStyle(document.documentElement);
-    let themeColor = rootStyles.getPropertyValue('--background').trim();
-
-    if (themeColor.length < 3) {
-      themeColor = '#ECEFF3';
-    }
-
-    let metaTag = document.querySelector('meta[name="theme-color"]');
-    if (!metaTag) {
-      metaTag = document.createElement('meta');
-      metaTag.setAttribute('name', 'theme-color');
-      document.head.appendChild(metaTag);
-    }
-
-    metaTag.setAttribute('content', themeColor);
-  };
-
-  // Deliberately not called during render: this touches document/getComputedStyle,
-  // which do not exist while Next server-renders this component. The mount effect
-  // below already applies the colour as soon as there is a DOM to apply it to.
-  useEffect(() => {
-    resetThemeColor();
-  }, []);
+  const [appearance, setAppearance] = useStickyState('system', 'appearance');
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', themeName);
+    const root = document.documentElement;
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
 
-    resetThemeColor();
-    setTimeout(() => {
-      resetThemeColor();
-    }, 100);
-    setTimeout(() => {
-      resetThemeColor();
-    }, 250);
-  }, [themeName]);
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      const rootStyles = getComputedStyle(document.documentElement);
-      const newColor = rootStyles.getPropertyValue('--background').trim();
-
-      let metaTag = document.querySelector('meta[name="theme-color"]');
-      if (!metaTag) {
-        metaTag = document.createElement('meta');
-        metaTag.setAttribute('name', 'theme-color');
-        document.head.appendChild(metaTag);
+    const apply = () => {
+      // On 'system' the attribute comes off entirely, which hands the decision
+      // back to the media query in globals.css rather than duplicating it here.
+      if (appearance === 'system') {
+        root.removeAttribute('data-theme');
+      } else {
+        root.setAttribute('data-theme', appearance);
       }
 
-      metaTag.setAttribute('content', newColor);
-    });
+      const resolved =
+        appearance === 'system'
+          ? media.matches
+            ? 'dark'
+            : 'light'
+          : appearance;
 
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
+      let meta = document.querySelector('meta[name="theme-color"]');
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('name', 'theme-color');
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', GROUND[resolved]);
+    };
 
-    return () => observer.disconnect();
-  }, []);
+    apply();
+    media.addEventListener('change', apply);
+    return () => media.removeEventListener('change', apply);
+  }, [appearance]);
 
   return (
     <ThemeContext.Provider
-      value={{ themeName, setThemeName, allThemeNames: ALL_THEME_NAMES }}
+      value={{ appearance, setAppearance, appearances: APPEARANCES }}
     >
       {children}
     </ThemeContext.Provider>
