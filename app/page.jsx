@@ -15,6 +15,7 @@ import {
   formatDuration,
   readableDate,
   sortWorkoutsByEndTime,
+  withLatestNumbers,
 } from '@/utils/utils';
 import { isStoredExerciseList } from '@/utils/validate';
 import { useStickyState } from '@/hooks/useStickyState';
@@ -191,15 +192,21 @@ export default function Home() {
     setWorkoutStartTime(Date.now());
     setWorkoutName(inherited);
     setInheritedRoutineName(inherited);
+    // The exercise list comes from this workout, but the numbers come from
+    // whenever each exercise was last done, which is often a later session
+    // under a different name. Copying this workout's numbers wholesale handed
+    // back weights the user had already moved on from.
     setExercises(() => {
       const copy = structuredClone(workout);
-      return copy.exercises.map((exercise) => ({
-        ...exercise,
-        repsDrag: Array(exercise.reps.length).fill(0),
-        weightsDrag: Array(exercise.weights.length).fill(0),
-        notes: '',
-        expanded: true,
-      }));
+      return withLatestNumbers(copy, latestExercises.current).map(
+        (exercise) => ({
+          ...exercise,
+          repsDrag: Array(exercise.reps.length).fill(0),
+          weightsDrag: Array(exercise.weights.length).fill(0),
+          notes: '',
+          expanded: true,
+        })
+      );
     });
   };
 

@@ -109,3 +109,37 @@ export function deriveRoutines(workouts) {
 
   return [...byName.values()].sort((a, b) => a.lastDone - b.lastDone);
 }
+
+// A routine remembers the numbers from the last time that routine ran, but the
+// same exercise usually turns up in other workouts in between, so those numbers
+// go stale: start a routine a month later and it hands back a month-old weight
+// for a lift that moved up last week.
+//
+// So each exercise is refilled from the most recent session it appears in,
+// whichever workout that was. The routine still decides how many sets you do;
+// only the numbers come from the newer session, repeating its last set when the
+// routine asks for more sets than that session had.
+export function withLatestNumbers(workout, latestExercises) {
+  const startedAt = workout.start_time.getTime();
+
+  return (workout.exercises ?? []).map((exercise) => {
+    // The index is keyed on the lowercased name, and stored names are not.
+    const latest = latestExercises?.[exercise.name.toLowerCase()];
+    if (!latest || latest.time <= startedAt) return exercise;
+
+    const sets = Math.min(
+      latest.exercise.reps.length,
+      latest.exercise.weights.length
+    );
+    if (sets === 0) return exercise;
+
+    const fill = (values, count) =>
+      Array.from({ length: count }, (_, i) => values[Math.min(i, sets - 1)]);
+
+    return {
+      ...exercise,
+      reps: fill(latest.exercise.reps, exercise.reps.length),
+      weights: fill(latest.exercise.weights, exercise.weights.length),
+    };
+  });
+}
