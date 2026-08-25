@@ -1,7 +1,8 @@
 {
   "name": "Rep Tracker",
   "short_name": "Rep Tracker",
-  "background_color": "#FFFFFF",
+  "background_color": "#f4f3fa",
+  "theme_color": "#f4f3fa",
   "display": "standalone",
   "orientation": "any",
   "scope": "/",

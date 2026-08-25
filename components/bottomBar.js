@@ -5,83 +5,37 @@ import BottomBarButton from './bottomBarButton';
 import { LetsIconsHome } from './SVGIcons/LetsIconsHome';
 import { LetsIconsSettings } from './SVGIcons/LetsIconsSettings';
 import { LetsIconsStats } from './SVGIcons/LetsIconsStats';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
 
+const TABS = [
+  { href: '/', label: 'Home', Icon: LetsIconsHome },
+  { href: '/stats', label: 'Stats', Icon: LetsIconsStats },
+  { href: '/settings', label: 'Settings', Icon: LetsIconsSettings },
+];
+
+// A floating pill, the shape the reference uses. The selected tab is a filled
+// pill inside it, which replaced a sliding indicator positioned from a measured
+// getBoundingClientRect behind two 250ms timers.
 export default function BottomBar() {
   const pathname = usePathname();
-
-  const itemRefs = useRef([]);
-
-  const [indicatorWidth, setIndicatorWidth] = useState(0);
-  const [indicatorLeft, setIndicatorLeft] = useState(0);
-
   const shown = useLoadDelay();
-
-  const moveIndicator = useCallback(() => {
-    itemRefs.current.forEach((item) => {
-      if (item && item.pathname === pathname) {
-        const { width, left } = item.getBoundingClientRect();
-        setIndicatorWidth(width - 20);
-        setIndicatorLeft(left + 10);
-      }
-    });
-  }, [pathname]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      moveIndicator();
-    }, 250);
-  }, []);
-
-  useEffect(() => {
-    setTimeout(() => {
-      moveIndicator();
-    }, 250);
-  }, [pathname]);
 
   return (
     shown && (
-      <div className={styles.bottomBarContainer}>
-        <BottomBarButton
-          active={pathname === '/'}
-          href={'/'}
-          ref={(el) => {
-            itemRefs.current[0] = el;
-            moveIndicator();
-          }}
-        >
-          <LetsIconsHome /> Home
-        </BottomBarButton>
-        <BottomBarButton
-          active={pathname === '/stats'}
-          href={'/stats'}
-          ref={(el) => {
-            itemRefs.current[1] = el;
-            moveIndicator();
-          }}
-        >
-          <LetsIconsStats /> Stats
-        </BottomBarButton>
-        <BottomBarButton
-          active={pathname === '/settings'}
-          href={'/settings'}
-          ref={(el) => {
-            itemRefs.current[2] = el;
-            moveIndicator();
-          }}
-        >
-          <LetsIconsSettings /> Settings
-        </BottomBarButton>
-        <div
-          className={styles.indicator}
-          style={{
-            width: indicatorWidth,
-            left: indicatorLeft,
-            opacity: indicatorWidth > 0 ? '1' : '0',
-          }}
-        />
-      </div>
+      <nav className={styles.dock} aria-label="Sections">
+        <div className={styles.pill}>
+          {TABS.map(({ href, label, Icon }) => (
+            <BottomBarButton
+              key={href}
+              href={href}
+              active={pathname === href}
+              label={label}
+            >
+              <Icon />
+            </BottomBarButton>
+          ))}
+        </div>
+      </nav>
     )
   );
 }

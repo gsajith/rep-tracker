@@ -1,64 +1,125 @@
+/* The workout card. Two states, and only one of them is loud.
+
+   Not started, it is the gradient field with the icon's sparkles and a lime
+   pill: the primary action of the product, and the only full-bleed brand field
+   on the home screen.
+
+   Running, it is a white card. The gradient underneath a screenful of lime
+   exercise blocks was two saturated fields fighting, and the blocks are the
+   thing you are actually reading. This also lines the running card up with the
+   logged sessions below it, which are the same white card with the same lime
+   tiles. */
+
 .container {
-  background: var(--accent);
-  color: var(--textInverted);
-  transition: width 300ms ease-in-out, background 300ms ease-in-out;
-  max-width: calc(100vw - 52px);
+  width: var(--card);
   padding: 18px;
-  border-radius: 32px;
-  width: 332px;
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--lift);
+  color: var(--ink);
 }
+
+/** ------------------------------------------------------------- start card */
 
 .startup {
-  font-size: 32px;
-  font-weight: bold;
-}
-
-.startup:hover, .startup:focus {
-  color: var(--textInverted);
-  cursor: pointer;
-  background: var(--accentHover);
-}
-
-.plusContainer {
+  position: relative;
+  overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent);
-  background: var(--white);
-  border-radius: 999px;
-  font-size: 64px;
-  padding: 3px 24px;
-}
-
-.addButton {
-  background: var(--secondary);
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 168px;
+  padding: 22px;
   border: none;
-  border-radius: 0px 14px 14px 0px;
-  font-weight: bold;
-  width: 68px;
-  transition: background 150ms ease-in-out;
+  /* Carries its own field. .container is the white running card, so the start
+     state cannot inherit a background from it. */
+  background: var(--field);
+  box-shadow: var(--lift-brand);
+  color: var(--on-brand);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 200ms cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
-.addButton:disabled {
-  background: var(--secondary);
+.startup:hover {
+  transform: translateY(-2px);
+}
+
+.startup:active {
+  transform: translateY(0);
+}
+
+.startLabel {
+  position: relative;
+  z-index: 1;
+  max-width: 7ch;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: var(--on-brand);
+}
+
+/* The three sparkles from the icon, over the field's top right. Decoration, so
+   they are aria-hidden in the markup and never carry meaning. */
+.sparkles {
+  position: absolute;
+  inset: 0;
+  color: var(--on-brand);
+  pointer-events: none;
+}
+
+.sparkleA {
+  position: absolute;
+  top: 44px;
+  right: 104px;
+  opacity: 0.5;
+}
+
+.sparkleB {
+  position: absolute;
+  top: 18px;
+  right: 48px;
+}
+
+.sparkleC {
+  position: absolute;
+  top: 66px;
+  right: 14px;
   opacity: 0.75;
 }
 
-.addButton:not(:disabled):hover, .addButton:not(:disabled):focus {
-  color: var(--text);
-  background: var(--secondaryHover);
+/* The lime pill: the thing to press, in the one colour reserved for it. */
+.plusContainer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--r-pill);
+  background: var(--lime);
+  color: var(--on-lime);
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1;
+  padding-bottom: 3px;
 }
 
-.addButton:not(:disabled):hover {
-  cursor: pointer;
-}
+/** ------------------------------------------------------ running: the head */
 
-.firstTime {
-  background: var(--white);
-  color: var(--text);
-  border-radius: 8px;
-  margin-top: 12px;
-  padding: 16px;
+.activeName {
+  margin: 0 0 14px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--brand-text);
+  /* Routine names are free text, so one can be a single unbroken word longer
+     than the card. */
+  overflow-wrap: anywhere;
 }
 
 .exercisesContainer {
@@ -67,350 +128,53 @@
   margin-bottom: 12px;
 }
 
+/** ------------------------------------------------------- exercise blocks */
+
 .exerciseContainer {
-  max-height: 70px;
+  max-height: 72px;
   overflow: hidden;
-  transition: max-height 300ms ease-in-out;
+  transition: max-height 260ms ease-out;
+}
+
+/* Rises in when it is added, which also makes the card assemble itself when a
+   routine drops six exercises in at once. */
+@keyframes blockIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rowIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .exercise {
+  animation: blockIn 320ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
-  background: var(--secondary);
-  color: var(--text);
-  border-radius: 14px 14px 0px 0px;
-  padding: 16px;
+  background: var(--lime);
+  color: var(--on-lime);
+  border-radius: var(--r-inner) var(--r-inner) 0 0;
+  padding: 14px;
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-direction: column;
-  margin-top: 12px;
-  margin-bottom: 0px;
+  margin-top: 10px;
 }
 
-/* Was `opacity: 0.7`, which multiplied with the 50% on .setAdornment inside it
-   and took the app's highest-value content down to 2.24:1, the worst ratio in
-   the app. The panel is tinted through its own colours now so nothing
-   compounds. */
-.pastExercise {
-  border-radius: 0px 0px 14px 14px;
-  background: var(--secondary);
-  color: var(--text);
-  padding: 16px;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
-}
-.exerciseName {
-  min-height: 44px;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  padding: 8px;
-  margin: -8px;
-  border-radius: 8px;
-  border: none;
-  background: none;
-}
-.exerciseName:hover {
-  background: rgb(from var(--secondaryHover) r g b / 80%);
-}
-.exerciseName > svg {
-  transition: rotate 150ms ease-in-out;
-}
-
-.setContainer {
-  background: var(--white);
-  border-radius: 8px;
-  padding: 2px 8px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  font-weight: bold;
-  font-size: 12px;
-}
-
-.setsContainer {
-  display: flex;
-  flex-direction: row;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-
-/* Was `opacity: 0.5`, which dropped the note placeholder to 3.33:1 at rest. */
-.notesInputContainer {
-}
-
-.notesInputContainer:hover, .notesInputContainer:focus-within{
-  opacity: 1;
-}
-
-.notesInput {
-  min-height: 44px;
-  border: none;
-  padding: 8px;
-  border-radius: 8px;
-  margin-top: 8px;
-  padding-left: 34px;
-  width: 100%;
-  color: var(--text);
-  background: var(--white);
-}
-
-.notesInput:focus {
-  outline: 2px solid var(--text);
-}
-
-.notesInputIcon {
-  margin-top: 6px;
-  margin-right: -28px;
-  padding-left: 4px;
-  z-index: 3;
-  color: var(--textSecondary);
-}
-
-.setInputs {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.setInputWrapper {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-
-.addSetButton {
-  min-height: 44px;
-  background: var(--accentText);
-  color: var(--textInverted);
-  border-radius: 8px;
-  border: none;
-  font-weight: bold;
-  padding: 8px;
-  cursor: pointer;
-  transition: background 150ms ease-in-out;
-}
-
-.addSetButton:hover, .addSetButton:focus {
-  color: var(--textInverted);
-  background: var(--accentHover);
-}
-
-.setInputContainer {
-  display: flex;
-  flex-direction: row;
-  gap: 4px;
-  align-items: center;
-  font-weight: bold;
-}
-
-/* 44px minimum: these are the controls a thumb hits between sets, and they
-   measured 34x34 before. min-width matters as much as min-height, because
-   VariableInput sizes the field to `value.length + 'ch'`, so a single-digit
-   rep count rendered 24px wide. */
-.setInputNumber {
-  min-height: 44px;
-  min-width: 44px;
-  text-align: center;
-  box-sizing: border-box;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  color: var(--text);
-  background: var(--white);
-}
-
-.setInputNumber:focus {
-  outline: 2px solid var(--text);
-}
-
-.deleteSetButton {
-  opacity: 0.8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  background: none;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.deleteSetButton:hover, .deleteSetButton:focus {
-  opacity: 1;
-  color: var(--accent);
-}
-
-/* Wraps rather than overflows. The timer, End workout and the trash button
-   together are wider than the card on a narrow phone, and without this the
-   trash button was painted outside the rounded edge. */
-.endWorkoutContainer {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.timer {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-/* margin-left keeps the buttons on the right edge once they wrap onto a line
-   of their own, where space-between has nothing left to push against. */
-.endWorkoutActions {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
-.timer > span {
-  font-size: 24px;
-  margin-top: 1.5px;
-}
-
-.endWorkoutButton {
-  border: none;
-  background: var(--white);
-  color: var(--accent);
-  /* Two words, one line: shrinking it into "End" over "workout" is what the
-     old overflowing footer did instead of wrapping. */
-  white-space: nowrap;
-  padding: 16px;
-  font-weight: bold;
-  font-size: 24px;
-  border-radius: 14px;
-  transition: background 150ms ease-in-out, border 150ms ease-in-out;
-  border: 2px solid var(--accent);
-  cursor: pointer;
-}
-
-.endWorkoutButton:hover, .endWorkoutButton:focus {
-  color: var(--accent);
-  background: var(--accentHoverLight);
-  border: 2px solid var(--text);
-}
-
-.trashWorkoutButton {
-  border: none;
-  background: var(--warning);
-  color: var(--white);
-  padding: 10px;
-  margin: 1px;
-  margin-right: 0px;
-  margin-left: 4px;
-  border-radius: 14px;
-  border: 2px solid var(--accentHover);
-  transition: background 150ms ease-in-out, border 150ms ease-in-out;
-  cursor: pointer;
-}
-
-.trashWorkoutButton:hover, .trashWorkoutButton:focus {
-  border: 2px solid var(--text);
-  color: var(--white);
-}
-
-.endWorkoutConfirmButton {
-  border: none;
-  background: var(--accent);
-  color: var(--textInverted);
-  padding: 16px;
-  font-weight: bold;
-  font-size: 18px;
-  border-radius: 14px;
-  transition: background 150ms ease-in-out, border 150ms ease-in-out;
-  border: 2px solid var(--accent);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  padding-left: 2px;
-}
-
-.endWorkoutConfirmButton:not(:disabled) {
-  cursor: pointer;
-}
-
-/* Dim only, no background swap. .addButton above can set --secondary when
-   disabled because that is already its base background and it sets no colour.
-   This button sets color: --textInverted, so a --secondary background would
-   put white on light lime in the default theme. */
-.endWorkoutConfirmButton:disabled {
-  opacity: 0.55;
-}
-
-.endWorkoutConfirmButton:not(:disabled):hover,
-.endWorkoutConfirmButton:not(:disabled):focus {
-  color: var(--textInverted);
-  background: var(--accentHover);
-  border: 2px solid var(--text);
-}
-
-/* 68% rather than 50%: this is the "x" and "lbs" sitting between the numbers,
-   and at 50% it failed on every surface it appears on. */
-.setAdornment {
-  color: rgb(from var(--text) r g b / 68%);
-}
-
-.deleteWorkout {
-  border: none;
-  background: var(--accent);
-  color: var(--textInverted);
-  padding: 16px;
-  font-weight: bold;
-  font-size: 18px;
-  border-radius: 14px;
-  transition: background 150ms ease-in-out, border 150ms ease-in-out;
-  border: 2px solid var(--accent);
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-
-  padding-left: 8px;
-  background: var(--warning);
-  border: 2px solid var(--textSecondary);
-}
-
-.deleteWorkout:hover,
-.deleteWorkout:focus {
-  background: var(--warning);
-  color: var(--textInverted);
-  border: 2px solid var(--text);
-}
-
-/* Error text inside the end-workout confirm modal. */
-.modalError {
-  color: var(--warning);
-  font-weight: 600;
-  text-align: left;
-}
-
-/* The exercise header is a row so removing the exercise can be its own named
-   control. It used to be reachable only by tapping the last set's small grey
-   x, which read as "remove a set" and destroyed the whole exercise. */
 .exerciseHeader {
   display: flex;
   align-items: center;
@@ -420,6 +184,31 @@
 .exerciseName {
   flex: 1;
   min-width: 0;
+  min-height: 44px;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px;
+  margin: -6px;
+  border-radius: var(--r-chip);
+  border: none;
+  background: none;
+  color: inherit;
+  text-align: left;
+}
+
+.exerciseName:hover {
+  background: rgb(0 0 0 / 8%);
+}
+
+.exerciseName > svg {
+  transition: rotate 150ms ease-out;
+  flex-shrink: 0;
+  color: rgb(from var(--on-lime) r g b / 60%);
 }
 
 .removeExerciseButton {
@@ -429,184 +218,594 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  margin: -8px -8px -8px 0;
+  margin: -6px -6px -6px 0;
   padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--r-pill);
   background: none;
-  color: var(--text);
+  color: rgb(from var(--on-lime) r g b / 60%);
   cursor: pointer;
-  transition: background 150ms ease-in-out;
+  transition: background 150ms ease, color 150ms ease;
 }
 
 .removeExerciseButton:hover {
-  background: rgb(from var(--secondaryHover) r g b / 80%);
+  background: rgb(0 0 0 / 8%);
+  color: var(--on-lime);
 }
 
-.removeExerciseButton:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: -3px;
+/* What last time left behind, hanging off the bottom of the live block as one
+   continuous part. Holds the sets, the note, or just the note. */
+.pastExercise {
+  border-radius: 0 0 var(--r-inner) var(--r-inner);
+  background: var(--lime);
+  color: rgb(from var(--on-lime) r g b / 72%);
+  padding: 0 14px 14px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Zero-set state. Wider than the inline "Add a set" because it stands alone
-   rather than riding on a set row, and it is the only route back. */
-.addFirstSetButton {
-  align-self: flex-start;
-  background: var(--accent);
-  color: var(--textInverted);
+.pastHeading {
+  font-weight: 600;
+}
+
+/* The note from the last session of this exercise. It is the one thing from
+   last time that does not get re-entered for you, so it is a panel you can read
+   rather than a line of running text, and it sits above today's field rather
+   than below it: it is context for what you are about to write. */
+.pastNote {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border-radius: var(--r-chip);
+  background: rgb(0 0 0 / 8%);
+  color: var(--on-lime);
+}
+
+.pastNoteIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: rgb(from var(--on-lime) r g b / 55%);
+}
+
+.pastNoteBody {
+  min-width: 0;
+}
+
+.pastNoteWhen {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgb(from var(--on-lime) r g b / 62%);
+}
+
+.pastNoteText {
+  display: block;
+  font-size: 14px;
+  line-height: 1.45;
+  /* Notes are free text, so one can be a single unbroken word. */
+  overflow-wrap: anywhere;
+}
+
+/** ---------------------------------------------------------------- the set */
+
+.setInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.setInputWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  animation: rowIn 260ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.setInputContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+  font-weight: 700;
+}
+
+/* The number you drag. A white chip on the tinted block, big enough to hit with
+   a thumb and heavy enough to read at arm's length.
+
+   content-box is load-bearing: VariableInput writes an inline
+   `width: <digits>ch`, so the box has to size its CONTENT to that. Under
+   border-box the padding comes out of it and a three-digit weight renders with
+   one and a half digits visible. */
+.setInputNumber {
+  box-sizing: content-box;
+  min-height: 26px;
+  min-width: 30px;
+  text-align: center;
+  padding: 10px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--r-chip);
   font-family: inherit;
-  font-weight: bold;
-  font-size: 16px;
-  min-height: 44px;
-  padding: 8px 16px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  background: var(--surface);
+  caret-color: var(--brand);
+  box-shadow: 0 1px 3px rgb(25 18 51 / 8%);
+  transition: transform 120ms cubic-bezier(0.2, 0.9, 0.3, 1),
+    box-shadow 120ms ease;
+}
+
+/* Set while a scrub is in flight. The chip lifts under the thumb so the gesture
+   feels like moving a control rather than watching a number change. */
+.setInputNumber[data-dragging] {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgb(25 18 51 / 22%), 0 0 0 3px var(--brand);
+  position: relative;
+  z-index: 2;
+}
+
+.setInputNumber:focus {
+  outline: 3px solid var(--brand);
+  outline-offset: 1px;
+}
+
+/* A set that beat last time. The icon's own mark, in the brand colour against
+   the lime, appearing the moment the number crosses. */
+.beat {
+  display: flex;
+  align-items: center;
+  color: var(--brand-text);
+  animation: beatIn 320ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+@keyframes beatIn {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-40deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* The x and the unit sit on the lime block, not on the card. */
+.setAdornment {
+  color: rgb(from var(--on-lime) r g b / 62%);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.deleteSetButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--r-pill);
+  color: rgb(from var(--on-lime) r g b / 55%);
   cursor: pointer;
-  transition: background 150ms ease-in-out;
+  transition: color 150ms ease, background 150ms ease;
 }
 
-.addFirstSetButton:hover {
-  background: var(--accentHover);
+.deleteSetButton:hover,
+.deleteSetButton:focus {
+  color: var(--warn);
+  background: rgb(0 0 0 / 8%);
 }
 
-.addFirstSetButton:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
+/* Its own row rather than riding on the last set. Sharing that row put two
+   number chips, a unit, a remove button and this side by side, which overflowed
+   the card on a narrow phone. */
+.addSetButton {
+  align-self: stretch;
+  min-height: 44px;
+  margin-top: 2px;
+  padding: 10px 14px;
+  background: rgb(0 0 0 / 7%);
+  color: var(--on-lime);
+  border: none;
+  border-radius: var(--r-chip);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.addSetButton:hover,
+.addSetButton:focus {
+  color: var(--on-lime);
+  background: rgb(0 0 0 / 13%);
+}
+
+/** ------------------------------------------------- read-only set readouts */
+
+.setsContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.setContainer {
+  background: var(--surface);
+  border-radius: var(--r-chip);
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+/** ---------------------------------------------------------------- notes */
+
+/* The icon is positioned out of flow. Laid out in the row it pushed the field
+   4px right of everything else in the block, because it was sized 34px wide and
+   pulled back with a -30px margin: a 4px remainder that put the notes field out
+   of line with "Add a set" and the set rows above it. */
+.notesInputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.notesInput {
+  min-height: 44px;
+  border: none;
+  padding: 10px 12px 10px 40px;
+  border-radius: var(--r-chip);
+  width: 100%;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.notesInput::placeholder {
+  color: var(--ink-mute);
+}
+
+/* Sits over the white field, not the lime block. */
+
+.notesInput:focus {
+  outline: 3px solid var(--brand);
+  outline-offset: -1px;
+}
+
+.notesInputIcon {
+  position: absolute;
+  left: 12px;
+  z-index: 3;
+  color: var(--ink-mute);
+  pointer-events: none;
 }
 
 
-/* Standard focus ring for this app: --text keeps it visible on every palette,
-   where --accent drops to 2.4:1 on green-dark. */
+/** -------------------------------------------------------- add an exercise */
+
+.addButton {
+  background: var(--brand);
+  color: var(--on-brand);
+  border: none;
+  border-radius: 0 var(--r-chip) var(--r-chip) 0;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  width: 68px;
+  flex-shrink: 0;
+  transition: opacity 150ms ease, background 150ms ease;
+}
+
+.addButton:disabled {
+  opacity: 0.4;
+}
+
+.addButton:not(:disabled):hover,
+.addButton:not(:disabled):focus {
+  color: var(--on-brand);
+  cursor: pointer;
+}
+
+.firstTime {
+  background: var(--surface-2);
+  color: var(--ink);
+  border-radius: var(--r-inner);
+  margin-top: 12px;
+  padding: 14px;
+  font-size: 15px;
+}
+
+/** ------------------------------------------------------------- the footer */
+
+.endWorkoutContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* The elapsed clock. The one number on the card that changes without being
+   touched, so it gets the gradient rather than a grey chip. */
+.timer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 8px 14px 8px 12px;
+  border-radius: var(--r-pill);
+  background: var(--field);
+  color: var(--on-brand);
+}
+
+/* A running clock should look like one. Breathes once every two seconds
+   alongside the digits it sits with. */
+.live {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: var(--r-pill);
+  background: var(--lime);
+  animation: breathe 2s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.timer > span {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* margin-left keeps the buttons on the right edge once they wrap onto a line of
+   their own, where space-between has nothing left to push against. */
+.endWorkoutActions {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.endWorkoutButton {
+  border: none;
+  background: var(--lime);
+  color: var(--on-lime);
+  /* Two words, one line: shrinking it into "End" over "workout" is what the old
+     overflowing footer did instead of wrapping. */
+  white-space: nowrap;
+  padding: 12px 20px;
+  min-height: 48px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.endWorkoutButton:hover,
+.endWorkoutButton:focus {
+  color: var(--on-lime);
+  background: var(--lime-deep);
+}
+
+.trashWorkoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  border: none;
+  background: var(--surface-2);
+  color: var(--ink-mute);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.trashWorkoutButton:hover,
+.trashWorkoutButton:focus {
+  color: var(--on-warn);
+  background: var(--warn);
+}
+
+/** ------------------------------------------------------------- dialogs */
+
+.endWorkoutConfirmButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--lime);
+  color: var(--on-lime);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 17px;
+  transition: background 150ms ease;
+}
+
+.endWorkoutConfirmButton:not(:disabled) {
+  cursor: pointer;
+}
+
+.endWorkoutConfirmButton:disabled {
+  opacity: 0.5;
+}
+
+.endWorkoutConfirmButton:not(:disabled):hover,
+.endWorkoutConfirmButton:not(:disabled):focus {
+  color: var(--on-lime);
+  background: var(--lime-deep);
+}
+
+.deleteWorkout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--warn);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 17px;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+/* :hover only, not :focus. Modal moves focus to its first control on open,
+   which is this one, so a fill on focus would open the dialog with the
+   destructive action as its loudest object. */
+.deleteWorkout:hover {
+  background: var(--warn);
+  color: var(--on-warn);
+}
+
+.cancelButton {
+  min-height: 48px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink-mute);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.cancelButton:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.modalError {
+  color: var(--warn);
+  font-weight: 600;
+  font-size: 15px;
+  text-align: left;
+}
+
+.nameField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.nameLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-mute);
+}
+
+.nameInput {
+  font-family: inherit;
+  font-size: 16px;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: var(--r-chip);
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.nameInput::placeholder {
+  color: var(--ink-mute);
+}
+
+.nameTaken {
+  color: var(--warn);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/** Focus rings. --brand holds against both renditions. **/
+.startup:focus-visible,
 .addButton:not(:disabled):focus-visible,
 .exerciseName:focus-visible,
+.removeExerciseButton:focus-visible,
 .deleteSetButton:focus-visible,
 .addSetButton:focus-visible,
 .endWorkoutButton:focus-visible,
 .trashWorkoutButton:focus-visible,
 .endWorkoutConfirmButton:not(:disabled):focus-visible,
 .deleteWorkout:focus-visible,
-.startup:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
-}
-
-/* The start card is the primary action and is now a real button. Buttons are
-   border-box in the UA stylesheet where the old div was content-box, so the
-   original `height: 80px` started clipping the two-line label the moment the
-   element changed; this keeps the same painted height (80 + 36 padding) and
-   lets it grow rather than cut. No width here: .container already sets it, and
-   overriding it stretched the card past every other card on the page. */
-.startup {
-  /* content-box, matching the div this used to be and the .container it shares
-     with the in-workout state. Buttons are border-box in the UA stylesheet, so
-     without this the 18px padding came out of the 80px height and clipped the
-     two-line label, and the painted width stopped matching every other card on
-     the page. */
-  box-sizing: content-box;
-  height: 80px;
-  font-family: inherit;
-  text-align: left;
-  border: none;
-}
-
-/* Both confirm dialogs previously offered only the action that commits or
-   destroys, so the only way to back out was tapping the unlabelled shim. */
-.cancelButton {
-  border: 2px solid var(--text);
-  border-radius: 14px;
-  background: transparent;
-  color: var(--text);
-  font-family: inherit;
-  font-weight: bold;
-  font-size: 18px;
-  min-height: 44px;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: box-shadow 150ms ease-in-out;
-}
-
-.cancelButton:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.cancelButton:focus-visible {
-  outline: 3px solid var(--text);
-  outline-offset: 2px;
-}
-
-.cancelButton:disabled {
-  opacity: 0.55;
-  cursor: default;
-}
-
-/* 4px narrower than the cards below it, matching the phone proportions. */
-@media (min-width: 768px) {
-  .container {
-    width: 556px;
-  }
-}
-
-/* Naming the workout in the end-of-workout confirm. */
-.nameField {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: left;
-}
-
-.nameLabel {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-/* A 1px hairline rather than a 2px rule: the field sits inside a dialog that is
-   already a distinct surface, so a heavy border reads as a second box drawn
-   around it. Emphasis comes from the focus ring. */
-.nameInput {
-  font-family: inherit;
-  font-size: 16px;
-  min-height: 44px;
-  padding: 10px 12px;
-  border: 1px solid rgb(from var(--text) r g b / 28%);
-  border-radius: 12px;
-  background: var(--background);
-  color: var(--text);
-  transition: border-color 150ms ease-in-out;
-}
-
-.nameInput:hover {
-  border-color: rgb(from var(--text) r g b / 45%);
-}
-
+.cancelButton:focus-visible,
 .nameInput:focus-visible {
-  outline: 3px solid var(--text);
+  outline: 3px solid var(--brand);
   outline-offset: 2px;
 }
 
-/* The card's heading, so you can see which routine you are part-way through
-   without opening anything. */
-.activeName {
-  margin: 0 0 12px;
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--textInverted);
-  opacity: 0.85;
-  /* Routine names are free text, so one of them can be a single unbroken word
-     longer than the card. */
-  overflow-wrap: anywhere;
+.exerciseName:focus-visible,
+.removeExerciseButton:focus-visible {
+  outline-offset: -3px;
 }
 
-.modalBody {
-  margin: 0;
-  font-size: 16px;
-  line-height: 1.5;
-  opacity: 0.8;
-}
+/** ---------------------------------------------------------------------------
+    Reduced motion. Last in the file on purpose: these selectors match the same
+    specificity as the ones they switch off, so they have to win on source
+    order.
+    ------------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .exerciseContainer,
+  .setInputNumber,
+  .startup {
+    transition: none;
+  }
 
-/* Shown under the name field when the typed name is already a routine. */
-.nameTaken {
-  color: var(--warning);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.4;
+  .exercise,
+  .setInputWrapper,
+  .beat,
+  .live {
+    animation: none;
+  }
+
+  .setInputNumber[data-dragging] {
+    transform: none;
+  }
 }

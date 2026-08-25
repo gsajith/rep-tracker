@@ -54,16 +54,8 @@ export function Exercise({
         <div className={styles.setsContainer}>
           {[...Array(numSets)].map((_e, i) => (
             <div className={styles.setContainer} key={i}>
-              <span style={{ fontSize: 18 }}>{exercise.reps[i]}</span>
-              <span
-                className={styles.setAdornment}
-                style={{
-                  marginTop: 2,
-                  fontSize: 16,
-                }}
-              >
-                ×
-              </span>
+              <span>{exercise.reps[i]}</span>
+              <span className={styles.setAdornment}>reps</span>
               <Weight
                 lb={exercise.weights[i]}
                 adornmentClassName={styles.setAdornment}
@@ -72,7 +64,7 @@ export function Exercise({
           ))}
           {truncateSets && (
             <div className={styles.setContainer}>
-              <span style={{ fontSize: 18 }}>+ {extraSets} more</span>
+              <span>+{extraSets} more</span>
             </div>
           )}
         </div>
@@ -155,7 +147,6 @@ export default function LoggedWorkout({ data, onLongPress, id, menuLabel }) {
           })}
         </div>
       </div>
-      <br />
       <div className={styles.metadata}>
         <span className={styles.metaLeft}>
           {/* The card gives no other hint that exercises continue past the
@@ -165,14 +156,7 @@ export default function LoggedWorkout({ data, onLongPress, id, menuLabel }) {
           </span>
           {data.notes ? <span>Note: {data.notes}</span> : null}
         </span>
-        <span
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 3,
-            justifyContent: 'flex-end',
-          }}
-        >
+        <span className={styles.metaRight}>
           <span
             className={duration ? styles.minutesLabel : styles.unfinishedLabel}
             title={

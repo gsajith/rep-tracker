@@ -1,6 +1,5 @@
 'use client';
-import ThemeButton from '@/components/themeButton';
-import { useTheme } from '@/context/themeProvider';
+import { APPEARANCE_LABELS, useTheme } from '@/context/themeProvider';
 import styles from './page.module.css';
 import { useEffect, useState } from 'react';
 import { useLoadDelay } from '@/hooks/useLoadDelay';
@@ -10,97 +9,99 @@ import { useWeightUnit } from '@/context/unitProvider';
 import { WEIGHT_UNITS, weightUnitLabel } from '@/utils/units';
 import classNames from 'classnames';
 
-// "blue-orange" reads as "Blue orange" rather than being announced as the
-// slug, or as nothing at all, which is what six unnamed buttons did before.
-const themeLabel = (name) => {
-  const words = name.replace(/-/g, ' ');
-  return words.charAt(0).toUpperCase() + words.slice(1);
-};
+// One control shape for the page: a label on the left, a switch on the right.
+function Switch({ label, options, value, onChange }) {
+  return (
+    <div className={styles.switch} role="group" aria-label={label}>
+      {options.map(({ id, text }) => (
+        <button
+          key={id}
+          type="button"
+          aria-pressed={value === id}
+          onClick={() => onChange(id)}
+          className={classNames(styles.switchButton, {
+            [styles.switchButtonActive]: value === id,
+          })}
+        >
+          {text}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function Settings() {
-  const { themeName, setThemeName, allThemeNames } = useTheme();
+  const { appearance, setAppearance, appearances } = useTheme();
   const { unit, setUnit } = useWeightUnit();
   const router = useRouter();
 
+  // The stored appearance is only readable on the client, so the switch waits
+  // for mount rather than rendering three unselected positions on the server.
   const [mount, setMount] = useState(false);
   const shown = useLoadDelay();
 
   useEffect(() => {
     setMount(true);
   }, []);
+
   return (
     shown && (
-      <div className={styles.container}>
+      <div className={styles.page}>
         <h1 className={styles.pageTitle}>Settings</h1>
-        <div className={styles.themeSelector}>
-          Color style:
-          <div className={styles.themeList}>
-            {mount &&
-              allThemeNames.map((theme) => (
-                <div data-theme={theme} key={theme}>
-                  <ThemeButton
-                    onClick={() => setThemeName(theme)}
-                    active={themeName === theme}
-                    label={themeLabel(theme)}
-                  />
-                </div>
-              ))}
+
+        <section className={styles.container}>
+          <div className={styles.settingRow}>
+            <span className={styles.settingTitle}>Appearance</span>
+            {mount && (
+              <Switch
+                label="Appearance"
+                value={appearance}
+                onChange={setAppearance}
+                options={appearances.map((name) => ({
+                  id: name,
+                  text: APPEARANCE_LABELS[name],
+                }))}
+              />
+            )}
           </div>
-        </div>
-        <div className={styles.unitSelector}>
-          <div>
-            <div className={styles.settingTitle}>Weight unit</div>
-            <p className={styles.settingBody}>
-              Everything already logged was recorded in pounds and gets
-              converted for display. Switching changes what you see, not what
-              you lifted.
-            </p>
+        </section>
+
+        <section className={styles.container}>
+          <div className={styles.settingRow}>
+            <span className={styles.settingTitle}>Weight unit</span>
+            {/* No mount gate, unlike the switch above: useLoadDelay already
+                holds the whole page back to a later tick than the mount effect,
+                so this never renders before the stored choice is readable. */}
+            <Switch
+              label="Weight unit"
+              value={unit}
+              onChange={setUnit}
+              options={WEIGHT_UNITS.map((name) => ({
+                id: name,
+                text: weightUnitLabel(name),
+              }))}
+            />
           </div>
-          {/* No mount gate, unlike the swatches above: useLoadDelay already
-              holds the whole page back to a later tick than the mount effect,
-              so this never renders before the stored choice is readable. */}
-          <div
-            className={styles.unitChoices}
-            role="group"
-            aria-label="Weight unit"
-          >
-            {WEIGHT_UNITS.map((name) => (
-              <button
-                key={name}
-                type="button"
-                aria-pressed={unit === name}
-                onClick={() => setUnit(name)}
-                className={classNames(styles.unitButton, {
-                  [`${styles.unitButtonActive}`]: unit === name,
-                })}
-              >
-                {weightUnitLabel(name)}
-              </button>
-            ))}
+        </section>
+
+        <section className={styles.container}>
+          <div className={styles.settingRow}>
+            <span className={styles.settingTitle}>Guided tour</span>
+            <button
+              type="button"
+              className={styles.replayButton}
+              onClick={() => {
+                // Written straight to storage rather than through
+                // useStickyState: this navigates away in the same tick, and
+                // that hook writes from an effect that may never get to run.
+                writeStickyValue('tourStatus', 'act1', browserStorage());
+                router.push('/');
+              }}
+            >
+              Replay
+            </button>
           </div>
-        </div>
-        <div className={styles.tour}>
-          <div>
-            <div className={styles.settingTitle}>Guided tour</div>
-            <p className={styles.settingBody}>
-              Walks through starting a workout, adding an exercise, and where
-              last time&apos;s numbers turn up.
-            </p>
-          </div>
-          <button
-            type="button"
-            className={styles.replayButton}
-            onClick={() => {
-              // Written straight to storage rather than through
-              // useStickyState: this navigates away in the same tick, and
-              // that hook writes from an effect that may never get to run.
-              writeStickyValue('tourStatus', 'act1', browserStorage());
-              router.push('/');
-            }}
-          >
-            Replay
-          </button>
-        </div>
+        </section>
       </div>
     )
   );

@@ -1,24 +1,27 @@
+/* Butts against the Add button, so its right corners are square. */
 .comboBoxInput {
   border: none;
   display: block;
-  padding: 16px;
-  border-radius: 14px 0px 0px 14px;
-  width: calc(100% - 32px);
-  transition: border-radius 100ms ease-in-out;
-  background: var(--white);
-  color: var(--text);
+  padding: 14px 16px;
+  min-height: 52px;
+  border-radius: var(--r-chip) 0 0 var(--r-chip);
+  width: calc(100% - 68px);
+  font-size: 16px;
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.comboBoxInput::placeholder {
+  color: var(--ink-mute);
 }
 
 .comboBoxInput[data-open] {
-  border-radius: 14px 0px 0px 0px;
+  border-radius: var(--r-chip) 0 0 0;
 }
 
-
-/* Standard focus ring for this app: --text keeps it visible on every palette,
-   where --accent drops to 2.4:1 on green-dark. */
-/* Inset, because the input butts directly against the Add button and an
-   outward ring would sit underneath it. */
+/* Inset, because the field butts against the Add button and an outward ring
+   would sit underneath it. */
 .comboBoxInput:focus-visible {
-  outline: 3px solid var(--text);
+  outline: 3px solid var(--brand);
   outline-offset: -3px;
 }

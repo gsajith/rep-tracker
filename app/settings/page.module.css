@@ -1,87 +1,98 @@
-.themeSelector {
+/* Three cards, one setting each, all the same shape. */
+
+.page {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-top: 8px;
 }
 
-.themeList {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
+.pageTitle {
+  width: var(--card);
+  margin-bottom: 16px;
+  font-size: 30px;
 }
 
 .container {
-  composes: container from "../page.module.css"
+  composes: container from '../page.module.css';
 }
 
-.tour,
-.unitSelector {
+/* Wraps rather than squeezes: "Appearance" plus a three-position switch is
+   wider than the card on a 320px screen, and the switch has a hard minimum
+   because its cells are touch targets. */
+.settingRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-top: 32px;
+  gap: 10px 16px;
 }
 
 .settingTitle {
-  font-weight: bold;
-  font-size: 18px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
 }
 
-/* Same reasoning as .emptyBody in page.module.css: faded --text clears 4.5:1
-   on every theme, --textSecondary does not. */
-.settingBody {
-  margin: 4px 0 0;
+.switch {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  padding: 4px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+}
+
+.switchButton {
+  min-width: 52px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink-mute);
+  font-family: inherit;
   font-size: 15px;
-  line-height: 1.45;
-  opacity: 0.72;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.switchButton:hover {
+  color: var(--ink);
+}
+
+/* Selected owns the field. Declared after .switchButton so it wins on source
+   order. */
+.switchButtonActive,
+.switchButtonActive:hover {
+  background: var(--field);
+  color: var(--on-brand);
 }
 
 .replayButton {
   flex-shrink: 0;
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: bold;
   min-height: 44px;
-  padding: 10px 16px;
-  border-radius: 12px;
-  background: transparent;
-  border: 2px solid var(--text);
-  color: var(--text);
+  padding: 11px 20px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--brand-text);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  transition: box-shadow 150ms ease-in-out;
+  transition: background 150ms ease;
 }
 
 .replayButton:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  background: var(--line);
 }
 
+.switchButton:focus-visible,
 .replayButton:focus-visible {
-  outline: 3px solid var(--text);
+  outline: 3px solid var(--brand);
   outline-offset: 2px;
-}
-
-.unitChoices {
-  display: flex;
-  flex-shrink: 0;
-  gap: 8px;
-}
-
-/* The same pill as Replay, down to the focus ring. Only the width floor is
-   new, so that "kg" and "lbs" come out the same size. */
-.unitButton {
-  composes: replayButton;
-  min-width: 64px;
-}
-
-/* --secondary behind --text, the pair the exercise cards use and the one
-   green-dark's --secondary was darkened to make work, so it clears 4.5:1 on
-   all six palettes. Declared after .replayButton so it wins the background on
-   source order. aria-pressed carries the selection for anything not reading
-   colour. */
-.unitButtonActive {
-  background: var(--secondary);
-}
-
-.pageTitle {
-  margin-bottom: 16px;
 }

@@ -1,21 +1,22 @@
-.bottomBarContainer {
-  background: var(--white);
-  box-shadow: 0px -3px 14px rgb(from var(--accentHoverLight) r g b / 30%);
-  border-top: 1px solid var(--backgroundShim);
+/* Floats above the content rather than sitting on the bottom edge. */
+.dock {
   position: fixed;
-  bottom: 0;
-  width: 100%;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
+  z-index: 20;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding-bottom: 16px;
+  pointer-events: none;
 }
 
-.indicator {
-  background: var(--accent);
-  position: absolute;
-  transition: all 300ms ease-in-out, opacity 300ms 300ms ease-in-out;
-  border-radius: 2px;
-  height: 4px;
-  bottom: 20px;
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  box-shadow: var(--lift), 0 2px 6px rgb(25 18 51 / 6%);
+  pointer-events: auto;
 }

@@ -1,105 +1,113 @@
 @import 'normalize.css';
 @import url('https://use.typekit.net/usl1ngp.css');
 
-:root, [data-theme="purple-green"], [data-theme="default"] {
-  --background: #ECEFF3;
-  --backgroundShim: #ECEFF3AA;
-  --white: #FFFFFF;
-  --text: #1D1226;
-  --textSecondary: #6B6873;
-  --accent: #A462D8;
-  --accentHover: #8553ae;
-  --accentHoverLight: #e2caf5;
-  --secondary: #DBF881;
-  --secondaryHover: #b7d755;
-  --textInverted: #FFFFFF;
-  --warning: #ac2746;
-  --accentText: #7A4AA8;
+/** ============================================================================
+    The palette is taken from the app icon, sampled rather than invented:
+    #536CFD at its top-left corner running to #34145A at its bottom-right, white
+    marks on top, and a long flat diagonal shadow behind them.
+
+    Three moves carry the brand:
+      1. The gradient field. Indigo to aubergine at 135deg, owning whole
+         regions rather than tinting edges. It is the start card, the hero, and
+         the dark surfaces.
+      2. Lime, for the thing to press. Inherited from the old --secondary and
+         confirmed by the reference image, where the violet card holds the
+         content and the lime pill is the action.
+      3. The long shadow and the four-point sparkle, the icon's own devices,
+         used where a number or a mark deserves weight.
+
+    Radii are generous: 24px on cards, 999px on pills.
+    ========================================================================= */
+
+:root {
+  --bg: #f4f3fa;
+  --surface: #ffffff;
+  --surface-2: #f0eef9;
+
+  --ink: #191233;
+  --ink-mute: #625c7d;
+  --line: #e4e1f0;
+
+  /* Sampled from public/icons/icon-512.png. */
+  --brand-from: #536cfd;
+  --brand-to: #34145a;
+  --brand: #4b45c6;
+  --brand-text: #4038b5;
+  --on-brand: #ffffff;
+  --on-brand-mute: rgb(255 255 255 / 72%);
+
+  --lime: #c9f24d;
+  --lime-deep: #b2db3a;
+  --on-lime: #1b2a05;
+
+  --warn: #c62b4e;
+  --on-warn: #ffffff;
+
+  --field: linear-gradient(135deg, var(--brand-from) 0%, var(--brand-to) 100%);
+  --longshadow-c: rgb(0 0 0 / 13%);
+
+  --r-card: 24px;
+  --r-inner: 16px;
+  --r-chip: 12px;
+  --r-pill: 999px;
+
+  --rail-top: 60px;
+  --rail-bottom: 84px;
+
+  --card: min(calc(100vw - 32px), 400px);
+
+  --lift: 0 6px 24px rgb(25 18 51 / 8%);
+  --lift-brand: 0 12px 32px rgb(52 20 90 / 28%);
+
+  --font: 'futura-pt', 'Futura', 'Avenir Next', sans-serif;
+
+  color-scheme: light;
 }
 
-[data-theme="blue-orange"] {
-  --background: #ECEFF3;
-  --backgroundShim: #ECEFF3AA;
-  --white: #FFFFFF;
-  --text: #1D1226;
-  --textSecondary: #6B6873;
-  --accent: #4586ee;
-  --accentHover: #225dbc;
-  --accentHoverLight: #c5d7f4;
-  --secondary: #f8b581;
-  --secondaryHover: #d3884f;
-  --textInverted: #FFFFFF;
-  --warning: #ac2746;
-  --accentText: #225DBC;
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #14102a;
+    --surface: #201a42;
+    --surface-2: #1a1536;
+
+    --ink: #f1effb;
+    --ink-mute: #a49dc4;
+    --line: #322b57;
+
+    --brand-from: #6b7fff;
+    --brand-to: #3e1c77;
+    --brand: #6656e0;
+    --brand-text: #9a8dff;
+
+    --longshadow-c: rgb(0 0 0 / 26%);
+
+    --lift: 0 6px 24px rgb(0 0 0 / 40%);
+    --lift-brand: 0 12px 32px rgb(0 0 0 / 50%);
+
+    color-scheme: dark;
+  }
 }
 
-[data-theme="blue-dark"] {
-  --background: #1a1a1b;
-  --backgroundShim: #1f1f20aa;
-  --white: #000000;
-  --text: #ebebeb;
-  --textSecondary: #979797;
-  --accent: #4586ee;
-  --accentHover: #8cabde;
-  --accentHoverLight: #284b84;
-  --secondary: #1414b3;
-  --secondaryHover: #0f0f73;
-  --textInverted: #000000;
-  --warning: #f488a1;
-  --accentText: #4586ee;
-}
+:root[data-theme='dark'] {
+  --bg: #14102a;
+  --surface: #201a42;
+  --surface-2: #1a1536;
 
-[data-theme="red-dark"] {
-  --background: #1a1a1b;
-  --backgroundShim: #1f1f20aa;
-  --white: #000000;
-  --text: #ebebeb;
-  --textSecondary: #979797;
-  --accent: #ee455c;
-  --accentHover: #de8c8c;
-  --accentHoverLight: #842828;
-  --secondary: #b31434;
-  --secondaryHover: #730f2a;
-  --textInverted: #000000;
-  --warning: #f488a1;
-  --accentText: #ee455c;
-}
+  --ink: #f1effb;
+  --ink-mute: #a49dc4;
+  --line: #322b57;
 
-[data-theme="cosmo-wanda"] {
-  --background: #ECEFF3;
-  --backgroundShim: #ECEFF3AA;
-  --white: #FFFFFF;
-  --text: #1D1226;
-  --textSecondary: #6B6873;
-  --accent: #57f7a7;
-  --accentHover: #22bc60;
-  --accentHoverLight: #c5f4d5;
-  --secondary: #f49fcb;
-  --secondaryHover: #d34fc8;
-  /* Dark, not white: this palette's accent and secondary are both pale, so
-     white text on them measured about 1.4:1 and the start card was
-     effectively unreadable. */
-  --textInverted: #1D1226;
-  --warning: #ac2746;
-  --accentText: #157A42;
-}
+  --brand-from: #6b7fff;
+  --brand-to: #3e1c77;
+  --brand: #6656e0;
+  --brand-text: #9a8dff;
 
-[data-theme="green-dark"] {
-  --background: #19192b;
-  --backgroundShim: #0d0d1aaa;
-  --white: #000000;
-  --text: #ebebeb;
-  --textSecondary: #979797;
-  --accent: #394493;
-  --accentHover: #535da2;
-  --accentHoverLight: #1d2550;
-  /* Darkened from #41af4f: the exercise cards use --secondary behind --text,
-     and the old pair measured 2.36:1, so every set on this theme failed. */
-  --secondary: #1E5C28;
-  --secondaryHover: #164420;
-  --textInverted: #000000;
-  --warning: #d4395d;
-  --accentText: #8B95D9;
+  --longshadow-c: rgb(0 0 0 / 26%);
+
+  --lift: 0 6px 24px rgb(0 0 0 / 40%);
+  --lift-brand: 0 12px 32px rgb(0 0 0 / 50%);
+
+  color-scheme: dark;
 }
 
 * {
@@ -108,126 +116,206 @@
   -webkit-user-select: none;
 }
 
-a {
-  text-decoration: none;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-html, body {
-  background: var(--background);
-  color: var(--text);
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  margin: 0;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding-top: 48px;
   align-items: center;
-  height: calc(100vh - 48px);
-  font-family: "futura-pt", sans-serif;
+  padding-top: var(--rail-top);
+  padding-bottom: var(--rail-bottom);
 }
 
 button {
-  color: var(--text);
+  font-family: inherit;
+  color: var(--ink);
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
 }
 
-button:hover, button:focus {
-  color: var(--text);
+input,
+textarea {
+  font-family: inherit;
 }
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+/* The icon's long diagonal shadow, cast down-right the way it is in the
+   artwork. Reserved for a display numeral or a brand mark on a gradient
+   field; on ordinary text it is noise. */
+.longShadow {
+  text-shadow: 1px 1px 0 var(--longshadow-c), 2px 2px 0 var(--longshadow-c),
+    3px 3px 0 var(--longshadow-c), 4px 4px 0 var(--longshadow-c),
+    5px 5px 0 var(--longshadow-c), 6px 6px 0 var(--longshadow-c),
+    7px 7px 0 var(--longshadow-c), 8px 8px 0 var(--longshadow-c),
+    9px 9px 0 var(--longshadow-c), 10px 10px 0 var(--longshadow-c),
+    11px 11px 0 var(--longshadow-c), 12px 12px 0 var(--longshadow-c),
+    13px 13px 0 var(--longshadow-c), 14px 14px 0 var(--longshadow-c),
+    15px 15px 0 var(--longshadow-c), 16px 16px 0 var(--longshadow-c),
+    17px 17px 0 var(--longshadow-c), 18px 18px 0 var(--longshadow-c),
+    19px 19px 0 var(--longshadow-c), 20px 20px 0 var(--longshadow-c),
+    21px 21px 0 var(--longshadow-c), 22px 22px 0 var(--longshadow-c),
+    23px 23px 0 var(--longshadow-c), 24px 24px 0 var(--longshadow-c),
+    25px 25px 0 var(--longshadow-c), 26px 26px 0 var(--longshadow-c),
+    27px 27px 0 var(--longshadow-c), 28px 28px 0 var(--longshadow-c);
+}
+
+/** Loading placeholders. **/
+.shimmerBG {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border-radius: var(--r-card);
+}
+
+.shimmerBG::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(from var(--surface-2) r g b / 90%),
+    transparent
+  );
+  animation: wipe 1.8s linear infinite;
+}
+
+@keyframes wipe {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmerBG::after {
+    animation: none;
+  }
+}
+
+/** ---------------------------------------------------------------------------
+    The landing surface, stamped server-side from the Clerk session so the
+    document arrives in the right layout mode instead of switching after
+    hydration. The app body is a centred column between two rails; a marketing
+    page is neither.
+    ------------------------------------------------------------------------ */
+
+html[data-surface='landing'],
+html[data-surface='landing'] body {
+  display: block;
+  height: auto;
+  min-height: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+  align-items: initial;
+  overflow-x: clip;
+}
+
+html[data-surface='landing'] :is(p, h1, h2, h3, li, blockquote, figcaption) {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+}
+
+/* Launched from the home screen this is the app, not a place to be sold to. */
+html[data-standalone][data-surface='landing'],
+html[data-standalone][data-surface='landing'] body {
+  display: flex;
+  min-height: 100dvh;
+  padding-top: var(--rail-top);
+  padding-bottom: var(--rail-bottom);
+  align-items: center;
+}
+
+/** ---------------------------------------------------------------------------
+    Third-party components.
+    ------------------------------------------------------------------------ */
 
 .cl-avatarBox {
-  width: 56px;
-  height: 56px;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-pill);
 }
 
-/** Combobox styling **/
+.cl-userButtonTrigger:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* The exercise-name combobox popup. Headless UI renders a bare div, so it is
+   matched on its data attribute. */
 div[data-open] {
-  background: var(--white);
-  width: calc(100% - 119px);
-  max-width: calc(272px) !important;
-  border-radius: 0px 0px 8px 8px;
+  background: var(--surface);
+  width: calc(100% - 84px);
+  max-width: 272px !important;
+  border-radius: 0 0 var(--r-inner) var(--r-inner);
+  box-shadow: var(--lift);
+  overflow: hidden;
 }
 
 div[data-open] > div {
-  padding: 8px 16px;
+  padding: 12px 16px;
   cursor: pointer;
+  font-weight: 500;
 }
 
 div[data-focus] {
-  background: var(--accentHoverLight);
+  background: var(--surface-2);
+  color: var(--brand-text);
 }
 
-/** Hide number input arrows **/
-
-/* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* Firefox */
-input[type=number] {
+input[type='number'] {
   -moz-appearance: textfield;
 }
 
-h2 {
-  margin-top: 0px;
-}
-
-
-/** Shimmer **/
-.shimmerBG {
-    animation-duration: 2.2s;
-    animation-fill-mode: forwards;
-    animation-iteration-count: infinite;
-    animation-name: shimmer;
-    animation-timing-function: linear;
-    background: var(--background);
-    background: linear-gradient(to right, var(--white) 8%, var(--background) 18%, var(--white) 33%);
-    background-size: 1200px 100%;
-  }
-
-@-webkit-keyframes shimmer {
-  0% {
-    background-position: -100% 0;
-  }
-
-  100% {
-    background-position: 100% 0;
-  }
-}
-
-
-@keyframes shimmer {
-  0% {
-    background-position: -1200px 0;
-  }
-
-  100% {
-    background-position: 1200px 0;
-  }
-}
-
-/** ########################################## START react-toggle ####################################### **/
+/** ############################ react-toggle ############################ **/
 
 .react-toggle {
   touch-action: pan-x;
-
   display: inline-block;
   position: relative;
   cursor: pointer;
   background-color: transparent;
   border: 0;
   padding: 0;
-
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
-
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -245,117 +333,52 @@ h2 {
 .react-toggle--disabled {
   cursor: not-allowed;
   opacity: 0.5;
-  -webkit-transition: opacity 0.25s;
-  transition: opacity 0.25s;
 }
 
 .react-toggle-track {
-  width: 50px;
-  height: 24px;
+  width: 52px;
+  height: 30px;
   padding: 0;
-  border-radius: 30px;
-  background-color: rgb(from var(--text) r g b / 30%);
-  -webkit-transition: all 0.2s ease;
-  -moz-transition: all 0.2s ease;
-  transition: all 0.2s ease;
-}
-
-.react-toggle:hover:not(.react-toggle--disabled) .react-toggle-track {
-  background-color: rgb(from var(--text) r g b / 60%);
+  border-radius: var(--r-pill);
+  background-color: var(--line);
+  transition: background-color 180ms ease;
 }
 
 .react-toggle--checked .react-toggle-track {
-  background-color: var(--accent);
+  background-color: var(--brand);
 }
 
-.react-toggle--checked:hover:not(.react-toggle--disabled) .react-toggle-track {
-  background-color: var(--accentHover);
-}
-
-.react-toggle-track-check {
-  position: absolute;
-  width: 14px;
-  height: 10px;
-  top: 0px;
-  bottom: 0px;
-  margin-top: auto;
-  margin-bottom: auto;
-  line-height: 0;
-  left: 8px;
-  opacity: 0;
-  -webkit-transition: opacity 0.25s ease;
-  -moz-transition: opacity 0.25s ease;
-  transition: opacity 0.25s ease;
-}
-
-.react-toggle--checked .react-toggle-track-check {
-  opacity: 1;
-  -webkit-transition: opacity 0.25s ease;
-  -moz-transition: opacity 0.25s ease;
-  transition: opacity 0.25s ease;
-}
-
+.react-toggle-track-check,
 .react-toggle-track-x {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  top: 0px;
-  bottom: 0px;
-  margin-top: auto;
-  margin-bottom: auto;
-  line-height: 0;
-  right: 10px;
-  opacity: 1;
-  -webkit-transition: opacity 0.25s ease;
-  -moz-transition: opacity 0.25s ease;
-  transition: opacity 0.25s ease;
-}
-
-.react-toggle--checked .react-toggle-track-x {
-  opacity: 0;
+  display: none;
 }
 
 .react-toggle-thumb {
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 22px;
-  height: 22px;
-  border: 1px solid var(--text);
-  border-radius: 50%;
-  background-color: var(--textInverted);
-
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: var(--r-pill);
+  background-color: var(--surface);
+  box-shadow: 0 1px 4px rgb(25 18 51 / 28%);
   box-sizing: border-box;
-
-  -webkit-transition: all 0.25s ease;
-  -moz-transition: all 0.25s ease;
-  transition: all 0.25s ease;
+  transition: left 180ms cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
 .react-toggle--checked .react-toggle-thumb {
-  left: 27px;
+  left: 25px;
 }
 
-.react-toggle--focus .react-toggle-thumb {
-  -webkit-box-shadow: 0px 0px 0px 2px var(--secondary);
-  -moz-box-shadow: 0px 0px 0px 2px var(--secondary);
-  box-shadow: 0px 0px 0px 2px var(--secondary);
-}
-
+.react-toggle--focus .react-toggle-thumb,
 .react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb {
--webkit-box-shadow: 0px 0px 0px 2px var(--secondary);
-  -moz-box-shadow: 0px 0px 0px 2px var(--secondary);
-  box-shadow: 0px 0px 0px 2px var(--secondary);
+  box-shadow: 0 0 0 3px var(--brand);
 }
 
-/** ########################################## END react-toggle ####################################### **/
-
-/* Page titles. Each page carries exactly one h1; the app had none, and used h2
-   as the top heading on two of three screens. */
-h1 {
-  margin-top: 0px;
-  font-size: 32px;
+@media (prefers-reduced-motion: reduce) {
+  .react-toggle-thumb,
+  .react-toggle-track {
+    transition: none;
+  }
 }

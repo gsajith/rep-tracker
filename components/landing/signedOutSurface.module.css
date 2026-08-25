@@ -1,0 +1,317 @@
+/* The signed-out surface. The icon's gradient owns the first viewport; the rest
+   of the page is white cards on the light ground, the same parts the app uses. */
+
+.page {
+  --gutter: 20px;
+  --measure: 1120px;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/** ------------------------------------------------------------------ rail */
+
+.rail {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: var(--rail-top);
+  padding: 0 var(--gutter);
+  background: var(--bg);
+}
+
+.wordmark {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.wordmarkCut {
+  color: var(--ink-mute);
+}
+
+/** ------------------------------------------------------------------ hero */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  margin: 0 var(--gutter);
+  /* The top band is the sparkles' own space. Without it they sat on the
+     headline's first line. The inline value matches .feature so the hero's text
+     and the cards' text share a left edge: at 24 against their 22 it was two
+     pixels out, which reads as a mistake where a real difference reads as a
+     decision. */
+  padding: 76px 22px 22px;
+  border-radius: 32px;
+  background: var(--field);
+  color: var(--on-brand);
+  box-shadow: var(--lift-brand);
+}
+
+/* The icon's three sparkles, at the scale the artwork uses them. */
+.sparkles {
+  position: absolute;
+  inset: 0;
+  color: var(--on-brand);
+  pointer-events: none;
+}
+
+.sparkleA {
+  position: absolute;
+  top: 34px;
+  right: 96px;
+  opacity: 0.45;
+}
+
+.sparkleB {
+  position: absolute;
+  top: 8px;
+  right: 40px;
+  opacity: 0.9;
+}
+
+.sparkleC {
+  position: absolute;
+  top: 40px;
+  right: 16px;
+  opacity: 0.6;
+}
+
+.heroCopy {
+  position: relative;
+  z-index: 1;
+}
+
+.heroHeading {
+  font-size: clamp(32px, 9vw, 44px);
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  margin: 0 0 16px;
+  color: var(--on-brand);
+}
+
+.heroBody {
+  font-size: 17px;
+  line-height: 1.45;
+  max-width: 30ch;
+  margin: 0 0 26px;
+  color: var(--on-brand-mute);
+}
+
+.heroNote {
+  display: block;
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-brand-mute);
+}
+
+/** ------------------------------------------------- the card on the fold */
+
+.heroCard {
+  position: relative;
+  z-index: 1;
+  margin-top: 32px;
+  padding: 18px;
+  background: var(--surface);
+  border-radius: var(--r-card);
+  color: var(--ink);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
+}
+
+.cardHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.cardName {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.cardWhen {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-mute);
+  white-space: nowrap;
+}
+
+.setList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.setRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+}
+
+.setIndex {
+  width: 54px;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-mute);
+}
+
+/* The same chip the app uses for a number you can drag. */
+.chip {
+  background: var(--surface-2);
+  border-radius: var(--r-chip);
+  padding: 8px 12px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.times {
+  color: var(--ink-mute);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.unit {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-mute);
+}
+
+/** -------------------------------------------------------------- features */
+
+.features {
+  display: grid;
+  gap: 12px;
+  padding: 40px var(--gutter);
+  max-width: var(--measure);
+  margin-inline: auto;
+}
+
+.feature {
+  padding: 22px;
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--lift);
+}
+
+.featureTitle {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.featureBody {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-mute);
+}
+
+/** ------------------------------------------------------------------ close */
+
+.close {
+  padding: 24px var(--gutter) 56px;
+  max-width: var(--measure);
+  margin-inline: auto;
+}
+
+.closeHeading {
+  font-size: clamp(26px, 7vw, 34px);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px;
+}
+
+.closeBody {
+  margin: 0 0 26px;
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 40ch;
+  color: var(--ink-mute);
+}
+
+/** ----------------------------------------------------------------- footer */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px var(--gutter) 28px;
+  max-width: var(--measure);
+  margin-inline: auto;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-mute);
+}
+
+.footerLink {
+  color: var(--brand-text);
+}
+
+.footerLink:hover {
+  text-decoration: underline;
+}
+
+.footerLink:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/** ------------------------------------------------------------ wider frames */
+
+@media (min-width: 768px) {
+  .page {
+    --gutter: 32px;
+  }
+
+  .hero {
+    padding: 96px 44px 44px;
+  }
+
+  .features {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Two columns: the claim on the left, the card it describes on the right. */
+@media (min-width: 1024px) {
+  .page {
+    --gutter: 40px;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 56px;
+    align-items: center;
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding: 72px 56px;
+  }
+
+  .heroCard {
+    margin-top: 0;
+  }
+
+  /* Between the two columns on a wide frame, where neither the copy nor the
+     card is. */
+  .sparkleA { top: 96px; right: 43%; }
+  .sparkleB { top: 40px; right: 37%; }
+  .sparkleC { top: 108px; right: 33%; }
+}
