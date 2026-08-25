@@ -434,6 +434,11 @@ export default function Workout({
       )}
       {inWorkout ? (
         <div>
+          {/* Across the top of the card, with the full width to wrap into. It
+              used to sit beside the timer in the footer, where a name of any
+              real length squeezed the timer and both buttons into columns a
+              word wide and pushed the trash button outside the card. */}
+          {workoutName && <h2 className={styles.activeName}>{workoutName}</h2>}
           {exercises.length > 0 && (
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable droppableId="droppable">
@@ -846,17 +851,8 @@ export default function Workout({
             <div className={styles.timer}>
               <LetsIconsTimeAtack />
               <span>{workoutTimer}</span>
-              {workoutName && (
-                <span className={styles.activeName}>{workoutName}</span>
-              )}
             </div>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-              }}
-            >
+            <div className={styles.endWorkoutActions}>
               <button
                 onClick={() => {
                   // Drop a message from a previous attempt, the same way the

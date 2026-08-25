@@ -254,11 +254,16 @@
   color: var(--accent);
 }
 
+/* Wraps rather than overflows. The timer, End workout and the trash button
+   together are wider than the card on a narrow phone, and without this the
+   trash button was painted outside the rounded edge. */
 .endWorkoutContainer {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   margin-top: 12px;
 }
 
@@ -267,6 +272,17 @@
   flex-direction: row;
   align-items: center;
   gap: 4px;
+  flex-shrink: 0;
+}
+
+/* margin-left keeps the buttons on the right edge once they wrap onto a line
+   of their own, where space-between has nothing left to push against. */
+.endWorkoutActions {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .timer > span {
@@ -278,6 +294,9 @@
   border: none;
   background: var(--white);
   color: var(--accent);
+  /* Two words, one line: shrinking it into "End" over "workout" is what the
+     old overflowing footer did instead of wrapping. */
+  white-space: nowrap;
   padding: 16px;
   font-weight: bold;
   font-size: 24px;
@@ -564,14 +583,17 @@
   outline-offset: 2px;
 }
 
-/* Shown beside the timer so you can see which routine you are part-way through
+/* The card's heading, so you can see which routine you are part-way through
    without opening anything. */
 .activeName {
-  margin-left: 8px;
-  font-size: 16px;
+  margin: 0 0 12px;
+  font-size: 20px;
   font-weight: bold;
   color: var(--textInverted);
   opacity: 0.85;
+  /* Routine names are free text, so one of them can be a single unbroken word
+     longer than the card. */
+  overflow-wrap: anywhere;
 }
 
 .modalBody {
